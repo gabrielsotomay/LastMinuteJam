@@ -5,6 +5,8 @@ using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
 using Platformer.Model;
 using Platformer.Core;
+using UnityEngine.InputSystem;
+using LastMinuteJam;
 
 namespace Platformer.Mechanics
 {
@@ -37,11 +39,34 @@ namespace Platformer.Mechanics
         bool jump;
         Vector2 move;
         SpriteRenderer spriteRenderer;
+
+        public AttackState attackState = AttackState.None;
+        public Direction direction = Direction.None;
+        public HealthState healthState = HealthState.Normal;
+
         internal Animator animator;
         readonly PlatformerModel model = Simulation.GetModel<PlatformerModel>();
+        internal PlayerInput playerInput;
+        private InputAction basicAttackAction;
+
+        PlayerStats playerStats;
+
+        [SerializeField] GameObject hitboxPrefab;
+        [SerializeField] PlayerAttackTypes playerAttackTypes;
+        List<PlayerAttack> playerAttacks;
+
+        PlayerAttack currentAttack;
+        GameObject attackHitbox;
+        int impactNumber = -1;
+        bool impactFinished = false;
+        PlayerAttack lastAttackTaken;
+        Vector2 impactVector;
+        private Queue<InputAction> actionQueue = new Queue<InputAction>();
 
         public Bounds Bounds => collider2d.bounds;
-
+        ulong id;
+        int attackNumber = 0;
+        float impactVelocity = 0;
         void Awake()
         {
             health = GetComponent<Health>();
@@ -49,12 +74,18 @@ namespace Platformer.Mechanics
             collider2d = GetComponent<Collider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
+            playerInput = GetComponent<PlayerInput>();
+            basicAttackAction = playerInput.actions["BasicAttack"];
+            basicAttackAction.performed += OnBasicAttack;
+            id = (ulong)Random.Range(0,10000);
+            direction = Direction.Right; // TODO: Change so facing left for right character at start?
         }
 
         protected override void Update()
         {
             if (controlEnabled)
             {
+                // TODO: change direction based on movement
                 move.x = Input.GetAxis("Horizontal");
                 if (jumpState == JumpState.Grounded && Input.GetButtonDown("Jump"))
                     jumpState = JumpState.PrepareToJump;
@@ -63,6 +94,7 @@ namespace Platformer.Mechanics
                     stopJump = true;
                     Schedule<PlayerStopJump>().player = this;
                 }
+
             }
             else
             {
@@ -70,6 +102,102 @@ namespace Platformer.Mechanics
             }
             UpdateJumpState();
             base.Update();
+        }
+
+
+        void OnRightAction(InputAction.CallbackContext context)
+        {
+
+        }
+        void OnLeftAction(InputAction.CallbackContext context)
+        {
+
+        }
+
+        void OnJumpAction(InputAction.CallbackContext context)
+        {
+
+        }
+
+
+        void OnBasicAttack(InputAction.CallbackContext context)
+        {
+            if (attackState == AttackState.None)
+            {
+                attackState = AttackState.WindUp;
+                currentAttack = GetBasicAttackType();
+                Schedule<WindupFinished>(currentAttack.windupTime).player = this;
+            }
+        }
+
+        public void OnWindupFinished()
+        {
+            if (attackState == AttackState.WindUp)
+            {
+                attackState = AttackState.Active;
+                Attack(currentAttack);
+                Schedule<ActiveFinished>(currentAttack.activeTime).player = this;
+            }
+        }
+        
+        private void Attack(PlayerAttack attack)
+        {
+            attackHitbox = Instantiate(hitboxPrefab, attack.position, Quaternion.Euler(0,0,attack.rotation), transform);
+            attackHitbox.transform.localScale = new Vector3(attack.hitboxScale.x, attack.hitboxScale.y, attackHitbox.transform.localScale.z);
+            HitboxController hitboxController = attackHitbox.GetComponent<HitboxController>();
+            hitboxController.playerAttack = attack;
+            hitboxController.playerId = id;
+        }
+
+
+        public void OnActiveFinished()
+        {
+            if (attackState == AttackState.Active)
+            {
+                attackState = AttackState.Recovery;
+                EndActiveAttack();
+                Schedule<AttackFinished>(currentAttack.recoverTime).player = this;
+            }
+        }
+
+        private void EndActiveAttack()
+        {
+            if (attackHitbox != null)
+            {
+                Destroy(attackHitbox);
+            }
+        }
+        public void OnRecoveryFinished()
+        {
+            if (attackState == AttackState.Recovery)
+            {
+                attackState = AttackState.None;
+                Schedule<AttackFinished>(currentAttack.recoverTime).player = this;
+            }
+        }
+
+        PlayerAttack GetBasicAttackType()
+        {
+            // TODO: do this properly
+            PlayerAttack attack = playerAttackTypes.basicAttack;
+            switch (direction)
+            {
+                case Direction.Left:
+                    attack.position.x = -attack.position.x;
+                    attack.hitboxScale.x = -attack.hitboxScale.x;
+                    break;
+                case Direction.None:
+                case Direction.Right:
+                    break;
+                case Direction.Up:
+                    attack.position.y = attack.position.x;
+                    attack.rotation = attack.rotation + 90;
+                    break;
+                default:
+                    break;
+            }
+            attack.SetInstanceId(attackNumber++);
+            return attack;
         }
 
         void UpdateJumpState()
@@ -104,18 +232,27 @@ namespace Platformer.Mechanics
 
         protected override void ComputeVelocity()
         {
-            if (jump && IsGrounded)
+            if (healthState == HealthState.Normal)
             {
-                velocity.y = jumpTakeOffSpeed * model.jumpModifier;
-                jump = false;
-            }
-            else if (stopJump)
-            {
-                stopJump = false;
-                if (velocity.y > 0)
+                if (jump && IsGrounded)
                 {
-                    velocity.y = velocity.y * model.jumpDeceleration;
+                    velocity.y = jumpTakeOffSpeed * model.jumpModifier;
+                    jump = false;
                 }
+                else if (stopJump)
+                {
+                    stopJump = false;
+                    if (velocity.y > 0)
+                    {
+                        velocity.y = velocity.y * model.jumpDeceleration;
+                    }
+                }
+            }
+            else if (impactFinished)
+            {
+                impactFinished = false;
+                velocity.y = lastAttackTaken.knockback * impactVector.x * playerStats.knockbackModifier;
+                velocity.x = lastAttackTaken.knockback * impactVector.y * playerStats.knockbackModifier;
             }
 
             if (move.x > 0.01f)
@@ -127,6 +264,54 @@ namespace Platformer.Mechanics
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
 
             targetVelocity = move * maxSpeed;
+        }
+
+        private void OnTriggerEnter2D(Collider2D cldr)
+        {
+            HitboxController hitboxController = cldr.GetComponent<HitboxController>();
+            if (hitboxController != null && healthState == HealthState.Attacking &&
+                    (attackState == AttackState.WindUp || attackState == AttackState.Active) &&
+                    hitboxController.playerAttack.id == currentAttack.id)
+            {
+                impactVector = Vector3.Normalize(transform.position - cldr.transform.position);
+                TakeHit(hitboxController);
+                
+            }
+        }
+        private void TakeHit(HitboxController hitboxController)
+        {
+            healthState = HealthState.Impacted;
+            health.Decrement();
+            attackState = AttackState.None;
+            Schedule<PlayerImpacted>().player = this;
+            ImpactFinished impactFinishedEvent = Schedule<ImpactFinished>(hitboxController.playerAttack.impactTime);
+            impactFinishedEvent.player = this;
+            impactFinishedEvent.impactId = ++impactNumber;
+            lastAttackTaken = hitboxController.playerAttack;
+            controlEnabled = false;
+
+        }
+
+        public void OnImpactFinished(int impactId)
+        {
+            if (impactNumber != impactId)
+            {
+                return;
+            }
+            healthState = HealthState.Disabled;
+            jumpState = JumpState.InFlight;
+            Schedule<PlayerDisable>().player = this;
+            Schedule<DisableFinished>(lastAttackTaken.disableTime).player = this;
+        }
+
+        public void OnDisableFinished()
+        {
+            if (healthState != HealthState.Disabled)
+            {
+                return;
+            }
+            healthState = HealthState.Normal;
+            controlEnabled = true;
         }
 
         public enum JumpState
@@ -145,5 +330,24 @@ namespace Platformer.Mechanics
             Active,
             Recovery
         }   
+
+        public enum HealthState
+        {
+            Normal,
+            Attacking,
+            Impacted,
+            Disabled,
+            Recovering,
+            Dead
+        }
+
+        public enum Direction
+        {
+            Left,
+            Right,
+            Up,
+            Down,
+            None
+        }
     }
 }
