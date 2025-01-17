@@ -137,5 +137,13 @@ namespace Platformer.Mechanics
             InFlight,
             Landed
         }
+
+        public enum AttackState
+        {
+            None, 
+            WindUp,
+            Active,
+            Recovery
+        }   
     }
 }
