@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -33,9 +34,15 @@ public class ComboInput : MonoBehaviour
     [SerializeField] private Sprite greenArrow;
     [SerializeField] private Sprite redArrow;
 
-    [SerializeField] private Transform comboDisplayContainer;
+    [SerializeField] private Transform spawnPosition;
     private List<GameObject> _comboImages = new List<GameObject>();
     private int counter = 0;
+    private float offset = 0;
+    private float scrollSpeed = 100f;
+
+    [SerializeField] private GameObject _comboDestroyAnim;
+
+    [SerializeField] private AudioSource _audioSource;
     void Start()
     {
         Debug.Log("STARTED");
@@ -56,18 +63,28 @@ public class ComboInput : MonoBehaviour
         _left.performed += ctx => ProcessInput("left");
         _down.performed += ctx => ProcessInput("down");
 
-
-
+        //comboDisplayContainer.transform.position = new Vector3(comboDisplayContainer.transform.position.x
+           //                                                    - scrollSpeed * Time.deltaTime, 100, 0);
+           PositionAndScrollComboUI();
     }
 
+    public void PositionAndScrollComboUI()
+    {
+        foreach (var image in _comboImages)
+        {
+            image.transform.localPosition = new Vector3(image.transform.localPosition.x - scrollSpeed * Time.deltaTime, 0, 0);
+        }
+    }
     public void DisplayCombo()
     {
         foreach (var direction in _combo)
         {
             GameObject imageObject = new GameObject(direction + "Image");
             _comboImages.Add(imageObject);
-            imageObject.transform.SetParent(comboDisplayContainer);
+            imageObject.transform.SetParent(spawnPosition);
             imageObject.transform.localScale = Vector3.one;
+            imageObject.transform.localPosition = new Vector3(offset, 0, 0);
+            offset += 89;
             Image image = imageObject.AddComponent<Image>();
             
             image.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -91,10 +108,7 @@ public class ComboInput : MonoBehaviour
                     image.sprite = blueArrow;
                     break;
             }
-            Vector3 currPos = imageObject.transform.position;
-            currPos.y += 0.2f;
-            imageObject.transform.position = new Vector3(currPos.x, currPos.y, currPos.z
-                );
+            
         }
     }
     
@@ -107,23 +121,21 @@ public class ComboInput : MonoBehaviour
                 for (int i = 0; i < _easyDifficultyLength; i++)
                 {
                     _combo.Add(_comboOptions[UnityEngine.Random.Range(0, _comboOptions.Count - 1)]);
-                    
                 }
-
                 break;
+            
             case 2:
                 for (int i = 0; i < _mediumDifficultyLength; i++)
                 {
                     _combo.Add(_comboOptions[UnityEngine.Random.Range(0, _comboOptions.Count - 1)]);
                 }
-
                 break;
+            
             case 3:
                 for (int i = 0; i < _hardDifficultyLength; i++)
                 {
                     _combo.Add(_comboOptions[UnityEngine.Random.Range(0, _comboOptions.Count - 1)]);
                 }
-                
                 break;
         }
         
@@ -132,9 +144,22 @@ public class ComboInput : MonoBehaviour
     public void ProcessInput(String input)
     {
         _currentCombo.Add(input);
-        if (_currentCombo[counter] == _combo[counter])
+        if (_currentCombo[counter] == _combo[counter] && counter < _comboImages.Count)
         {
-            Destroy(_comboImages[counter]);
+            _comboImages[counter].GetComponent<Image>().sprite = greenArrow;
+            
+            GameObject particleObject = Instantiate(
+                _comboDestroyAnim, _comboImages[counter].transform.position, Quaternion.identity);
+            
+            
+            
+            particleObject.transform.SetParent(_comboImages[counter].transform, false);
+            
+            particleObject.transform.localPosition = Vector3.zero;
+            
+            _audioSource.Play();
+            //Destroy(_comboImages[counter]);
+            
             counter++;
         }
         else
@@ -149,4 +174,6 @@ public class ComboInput : MonoBehaviour
             textMesh.text = "You completed the combo!";
         }
     }
+    
+    
 }
