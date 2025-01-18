@@ -43,6 +43,8 @@ public class ComboInput : MonoBehaviour
     [SerializeField] private GameObject _comboDestroyAnim;
 
     [SerializeField] private AudioSource _audioSource;
+
+    public CameraShake cameraShake;
     void Start()
     {
         Debug.Log("STARTED");
@@ -158,7 +160,7 @@ public class ComboInput : MonoBehaviour
             particleObject.transform.localPosition = Vector3.zero;
             
             _audioSource.Play();
-            //Destroy(_comboImages[counter]);
+            StartCoroutine(cameraShake.Shake(1, 10));
             
             counter++;
         }
