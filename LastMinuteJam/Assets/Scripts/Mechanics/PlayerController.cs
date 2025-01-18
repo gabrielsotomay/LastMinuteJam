@@ -46,10 +46,17 @@ namespace Platformer.Mechanics
 
         internal Animator animator;
         readonly PlatformerModel model = Simulation.GetModel<PlatformerModel>();
-        internal PlayerInput playerInput;
+        //internal PlayerInput playerInput;
         private InputAction basicAttackAction;
+        private InputAction moveRightAction;
+        private InputAction moveLeftAction;
+        private InputAction upAction;
+        private InputAction jumpAction;
+        private InputAction heavyAttackAction;
 
         PlayerStats playerStats;
+        //PlayerInputs playerInputs;
+        PlayerInput playerInput;
 
         [SerializeField] GameObject hitboxPrefab;
         [SerializeField] PlayerAttackTypes playerAttackTypes;
@@ -63,10 +70,12 @@ namespace Platformer.Mechanics
         Vector2 impactVector;
         private Queue<InputAction> actionQueue = new Queue<InputAction>();
 
+        public bool isPlayer1 = false;
         public Bounds Bounds => collider2d.bounds;
         ulong id;
         int attackNumber = 0;
         float impactVelocity = 0;
+        private Vector2 movementInput = Vector2.zero;
         void Awake()
         {
             health = GetComponent<Health>();
@@ -74,26 +83,161 @@ namespace Platformer.Mechanics
             collider2d = GetComponent<Collider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
+
+            // Player inputs
+            //playerInputs = new PlayerInputs();
             playerInput = GetComponent<PlayerInput>();
+            if (isPlayer1)
+            {
+                playerInput.SwitchCurrentControlScheme("KeyboardPlayer1");
+            }
+            else
+            {
+                playerInput.SwitchCurrentControlScheme("KeyboardPlayer2");
+
+            }
+            Debug.Log("Awoke player ");
+
             basicAttackAction = playerInput.actions["BasicAttack"];
-            basicAttackAction.performed += OnBasicAttack;
+            basicAttackAction.Enable();
+            heavyAttackAction = playerInput.actions["HeavyAttack"];
+            // TODO : heavyAttackAction.performed += OnHeavyAttack;
+            moveLeftAction = playerInput.actions["MoveLeft"];
+            moveRightAction = playerInput.actions["MoveRight"];
+            upAction = playerInput.actions["LookUp"];
+            jumpAction = playerInput.actions["Jump"];
+            
             id = (ulong)Random.Range(0,10000);
             direction = Direction.Right; // TODO: Change so facing left for right character at start?
         }
+        /*
+        protected override void Start()
+        {
+            base.Start();
+
+        }
+        */
+
+        public void OnMove(InputAction.CallbackContext context)            
+        {
+            movementInput = context.ReadValue<Vector2>();
+            UpdateDirection();
+        }
+
+        private void UpdateDirection()
+        {
+            if (movementInput.x > 0)
+            {
+                if (Mathf.Abs(movementInput.x) > Mathf.Abs(movementInput.y))
+                {
+                    direction = Direction.Right;
+                }
+                else if (movementInput.y > 0)
+                {
+                    direction = Direction.Up;
+                }
+                else if (movementInput.y < 0)
+                {
+                    direction = Direction.Down;
+                }
+            }
+            else if (movementInput.x < 0)
+            {
+                if (Mathf.Abs(movementInput.x) > Mathf.Abs(movementInput.y))
+                {
+                    direction = Direction.Left;
+                }
+                else if (movementInput.y > 0)
+                {
+                    direction = Direction.Up;
+                }
+                else if (movementInput.y < 0)
+                {
+                    direction = Direction.Down;
+                }
+            }            
+            else if (movementInput.y < 0)
+            {
+                direction = Direction.Up;
+
+            }
+            else if (movementInput.y > 0)
+            {
+                direction = Direction.Down;
+            }
+
+        }
+
+        void OnLookRight(InputAction.CallbackContext context)
+        {
+        }
+
+        void OnLookUp(InputAction.CallbackContext context)
+        {
+            direction = Direction.Up;
+        }
+        void OnLookLeft(InputAction.CallbackContext context)
+        {
+            direction = Direction.Left;
+            Debug.Log("Looked left");
+        }
+
+
+
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            Debug.Log("Ran enable");
+            basicAttackAction.performed += OnBasicAttack;
+            moveLeftAction.started += OnLookLeft;
+            moveRightAction.started += OnLookRight;
+            upAction.performed += OnLookUp;
+            jumpAction.performed += OnJump;
+            /*
+            playerInputs.Enable();
+            playerInputs.Basic.BasicAttack.performed += OnBasicAttack;
+            playerInputs.Basic.LookLeft.performed += OnLookLeft;
+            playerInputs.Basic.LookRight.performed += OnLookRight;
+            playerInputs.Basic.LookUp.performed += OnLookUp;
+            playerInputs.Basic.Jump.performed += OnJump;
+            */
+        }
+        protected override void OnDisable() 
+            {
+            base.OnDisable();
+            basicAttackAction.performed -= OnBasicAttack;
+            moveLeftAction.started -= OnLookLeft;
+            moveRightAction.started -= OnLookRight;
+            upAction.performed -= OnLookUp;
+            jumpAction.performed -= OnJump;
+            /*
+            playerInputs.Disable();
+            playerInputs.Basic.BasicAttack.performed -= OnBasicAttack;
+            playerInputs.Basic.LookLeft.performed -= OnLookLeft;
+            playerInputs.Basic.LookRight.performed -= OnLookRight;
+            playerInputs.Basic.LookUp.performed -= OnLookUp;
+            playerInputs.Basic.Jump.performed -= OnJump;
+            */
+        }
+        
+            
 
         protected override void Update()
         {
             if (controlEnabled)
             {
                 // TODO: change direction based on movement
-                move.x = Input.GetAxis("Horizontal");
-                if (jumpState == JumpState.Grounded && Input.GetButtonDown("Jump"))
-                    jumpState = JumpState.PrepareToJump;
-                else if (Input.GetButtonUp("Jump"))
+                if (movementInput.x > 0)
                 {
-                    stopJump = true;
-                    Schedule<PlayerStopJump>().player = this;
+                    move.x = playerStats.moveSpeed;
                 }
+                else if (movementInput.x > 0)
+                {
+                    move.x = -playerStats.moveSpeed;
+                }
+                else
+                    move.x = 0;
 
             }
             else
@@ -105,22 +249,21 @@ namespace Platformer.Mechanics
         }
 
 
-        void OnRightAction(InputAction.CallbackContext context)
+
+        public void OnJump(InputAction.CallbackContext context)
         {
 
-        }
-        void OnLeftAction(InputAction.CallbackContext context)
-        {
-
-        }
-
-        void OnJumpAction(InputAction.CallbackContext context)
-        {
-
+            if (jumpState == JumpState.Grounded && Input.GetButtonDown("Jump"))
+                jumpState = JumpState.PrepareToJump;
+            else if (Input.GetButtonUp("Jump"))
+            {
+                stopJump = true;
+                Schedule<PlayerStopJump>().player = this;
+            }
         }
 
 
-        void OnBasicAttack(InputAction.CallbackContext context)
+        public void OnBasicAttack(InputAction.CallbackContext context)
         {
             if (attackState == AttackState.None)
             {
