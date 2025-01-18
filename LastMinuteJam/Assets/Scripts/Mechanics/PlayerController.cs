@@ -299,13 +299,13 @@ namespace Platformer.Mechanics
 
         public void OnBasicAttack(InputAction.CallbackContext context)
         {
-            if (!controlEnabled)
+            if (!controlEnabled || healthState != HealthState.Normal)
             {
                 return;
             }
             if (attackState == AttackState.None)
             {
-                attackState = AttackState.WindUp;
+                SetAttackState(AttackState.WindUp);
                 currentAttack = GetBasicAttackType();
                 Schedule<WindupFinished>(currentAttack.windupTime).player = this;
             }
@@ -315,7 +315,7 @@ namespace Platformer.Mechanics
         {
             if (attackState == AttackState.WindUp)
             {
-                attackState = AttackState.Active;
+                SetAttackState(AttackState.Active);
                 Attack(currentAttack);
                 Schedule<ActiveFinished>(currentAttack.activeTime).player = this;
             }
@@ -335,14 +335,14 @@ namespace Platformer.Mechanics
         {
             if (attackState == AttackState.Active)
             {
-                attackState = AttackState.Recovery;
+                SetAttackState(AttackState.Recovery);
                 EndActiveAttack();
                 Schedule<AttackFinished>(currentAttack.recoverTime).player = this;
             }
         }
         public void OnAttackFinished()
         {
-            attackState = AttackState.None;
+            SetAttackState(AttackState.None);
         }
         private void EndActiveAttack()
         {
@@ -470,7 +470,6 @@ namespace Platformer.Mechanics
         {
             SetHealthState(HealthState.Impacted);
             health.Decrement();
-            attackState = AttackState.None;
             Schedule<PlayerImpacted>().player = this;
             ImpactFinished impactFinishedEvent = Schedule<ImpactFinished>(hitboxController.playerAttack.impactTime);
             impactFinishedEvent.player = this;
@@ -487,7 +486,6 @@ namespace Platformer.Mechanics
                 return;
             }
             SetHealthState(HealthState.Disabled);
-            jumpState = JumpState.InFlight;
             Schedule<PlayerDisable>().player = this;
             Schedule<DisableFinished>(lastAttackTaken.disableTime).player = this;
         }
@@ -508,11 +506,13 @@ namespace Platformer.Mechanics
                     break;
                 case HealthState.Disabled:
                     animator.SetBool("disabled", isActive);
+                    jumpState = JumpState.InFlight;
                     break;
                 case HealthState.Impacted:
                     animator.SetBool("impacted", isActive);
                     if (isActive)
                     {
+                        SetAttackState(AttackState.None);
                         animator.SetBool("windup", false);
                         animator.SetBool("active", false);
                         animator.SetBool("recover", false);
@@ -529,6 +529,33 @@ namespace Platformer.Mechanics
             }
         }
 
+        private void SetAttackState(AttackState newState)
+        {
+            AnimateAttackState(attackState, false);
+            AnimateAttackState(newState, true);
+            attackState = newState;
+
+        }
+        private void AnimateAttackState(AttackState newState, bool isActive)
+        {
+            switch (newState)
+            {
+                case AttackState.None:
+
+                    break;
+                case AttackState.WindUp:
+                    animator.SetBool("windup", isActive);
+                    break;
+                case AttackState.Active:
+                    animator.SetBool("active", isActive);
+                    break;
+                case AttackState.Recovery:
+                    animator.SetBool("recover", isActive);
+                    break;
+                default:
+                    break;
+            }
+        }
 
         public void OnDisableFinished()
         {
