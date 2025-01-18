@@ -309,7 +309,15 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      JJ_Heavy_Attack_Animation_0: -6240140463681467248
+      JJ_Heavy_Attack_Animation_1: 774509472399925067
+      JJ_Heavy_Attack_Animation_2: -7825974357783442712
+      JJ_Heavy_Attack_Animation_3: -7073032208560347368
+      JJ_Heavy_Attack_Animation_4: 4082214258345594526
+      JJ_Heavy_Attack_Animation_5: -3009948806577492382
+      JJ_Heavy_Attack_Animation_6: -8388383751554178385
+      JJ_Heavy_Attack_Animation_7: -6138052252261362885
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -159,7 +159,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      JJ_Jump-Fall_Animation_0: 8449106778177247815
+      JJ_Jump-Fall_Animation_1: -1670091146902043601
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
