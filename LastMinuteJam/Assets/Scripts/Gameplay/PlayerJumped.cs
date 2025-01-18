@@ -9,12 +9,15 @@ namespace Platformer.Gameplay
     /// <typeparam name="PlayerJumped"></typeparam>
     public class PlayerJumped : Simulation.Event<PlayerJumped>
     {
-        public PlayerController player;
+        public AudioHelper.OneShot oneShotAudio;
 
         public override void Execute()
         {
-            if (player.audioSource && player.jumpAudio)
-                player.audioSource.PlayOneShot(player.jumpAudio);
+            if (oneShotAudio.source && oneShotAudio.clip)
+            {
+                oneShotAudio.source.PlayOneShot(oneShotAudio.clip);
+
+            }
         }
     }
 }

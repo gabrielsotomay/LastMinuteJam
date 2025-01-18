@@ -7,6 +7,7 @@ using Platformer.Model;
 using Platformer.Core;
 using UnityEngine.InputSystem;
 using LastMinuteJam;
+using UnityEngine.Splines;
 
 namespace Platformer.Mechanics
 {
@@ -16,65 +17,104 @@ namespace Platformer.Mechanics
     /// </summary>
     public class PlayerController : KinematicObject
     {
+        // Audio
         public AudioClip jumpAudio;
         public AudioClip respawnAudio;
         public AudioClip ouchAudio;
 
-        /// <summary>
-        /// Max horizontal speed of the player.
-        /// </summary>
-        public float maxSpeed = 7;
-        /// <summary>
-        /// Initial jump velocity at the start of a jump.
-        /// </summary>
-        public float jumpTakeOffSpeed = 7;
+        // Components
+        private Collider2D collider2d;
+        private AudioSource audioSource;
+        private SpriteRenderer spriteRenderer;
+        internal Animator animator;
+        private PlayerInput playerInput;
+        private Bounds bounds;
+
+        // Other local scripts
+        public Health health;
 
         public JumpState jumpState = JumpState.Grounded;
-        private bool stopJump;
-        /*internal new*/ public Collider2D collider2d;
-        /*internal new*/ public AudioSource audioSource;
-        public Health health;
-        public bool controlEnabled = true;
+        public AttackState attackState = AttackState.None;
+        public HealthState healthState = HealthState.Normal;
+        public Direction direction = Direction.None;
 
+        // Variables
+        private bool stopJump;
+        public bool controlEnabled = true;
         bool jump;
         Vector2 move;
-        SpriteRenderer spriteRenderer;
+        private Vector2 movementInput = Vector2.zero;
 
-        public AttackState attackState = AttackState.None;
-        public Direction direction = Direction.None;
-        public HealthState healthState = HealthState.Normal;
 
-        internal Animator animator;
-        readonly PlatformerModel model = Simulation.GetModel<PlatformerModel>();
-        //internal PlayerInput playerInput;
-        private InputAction basicAttackAction;
+        readonly PlatformerModel model = GetModel<PlatformerModel>();
+        
+        // Inputs
         private InputAction moveAction;
-        private InputAction upAction;
         private InputAction jumpAction;
+        private InputAction basicAttackAction;
         private InputAction heavyAttackAction;
 
+        // Data
         [SerializeField] PlayerStats playerStats;
-        //PlayerInputs playerInputs;
-        PlayerInput playerInput;
 
+        // Prefabs
         [SerializeField] GameObject hitboxPrefab;
-        [SerializeField] PlayerAttackTypes playerAttackTypes;
-        List<PlayerAttack> playerAttacks;
 
+        // Attacks
+        [SerializeField] PlayerAttackTypes playerAttackTypes; // TODO: Give this to character on setup
+        List<PlayerAttack> playerAttacks;
         PlayerAttack currentAttack;
         GameObject attackHitbox;
+        int attackNumber = 0;
         int impactNumber = -1;
         bool impactFinished = false;
         PlayerAttack lastAttackTaken;
         Vector2 impactVector;
-        private Queue<InputAction> actionQueue = new Queue<InputAction>();
 
+        // TODO: input queue
+        // private Queue<InputAction> actionQueue = new Queue<InputAction>();
+
+        // Player info
         public bool isPlayer1 = false;
-        public Bounds Bounds => collider2d.bounds;
         ulong id;
-        int attackNumber = 0;
-        float impactVelocity = 0;
-        private Vector2 movementInput = Vector2.zero;
+
+
+
+        public enum JumpState
+        {
+            Grounded,
+            PrepareToJump,
+            Jumping,
+            InFlight,
+            Landed
+        }
+
+        public enum AttackState
+        {
+            None,
+            WindUp,
+            Active,
+            Recovery
+        }
+
+        public enum HealthState
+        {
+            Normal,
+            Impacted,
+            Disabled,
+            Recovering,
+            Dead
+        }
+
+        public enum Direction
+        {
+            Left,
+            Right,
+            Up,
+            Down,
+            None
+        }
+
         void Awake()
         {
             health = GetComponent<Health>();
@@ -82,10 +122,9 @@ namespace Platformer.Mechanics
             collider2d = GetComponent<Collider2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
-
-            // Player inputs
             //playerInputs = new PlayerInputs();
             playerInput = GetComponent<PlayerInput>();
+            bounds = collider2d.bounds;
             /*
             if (isPlayer1)
             {
@@ -98,6 +137,7 @@ namespace Platformer.Mechanics
             }
             */
             Debug.Log("Awoke player ");
+            // Player inputs
 
             basicAttackAction = playerInput.actions["BasicAttack"];
             basicAttackAction.Enable();
@@ -111,19 +151,88 @@ namespace Platformer.Mechanics
             id = (ulong)Random.Range(0,10000);
             direction = Direction.Right; // TODO: Change so facing left for right character at start?
         }
-        /*
-        protected override void Start()
+        
+        
+        protected override void OnEnable()
         {
-            base.Start();
+            base.OnEnable();
+            Debug.Log("Ran enable");
+            basicAttackAction.performed += OnBasicAttack;
+            jumpAction.performed += OnJump;
+            moveAction.performed += OnMove;
 
+            Spawn();
+            /*
+            playerInputs.Enable();
+            playerInputs.Basic.BasicAttack.performed += OnBasicAttack;
+            playerInputs.Basic.LookLeft.performed += OnLookLeft;
+            playerInputs.Basic.LookRight.performed += OnLookRight;
+            playerInputs.Basic.LookUp.performed += OnLookUp;
+            playerInputs.Basic.Jump.performed += OnJump;
+            */
         }
-        */
+        protected override void OnDisable() 
+            {
+            base.OnDisable();
+            basicAttackAction.performed -= OnBasicAttack;
+            jumpAction.performed -= OnJump;
+            moveAction.performed -= OnMove;
+            /*
+            playerInputs.Disable();
+            playerInputs.Basic.BasicAttack.performed -= OnBasicAttack;
+            playerInputs.Basic.LookLeft.performed -= OnLookLeft;
+            playerInputs.Basic.LookRight.performed -= OnLookRight;
+            playerInputs.Basic.LookUp.performed -= OnLookUp;
+            playerInputs.Basic.Jump.performed -= OnJump;
+            */
+        }
 
-        private void OnMove(InputAction.CallbackContext context)            
+        public void Spawn()
+        {
+            collider2d.enabled = true;
+            controlEnabled = false;
+            if (audioSource && respawnAudio)
+                audioSource.PlayOneShot(respawnAudio);
+            health.Increment();
+            Teleport(model.spawnPoint.transform.position);
+            jumpState = PlayerController.JumpState.Grounded;
+            animator.SetBool("dead", false);
+            model.virtualCamera.Follow = transform;
+            model.virtualCamera.LookAt = transform;
+            Simulation.Schedule<EnablePlayerInput>(2f).player = this;
+        }
+
+        protected override void Update()
+        {
+            if (controlEnabled)
+            {
+                // TODO: change direction based on movement
+                if (movementInput.x > 0)
+                {
+                    move.x = playerStats.moveSpeed;
+                }
+                else if (movementInput.x < 0)
+                {
+                    move.x = -playerStats.moveSpeed;
+                }
+                else
+                    move.x = 0;
+
+            }
+            else
+            {
+                move.x = 0;
+            }
+            UpdateJumpState();
+            base.Update();
+        }
+
+        private void OnMove(InputAction.CallbackContext context)
         {
             movementInput = context.ReadValue<Vector2>();
             UpdateDirection();
         }
+
 
         private void UpdateDirection()
         {
@@ -156,11 +265,10 @@ namespace Platformer.Mechanics
                 {
                     direction = Direction.Down;
                 }
-            }            
+            }
             else if (movementInput.y < 0)
             {
                 direction = Direction.Up;
-
             }
             else if (movementInput.y > 0)
             {
@@ -168,69 +276,6 @@ namespace Platformer.Mechanics
             }
 
         }
-
-
-
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            Debug.Log("Ran enable");
-            basicAttackAction.performed += OnBasicAttack;
-            jumpAction.performed += OnJump;
-            moveAction.performed += OnMove;
-            /*
-            playerInputs.Enable();
-            playerInputs.Basic.BasicAttack.performed += OnBasicAttack;
-            playerInputs.Basic.LookLeft.performed += OnLookLeft;
-            playerInputs.Basic.LookRight.performed += OnLookRight;
-            playerInputs.Basic.LookUp.performed += OnLookUp;
-            playerInputs.Basic.Jump.performed += OnJump;
-            */
-        }
-        protected override void OnDisable() 
-            {
-            base.OnDisable();
-            basicAttackAction.performed -= OnBasicAttack;
-            jumpAction.performed -= OnJump;
-            moveAction.performed -= OnMove;
-            /*
-            playerInputs.Disable();
-            playerInputs.Basic.BasicAttack.performed -= OnBasicAttack;
-            playerInputs.Basic.LookLeft.performed -= OnLookLeft;
-            playerInputs.Basic.LookRight.performed -= OnLookRight;
-            playerInputs.Basic.LookUp.performed -= OnLookUp;
-            playerInputs.Basic.Jump.performed -= OnJump;
-            */
-        }
-        
-            
-
-        protected override void Update()
-        {
-            if (controlEnabled)
-            {
-                // TODO: change direction based on movement
-                if (movementInput.x > 0)
-                {
-                    move.x = playerStats.moveSpeed;
-                }
-                else if (movementInput.x < 0)
-                {
-                    move.x = -playerStats.moveSpeed;
-                }
-                else
-                    move.x = 0;
-
-            }
-            else
-            {
-                move.x = 0;
-            }
-            UpdateJumpState();
-            base.Update();
-        }
-
 
 
         private void OnJump(InputAction.CallbackContext context)
@@ -352,7 +397,7 @@ namespace Platformer.Mechanics
                 case JumpState.Jumping:
                     if (!IsGrounded)
                     {
-                        Schedule<PlayerJumped>().player = this;
+                        Schedule<PlayerJumped>().oneShotAudio = new AudioHelper.OneShot(audioSource, jumpAudio);
                         jumpState = JumpState.InFlight;
                     }
                     break;
@@ -375,7 +420,7 @@ namespace Platformer.Mechanics
             {
                 if (jump && IsGrounded)
                 {
-                    velocity.y = jumpTakeOffSpeed * model.jumpModifier;
+                    velocity.y = playerStats.jumpSpeed * model.jumpModifier;
                     jump = false;
                 }
                 else if (stopJump)
@@ -404,15 +449,15 @@ namespace Platformer.Mechanics
             }
 
             animator.SetBool("grounded", IsGrounded);
-            animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);
+            animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / playerStats.maxSpeed);
 
-            targetVelocity = move * maxSpeed;
+            targetVelocity = move * playerStats.maxSpeed;
         }
 
         private void OnTriggerEnter2D(Collider2D cldr)
         {
             HitboxController hitboxController = cldr.GetComponent<HitboxController>();
-            if (hitboxController != null && healthState == HealthState.Attacking &&
+            if (hitboxController != null && 
                     (attackState == AttackState.WindUp || attackState == AttackState.Active) &&
                     hitboxController.playerAttack.id == currentAttack.id)
             {
@@ -423,7 +468,7 @@ namespace Platformer.Mechanics
         }
         private void TakeHit(HitboxController hitboxController)
         {
-            healthState = HealthState.Impacted;
+            SetHealthState(HealthState.Impacted);
             health.Decrement();
             attackState = AttackState.None;
             Schedule<PlayerImpacted>().player = this;
@@ -441,11 +486,49 @@ namespace Platformer.Mechanics
             {
                 return;
             }
-            healthState = HealthState.Disabled;
+            SetHealthState(HealthState.Disabled);
             jumpState = JumpState.InFlight;
             Schedule<PlayerDisable>().player = this;
             Schedule<DisableFinished>(lastAttackTaken.disableTime).player = this;
         }
+
+        private void SetHealthState(HealthState newState)
+        {
+            AnimateHealthState(healthState, false);
+            AnimateHealthState(newState, true);
+            healthState = newState;
+
+        }
+        private void AnimateHealthState(HealthState newState, bool isActive)
+        {
+            switch (newState)
+            {
+                case HealthState.Normal:
+                    
+                    break;
+                case HealthState.Disabled:
+                    animator.SetBool("disabled", isActive);
+                    break;
+                case HealthState.Impacted:
+                    animator.SetBool("impacted", isActive);
+                    if (isActive)
+                    {
+                        animator.SetBool("windup", false);
+                        animator.SetBool("active", false);
+                        animator.SetBool("recover", false);
+                    }
+                    break;
+                case HealthState.Recovering:
+                    animator.SetBool("reenable", isActive);
+                    break;
+                case HealthState.Dead:
+                    animator.SetBool("dead", isActive);
+                    break;
+                default:
+                    break;
+            }
+        }
+
 
         public void OnDisableFinished()
         {
@@ -453,44 +536,34 @@ namespace Platformer.Mechanics
             {
                 return;
             }
-            healthState = HealthState.Normal;
+            SetHealthState(HealthState.Normal);
             controlEnabled = true;
         }
 
-        public enum JumpState
+        
+
+        public void OnDeath()
         {
-            Grounded,
-            PrepareToJump,
-            Jumping,
-            InFlight,
-            Landed
+            if (health.IsAlive)
+            {
+                health.Die();
+
+                model.virtualCamera.Follow = null;
+                model.virtualCamera.LookAt = null;
+                // player.collider.enabled = false;
+                controlEnabled = false;
+
+                if (audioSource && ouchAudio)
+                {
+                    audioSource.PlayOneShot(ouchAudio);
+                }
+                animator.SetTrigger("hurt");
+                animator.SetBool("dead", true);
+                Simulation.Schedule<PlayerSpawn>(2);
+            }
         }
 
-        public enum AttackState
-        {
-            None, 
-            WindUp,
-            Active,
-            Recovery
-        }   
 
-        public enum HealthState
-        {
-            Normal,
-            Attacking,
-            Impacted,
-            Disabled,
-            Recovering,
-            Dead
-        }
 
-        public enum Direction
-        {
-            Left,
-            Right,
-            Up,
-            Down,
-            None
-        }
     }
 }
