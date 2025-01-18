@@ -48,13 +48,12 @@ namespace Platformer.Mechanics
         readonly PlatformerModel model = Simulation.GetModel<PlatformerModel>();
         //internal PlayerInput playerInput;
         private InputAction basicAttackAction;
-        private InputAction moveRightAction;
-        private InputAction moveLeftAction;
+        private InputAction moveAction;
         private InputAction upAction;
         private InputAction jumpAction;
         private InputAction heavyAttackAction;
 
-        PlayerStats playerStats;
+        [SerializeField] PlayerStats playerStats;
         //PlayerInputs playerInputs;
         PlayerInput playerInput;
 
@@ -87,6 +86,7 @@ namespace Platformer.Mechanics
             // Player inputs
             //playerInputs = new PlayerInputs();
             playerInput = GetComponent<PlayerInput>();
+            /*
             if (isPlayer1)
             {
                 playerInput.SwitchCurrentControlScheme("KeyboardPlayer1");
@@ -96,17 +96,18 @@ namespace Platformer.Mechanics
                 playerInput.SwitchCurrentControlScheme("KeyboardPlayer2");
 
             }
+            */
             Debug.Log("Awoke player ");
 
             basicAttackAction = playerInput.actions["BasicAttack"];
             basicAttackAction.Enable();
             heavyAttackAction = playerInput.actions["HeavyAttack"];
             // TODO : heavyAttackAction.performed += OnHeavyAttack;
-            moveLeftAction = playerInput.actions["MoveLeft"];
-            moveRightAction = playerInput.actions["MoveRight"];
-            upAction = playerInput.actions["LookUp"];
             jumpAction = playerInput.actions["Jump"];
-            
+            jumpAction.Enable();
+            moveAction = playerInput.actions["Movement"];
+            moveAction.Enable();
+
             id = (ulong)Random.Range(0,10000);
             direction = Direction.Right; // TODO: Change so facing left for right character at start?
         }
@@ -118,7 +119,7 @@ namespace Platformer.Mechanics
         }
         */
 
-        public void OnMove(InputAction.CallbackContext context)            
+        private void OnMove(InputAction.CallbackContext context)            
         {
             movementInput = context.ReadValue<Vector2>();
             UpdateDirection();
@@ -168,20 +169,6 @@ namespace Platformer.Mechanics
 
         }
 
-        void OnLookRight(InputAction.CallbackContext context)
-        {
-        }
-
-        void OnLookUp(InputAction.CallbackContext context)
-        {
-            direction = Direction.Up;
-        }
-        void OnLookLeft(InputAction.CallbackContext context)
-        {
-            direction = Direction.Left;
-            Debug.Log("Looked left");
-        }
-
 
 
 
@@ -190,10 +177,8 @@ namespace Platformer.Mechanics
             base.OnEnable();
             Debug.Log("Ran enable");
             basicAttackAction.performed += OnBasicAttack;
-            moveLeftAction.started += OnLookLeft;
-            moveRightAction.started += OnLookRight;
-            upAction.performed += OnLookUp;
             jumpAction.performed += OnJump;
+            moveAction.performed += OnMove;
             /*
             playerInputs.Enable();
             playerInputs.Basic.BasicAttack.performed += OnBasicAttack;
@@ -207,10 +192,8 @@ namespace Platformer.Mechanics
             {
             base.OnDisable();
             basicAttackAction.performed -= OnBasicAttack;
-            moveLeftAction.started -= OnLookLeft;
-            moveRightAction.started -= OnLookRight;
-            upAction.performed -= OnLookUp;
             jumpAction.performed -= OnJump;
+            moveAction.performed -= OnMove;
             /*
             playerInputs.Disable();
             playerInputs.Basic.BasicAttack.performed -= OnBasicAttack;
@@ -232,7 +215,7 @@ namespace Platformer.Mechanics
                 {
                     move.x = playerStats.moveSpeed;
                 }
-                else if (movementInput.x > 0)
+                else if (movementInput.x < 0)
                 {
                     move.x = -playerStats.moveSpeed;
                 }
@@ -250,12 +233,18 @@ namespace Platformer.Mechanics
 
 
 
-        public void OnJump(InputAction.CallbackContext context)
+        private void OnJump(InputAction.CallbackContext context)
         {
 
-            if (jumpState == JumpState.Grounded && Input.GetButtonDown("Jump"))
+            if (!controlEnabled)
+            {
+                return;
+            }
+            if (jumpState == JumpState.Grounded && context.action.triggered)
+            {
                 jumpState = JumpState.PrepareToJump;
-            else if (Input.GetButtonUp("Jump"))
+            }
+            else if (!context.action.triggered)
             {
                 stopJump = true;
                 Schedule<PlayerStopJump>().player = this;
@@ -265,6 +254,10 @@ namespace Platformer.Mechanics
 
         public void OnBasicAttack(InputAction.CallbackContext context)
         {
+            if (!controlEnabled)
+            {
+                return;
+            }
             if (attackState == AttackState.None)
             {
                 attackState = AttackState.WindUp;
@@ -285,7 +278,7 @@ namespace Platformer.Mechanics
         
         private void Attack(PlayerAttack attack)
         {
-            attackHitbox = Instantiate(hitboxPrefab, attack.position, Quaternion.Euler(0,0,attack.rotation), transform);
+            attackHitbox = Instantiate(hitboxPrefab, transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0,0,attack.rotation), transform);
             attackHitbox.transform.localScale = new Vector3(attack.hitboxScale.x, attack.hitboxScale.y, attackHitbox.transform.localScale.z);
             HitboxController hitboxController = attackHitbox.GetComponent<HitboxController>();
             hitboxController.playerAttack = attack;
@@ -302,7 +295,10 @@ namespace Platformer.Mechanics
                 Schedule<AttackFinished>(currentAttack.recoverTime).player = this;
             }
         }
-
+        public void OnAttackFinished()
+        {
+            attackState = AttackState.None;
+        }
         private void EndActiveAttack()
         {
             if (attackHitbox != null)
@@ -398,10 +394,14 @@ namespace Platformer.Mechanics
                 velocity.x = lastAttackTaken.knockback * impactVector.y * playerStats.knockbackModifier;
             }
 
-            if (move.x > 0.01f)
+            if (direction == Direction.Right)
+            {
                 spriteRenderer.flipX = false;
-            else if (move.x < -0.01f)
+            }
+            else if (direction == Direction.Left)
+            {
                 spriteRenderer.flipX = true;
+            }
 
             animator.SetBool("grounded", IsGrounded);
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / maxSpeed);

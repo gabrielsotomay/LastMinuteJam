@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: ExamplePlayerStats
   m_EditorClassIdentifier: 
   knockbackModifier: 1
+  moveSpeed: 1

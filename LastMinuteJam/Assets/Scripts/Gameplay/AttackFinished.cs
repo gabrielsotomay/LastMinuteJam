@@ -8,6 +8,7 @@ public class AttackFinished : Simulation.Event<AttackFinished>
 
     public override void Execute()
     {
+        player.OnAttackFinished();
 
         // TODO : Animate finish attack (return to normal)
     }
