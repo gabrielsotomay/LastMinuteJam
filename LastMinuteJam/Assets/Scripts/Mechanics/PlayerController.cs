@@ -8,6 +8,7 @@ using Platformer.Core;
 using UnityEngine.InputSystem;
 using LastMinuteJam;
 using UnityEngine.Splines;
+using System.Net;
 
 namespace Platformer.Mechanics
 {
@@ -70,6 +71,11 @@ namespace Platformer.Mechanics
         bool impactFinished = false;
         PlayerAttack lastAttackTaken;
         Vector2 impactVector;
+        List<int> impactList = new List<int>();
+
+        // Attack animations
+        [SerializeField] List<AnimationClip> attackAnimations = new List<AnimationClip>();
+        [SerializeField] List<Sprite> hitboxSprites = new List<Sprite>();
 
         // TODO: input queue
         // private Queue<InputAction> actionQueue = new Queue<InputAction>();
@@ -78,6 +84,7 @@ namespace Platformer.Mechanics
         public bool isPlayer1 = false;
         ulong id;
 
+        Vector3 spawnPosition;
 
 
         public enum JumpState
@@ -115,6 +122,11 @@ namespace Platformer.Mechanics
             None
         }
 
+
+        void Setup()
+        {
+            // TODO : Setup all player data
+        }
         void Awake()
         {
             health = GetComponent<Health>();
@@ -124,6 +136,7 @@ namespace Platformer.Mechanics
             animator = GetComponent<Animator>();
             //playerInputs = new PlayerInputs();
             playerInput = GetComponent<PlayerInput>();
+            spawnPosition = transform.position;
             bounds = collider2d.bounds;
             /*
             if (isPlayer1)
@@ -138,14 +151,19 @@ namespace Platformer.Mechanics
             */
             Debug.Log("Awoke player ");
             // Player inputs
-
+            basicAttackAction = InputSystem.actions["BasicAttack"];
+            heavyAttackAction = InputSystem.actions["HeavyAttack"];
+            jumpAction = InputSystem.actions["Jump"];
+            moveAction = InputSystem.actions["Movement"];
+            /*
             basicAttackAction = playerInput.actions["BasicAttack"];
-            basicAttackAction.Enable();
             heavyAttackAction = playerInput.actions["HeavyAttack"];
-            // TODO : heavyAttackAction.performed += OnHeavyAttack;
             jumpAction = playerInput.actions["Jump"];
-            jumpAction.Enable();
             moveAction = playerInput.actions["Movement"];
+            */
+            basicAttackAction.Enable();
+            heavyAttackAction.Enable();
+            jumpAction.Enable();
             moveAction.Enable();
 
             id = (ulong)Random.Range(0,10000);
@@ -158,6 +176,7 @@ namespace Platformer.Mechanics
             base.OnEnable();
             Debug.Log("Ran enable");
             basicAttackAction.performed += OnBasicAttack;
+            heavyAttackAction.performed += OnHeavyAttack;
             jumpAction.performed += OnJump;
             moveAction.performed += OnMove;
 
@@ -175,6 +194,7 @@ namespace Platformer.Mechanics
             {
             base.OnDisable();
             basicAttackAction.performed -= OnBasicAttack;
+            heavyAttackAction.performed -= OnHeavyAttack;
             jumpAction.performed -= OnJump;
             moveAction.performed -= OnMove;
             /*
@@ -194,12 +214,14 @@ namespace Platformer.Mechanics
             if (audioSource && respawnAudio)
                 audioSource.PlayOneShot(respawnAudio);
             health.Increment();
-            Teleport(model.spawnPoint.transform.position);
-            jumpState = PlayerController.JumpState.Grounded;
+            //Teleport(model.spawnPoint.transform.position);
+            
+            
+            jumpState = JumpState.Grounded;
             animator.SetBool("dead", false);
             model.virtualCamera.Follow = transform;
             model.virtualCamera.LookAt = transform;
-            Simulation.Schedule<EnablePlayerInput>(2f).player = this;
+            Schedule<EnablePlayerInput>(2f).player = this;
         }
 
         protected override void Update()
@@ -304,13 +326,67 @@ namespace Platformer.Mechanics
                 return;
             }
             if (attackState == AttackState.None)
-            {
+            { 
                 SetAttackState(AttackState.WindUp);
+                UpdateAttackAnimations(0);
                 currentAttack = GetBasicAttackType();
                 Schedule<WindupFinished>(currentAttack.windupTime).player = this;
             }
         }
 
+
+        public void OnHeavyAttack(InputAction.CallbackContext context)
+        {
+            if (!controlEnabled || healthState != HealthState.Normal)
+            {
+                return;
+            }
+            if (attackState == AttackState.None)
+            {
+                SetAttackState(AttackState.WindUp);
+                currentAttack = GetHeavyAttackType();
+                UpdateAttackAnimations(1);
+                Schedule<WindupFinished>(currentAttack.windupTime).player = this;
+            }
+        }
+
+
+        private void UpdateAttackAnimations(int id)
+        {
+            AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+            if (id == 0)
+            {
+                animatorOverrideController[attackAnimations[0]] = attackAnimations[0];
+                animatorOverrideController[attackAnimations[1]] = attackAnimations[1];
+                animatorOverrideController[attackAnimations[2]] = attackAnimations[2];
+                animatorOverrideController[attackAnimations[3]] = attackAnimations[0];
+                animatorOverrideController[attackAnimations[4]] = attackAnimations[1];
+                animatorOverrideController[attackAnimations[5]] = attackAnimations[2];
+
+            }
+            else if (id == 1)
+            {
+                animatorOverrideController[attackAnimations[0]] = attackAnimations[3];
+                animatorOverrideController[attackAnimations[1]] = attackAnimations[4];
+                animatorOverrideController[attackAnimations[2]] = attackAnimations[5];
+                animatorOverrideController[attackAnimations[3]] = attackAnimations[3];
+                animatorOverrideController[attackAnimations[4]] = attackAnimations[4];
+                animatorOverrideController[attackAnimations[5]] = attackAnimations[5];
+            }
+            animator.runtimeAnimatorController = animatorOverrideController;
+        }
+
+
+        private void SetAttackAnimations(int id)
+        {
+            if (id == 1)
+            {
+                AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+                animator.runtimeAnimatorController = animatorOverrideController;
+            }
+
+
+        }
         public void OnWindupFinished()
         {
             if (attackState == AttackState.WindUp)
@@ -323,11 +399,20 @@ namespace Platformer.Mechanics
         
         private void Attack(PlayerAttack attack)
         {
-            attackHitbox = Instantiate(hitboxPrefab, transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0,0,attack.rotation), transform);
+            if (attack.type == PlayerAttack.Type.Projectile)
+            {
+                attackHitbox = Instantiate(hitboxPrefab, transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation));
+            }
+            else
+            {
+                attackHitbox = Instantiate(hitboxPrefab, transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), transform);
+            }
+            attackHitbox.GetComponent<SpriteRenderer>().sprite = hitboxSprites[attack.id];
             attackHitbox.transform.localScale = new Vector3(attack.hitboxScale.x, attack.hitboxScale.y, attackHitbox.transform.localScale.z);
             HitboxController hitboxController = attackHitbox.GetComponent<HitboxController>();
             hitboxController.playerAttack = attack;
             hitboxController.playerId = id;
+            hitboxController.Fire();
         }
 
 
@@ -346,16 +431,13 @@ namespace Platformer.Mechanics
         }
         private void EndActiveAttack()
         {
-            if (attackHitbox != null)
-            {
-                Destroy(attackHitbox);
-            }
+            attackHitbox = null;
         }
         public void OnRecoveryFinished()
         {
             if (attackState == AttackState.Recovery)
             {
-                attackState = AttackState.None;
+                SetAttackState(AttackState.None);
                 Schedule<AttackFinished>(currentAttack.recoverTime).player = this;
             }
         }
@@ -364,25 +446,45 @@ namespace Platformer.Mechanics
         {
             // TODO: do this properly
             PlayerAttack attack = playerAttackTypes.basicAttack;
+            attack = SetAttackDirection(attack);
+            attack.SetInstanceId(attackNumber++);
+            return attack;
+        }
+
+        PlayerAttack GetHeavyAttackType()
+        {
+            // TODO: do this properly
+            PlayerAttack attack = playerAttackTypes.heavyAttack;
+            attack = SetAttackDirection(attack);
+            attack.SetInstanceId(attackNumber++);
+            return attack;
+        }
+
+
+        private PlayerAttack SetAttackDirection(PlayerAttack attack)
+        {
             switch (direction)
             {
                 case Direction.Left:
                     attack.position.x = -attack.position.x;
                     attack.hitboxScale.x = -attack.hitboxScale.x;
+                    attack.velocity.x = -attack.velocity.x;
                     break;
                 case Direction.None:
                 case Direction.Right:
                     break;
                 case Direction.Up:
                     attack.position.y = attack.position.x;
+                    attack.velocity.y = attack.velocity.x;
+                    attack.velocity.x = 0;
                     attack.rotation = attack.rotation + 90;
                     break;
                 default:
                     break;
             }
-            attack.SetInstanceId(attackNumber++);
             return attack;
         }
+
 
         void UpdateJumpState()
         {
@@ -439,14 +541,18 @@ namespace Platformer.Mechanics
                 velocity.x = lastAttackTaken.knockback * impactVector.y * playerStats.knockbackModifier;
             }
 
-            if (direction == Direction.Right)
+            if (attackState == AttackState.None)
             {
-                spriteRenderer.flipX = false;
+                if (direction == Direction.Right)
+                {
+                    spriteRenderer.flipX = false;
+                }
+                else if (direction == Direction.Left)
+                {
+                    spriteRenderer.flipX = true;
+                }
             }
-            else if (direction == Direction.Left)
-            {
-                spriteRenderer.flipX = true;
-            }
+            
 
             animator.SetBool("grounded", IsGrounded);
             animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / playerStats.maxSpeed);
@@ -457,17 +563,42 @@ namespace Platformer.Mechanics
         private void OnTriggerEnter2D(Collider2D cldr)
         {
             HitboxController hitboxController = cldr.GetComponent<HitboxController>();
-            if (hitboxController != null && 
-                    (attackState == AttackState.WindUp || attackState == AttackState.Active) &&
-                    hitboxController.playerAttack.id == currentAttack.id)
+
+            // Check parry
+            if (hitboxController == null)
             {
+                return;
+            }
+            if (CheckParry(hitboxController))
+            {
+                // TODO: Don't get hit and do cool effect
+            }
+            else if (hitboxController.playerId != id && !impactList.Contains(hitboxController.GetInstanceID()))
+            { 
                 impactVector = Vector3.Normalize(transform.position - cldr.transform.position);
                 TakeHit(hitboxController);
-                
+                hitboxController.HitEnemy();
             }
+
         }
+
+        private bool CheckParry(HitboxController hitboxController)
+        {
+            return false;
+            // TODO : Fix this to make super cool parry combos
+            if (
+                (attackState == AttackState.WindUp || attackState == AttackState.Active) &&
+                hitboxController.playerAttack.id != currentAttack.id) 
+            {
+                return true;
+            }
+            return false;
+        }
+
+
         private void TakeHit(HitboxController hitboxController)
         {
+            impactList.Add(hitboxController.GetInstanceID());
             SetHealthState(HealthState.Impacted);
             health.Decrement();
             Schedule<PlayerImpacted>().player = this;
@@ -531,6 +662,10 @@ namespace Platformer.Mechanics
 
         private void SetAttackState(AttackState newState)
         {
+            if(newState == AttackState.WindUp)
+            {
+
+            }
             AnimateAttackState(attackState, false);
             AnimateAttackState(newState, true);
             attackState = newState;

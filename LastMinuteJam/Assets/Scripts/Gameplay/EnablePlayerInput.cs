@@ -9,7 +9,7 @@ namespace Platformer.Gameplay
     /// </summary>
     public class EnablePlayerInput : Simulation.Event<EnablePlayerInput>
     {
-        public PlayerController player = Simulation.GetModel<PlayerController>();
+        public PlayerController player;
 
         public override void Execute()
         {

@@ -12,10 +12,15 @@ namespace LastMinuteJam
         [SerializeField] public float windupTime;
         [SerializeField] public float activeTime;
         [SerializeField] public float recoverTime;
+        [SerializeField] public float lifeTime;
         [SerializeField] public float baseAttack;
         [SerializeField] public float knockback;
         [SerializeField] public float impactTime;
         [SerializeField] public float disableTime;
+        [SerializeField] public Type type;
+        [SerializeField] public Vector2 recoil;
+        [SerializeField] public Vector2 velocity;
+
         int _instanceId;
 
         public void SetInstanceId(int instanceId)
@@ -30,5 +35,14 @@ namespace LastMinuteJam
             None
 
         }
+        public enum Type
+        {
+            None,
+            Projectile,
+            Melee,
+            Special
+        }
+
+        
     }
 }

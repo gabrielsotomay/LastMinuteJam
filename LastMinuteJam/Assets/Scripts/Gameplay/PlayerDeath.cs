@@ -13,8 +13,7 @@ namespace Platformer.Gameplay
     /// <typeparam name="PlayerDeath"></typeparam>
     public class PlayerDeath : Simulation.Event<PlayerDeath>
     {
-        PlayerController player = Simulation.GetModel<PlayerController>();
-
+        public PlayerController player;
         public override void Execute()
         {
             player.OnDeath();

@@ -209,7 +209,11 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      JJ_Run_Animation_0: 1560784379865200367
+      JJ_Run_Animation_1: 2495424778789975145
+      JJ_Run_Animation_2: 6937399401747718605
+      JJ_Run_Animation_3: 2527862257840747888
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
