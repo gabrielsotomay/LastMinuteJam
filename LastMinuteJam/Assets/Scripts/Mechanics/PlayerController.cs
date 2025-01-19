@@ -238,8 +238,9 @@ namespace Platformer.Mechanics
                     move.x = -playerStats.moveSpeed;
                 }
                 else
+                {
                     move.x = 0;
-
+                }
             }
             else
             {
