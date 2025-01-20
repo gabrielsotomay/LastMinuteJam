@@ -712,7 +712,7 @@ namespace Platformer.Mechanics
 
                 model.virtualCamera.Follow = null;
                 model.virtualCamera.LookAt = null;
-                // player.collider.enabled = false;
+                
                 controlEnabled = false;
 
                 if (audioSource && ouchAudio)
