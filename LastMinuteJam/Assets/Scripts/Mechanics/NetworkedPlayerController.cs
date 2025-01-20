@@ -57,6 +57,7 @@ namespace Platformer.Mechanics
 
         // Prefabs
         [SerializeField] GameObject hitboxPrefab;
+        [SerializeField] List<GameObject> hitboxes;
 
         // Attacks
         [SerializeField] PlayerAttackTypes playerAttackTypes; // TODO: Give this to character on setup
