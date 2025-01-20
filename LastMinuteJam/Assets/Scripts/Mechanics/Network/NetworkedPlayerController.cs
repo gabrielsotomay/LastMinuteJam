@@ -57,7 +57,8 @@ namespace Platformer.Mechanics
 
         // Prefabs
         [SerializeField] GameObject hitboxPrefab;
-        [SerializeField] List<GameObject> hitboxes;
+        [SerializeField] List<NetworkAttackController> attacks;
+        List<int> activeAttacks = new List<int>(); // list of attacks in "attacks" array that are active
 
         // Attacks
         [SerializeField] PlayerAttackTypes playerAttackTypes; // TODO: Give this to character on setup
@@ -70,6 +71,9 @@ namespace Platformer.Mechanics
         PlayerAttack lastAttackTaken;
         Vector2 impactVector;
         List<int> impactList = new List<int>();
+
+        // Networked things?!
+
 
         // Attack animations
         [SerializeField] List<AnimationClip> attackAnimations = new List<AnimationClip>();
@@ -131,12 +135,16 @@ namespace Platformer.Mechanics
         {
             health = GetComponent<Health>();
             collider2d = GetComponent<Collider2D>();
+            
         }
-
 
         public override void NetworkStart()
         {
-            
+            int attackId = 0;
+            foreach (NetworkAttackController attack in attacks)
+            {
+                attack.Init(this, attackId++);
+            }
             spawnPosition = transform.position;
             bounds = collider2d.bounds;
 
@@ -172,7 +180,6 @@ namespace Platformer.Mechanics
                 {
                     OnJump(false);
                 }
-
 
                 // Applies movement
 
@@ -368,18 +375,19 @@ namespace Platformer.Mechanics
         {
             if (attack.type == PlayerAttack.Type.Projectile)
             {
-                attackHitbox = Instantiate(hitboxPrefab, transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation));
+                //attackHitbox = Instantiate(hitboxPrefab, );
             }
             else
             {
-                attackHitbox = Instantiate(hitboxPrefab, transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), transform);
+                //attackHitbox = Instantiate(hitboxPrefab, transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), transform);
             }
             attackHitbox.GetComponent<SpriteRenderer>().sprite = hitboxSprites[attack.id];
             attackHitbox.transform.localScale = new Vector3(attack.hitboxScale.x, attack.hitboxScale.y, attackHitbox.transform.localScale.z);
-            HitboxController hitboxController = attackHitbox.GetComponent<HitboxController>();
-            hitboxController.playerAttack = attack;
-            hitboxController.playerId = id;
-            hitboxController.Fire();
+            // TODO: Select the correct attack
+
+
+            //hitboxController.playerAttack = attack;
+            //hitboxController.Fire(transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), attack);
         }
 
 

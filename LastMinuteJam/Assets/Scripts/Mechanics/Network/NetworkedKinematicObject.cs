@@ -35,7 +35,6 @@ namespace Platformer.Mechanics
         protected Vector2 targetVelocity;
         protected Vector2 groundNormal;
         protected Rigidbody2D body;
-        protected NetworkRigidbody2D netBody;
         protected ContactFilter2D contactFilter;
         protected RaycastHit2D[] hitBuffer = new RaycastHit2D[16];
 
@@ -76,7 +75,6 @@ namespace Platformer.Mechanics
         protected virtual void OnEnable()
         {
             body = GetComponent<Rigidbody2D>();
-            //netBody = GetComponent<NetworkRigidbody2D> ();
             body.bodyType = RigidbodyType2D.Kinematic;
         }
 
@@ -105,7 +103,7 @@ namespace Platformer.Mechanics
             //if already falling, fall faster than the jump speed, otherwise use normal gravity.
             if (velocity.y < 0)
                 velocity += gravityModifier * Physics2D.gravity * Time.fixedDeltaTime;
-            else
+            else if (gravityModifier > 0)
                 velocity += Physics2D.gravity * Time.fixedDeltaTime;
 
             velocity.x = targetVelocity.x;
