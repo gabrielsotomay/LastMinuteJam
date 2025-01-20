@@ -1,0 +1,20 @@
+using Platformer.Core;
+using Platformer.Mechanics;
+using Platformer.Model;
+
+namespace Platformer.Gameplay
+{
+    /// <summary>
+    /// Fired when the player is spawned after dying.
+    /// </summary>
+    public class PlayerSpawnN : Simulation.Event<PlayerSpawnN>
+    {
+        public NetworkedPlayerController player;
+
+        public override void Execute()
+        {
+            player.Spawn();
+                
+        }
+    }
+}

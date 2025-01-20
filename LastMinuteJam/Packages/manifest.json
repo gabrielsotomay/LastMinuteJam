@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.karrar.netick": "https://github.com/NetickNetworking/NetickForUnity.git",
     "com.unity.cinemachine": "3.1.0",
     "com.unity.collab-proxy": "2.6.0",
     "com.unity.connect.share": "4.2.3",

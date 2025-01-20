@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.karrar.netick": {
+      "version": "https://github.com/NetickNetworking/NetickForUnity.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.mono-cecil": "1.11.4"
+      },
+      "hash": "a7849bb23b8e3e70bdc2e5d8509ab40b5160a444"
+    },
     "com.unity.2d.animation": {
       "version": "10.1.4",
       "depth": 1,
@@ -236,7 +245,7 @@
     },
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.4",
-      "depth": 3,
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
