@@ -1,6 +1,6 @@
 using Platformer.Core;
 using Platformer.Mechanics;
-using static Platformer.Core.Simulation;
+using static Platformer.Core.SimulationNetick;
 
 namespace Platformer.Gameplay
 {
@@ -9,13 +9,14 @@ namespace Platformer.Gameplay
     /// PlayerDeath event.
     /// </summary>
     /// <typeparam name="HealthIsZero"></typeparam>
-    public class HealthIsZeroN : Simulation.Event<HealthIsZeroN>
+    public class HealthIsZeroN : SimulationNetick.Event<HealthIsZeroN>
     {
         public Health health;
+        public float time;
 
         public override void Execute()
         {
-            Schedule<PlayerDeathN>();
+            Schedule<PlayerDeathN>(time);
         }
     }
 }

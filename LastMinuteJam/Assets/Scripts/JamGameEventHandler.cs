@@ -1,0 +1,133 @@
+using UnityEngine;
+using Netick;
+using Netick.Unity;
+using System.Collections.Generic;
+using Platformer.Mechanics;
+using UnityEngine.InputSystem;
+
+namespace Platformer
+{
+
+    public class JamGameEventHandler : NetworkBehaviour
+    {
+        public List<NetworkedPlayerController> Players = new(4);
+        public List<NetworkedPlayerController> AlivePlayers = new(4);
+
+        private GameObject _playerPrefab;
+
+        private Vector3[] _spawnPositions = new Vector3[4] { new Vector3(11, 9, 0), new Vector3(11, 1, 0), new Vector3(1, 9, 0), new Vector3(1, 1, 0) };
+        private Queue<Vector3> _freePositions = new(4);
+
+
+
+
+
+        public override void NetworkStart()
+        {
+            /*
+            basicAttackAction.performed += OnLightAttack;
+            heavyAttackAction.performed += OnHeavyAttack;
+            jumpAction.performed += OnJump;
+            moveAction.performed += OnMove;
+            */
+
+            _playerPrefab = Sandbox.GetPrefab("NetworkedPlayerPrefab");
+
+            Sandbox.Events.OnConnectRequest += OnConnectRequest;
+            Sandbox.Events.OnPlayerConnected += OnPlayerConnected;
+            Sandbox.Events.OnPlayerDisconnected += OnPlayerDisconnected;
+
+            // TODO: Make this for the powerups or something Sandbox.InitializePool(Sandbox.GetPrefab("Bomb"), 5);
+            Sandbox.InitializePool(_playerPrefab, 4);
+
+            for (int i = 0; i < 4; i++)
+            {
+                _freePositions.Enqueue(_spawnPositions[i]);
+            }
+            base.NetworkStart();
+
+            if (IsServer)
+                RestartGame();
+        }
+
+        public void OnConnectRequest(NetworkSandbox sandbox, NetworkConnectionRequest request)
+        {
+            if (Sandbox.ConnectedPlayers.Count >= 4)
+                request.Refuse();
+        }
+        // This is called on the server when a playerObj has connected.
+        public void OnPlayerConnected(NetworkSandbox sandbox, NetworkPlayer player)
+        {
+            var playerObj = sandbox.NetworkInstantiate(_playerPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
+            player.PlayerObject = playerObj.gameObject;
+            AlivePlayers.Add(playerObj);
+            Players.Add(playerObj);
+            //SetPlayerInputsRpc();
+            Debug.Log("Ran a thing and count is " + Sandbox.ConnectedPlayers.Count);
+            foreach (NetworkPlayer networkPlayer in Sandbox.ConnectedPlayers)
+            {
+                ((GameObject)networkPlayer.PlayerObject).GetComponent<NetworkedPlayerController>().InputSource = networkPlayer;
+            }
+        }
+        /*
+        [Rpc(target:RpcPeers.Everyone)]
+        private void SetPlayerInputsRpc()
+        {
+            Find
+            Sandbox.FindObjectOfType<NetworkedPlayerController>()
+            Debug.Log("Ran a thing and count is " + Sandbox.ConnectedPlayers.Count);
+            foreach (NetworkPlayer networkPlayer in Sandbox.ConnectedPlayers)
+            {
+                ((GameObject)networkPlayer.PlayerObject).GetComponent<NetworkedPlayerController>().InputSource = networkPlayer;
+            }
+        }
+        
+        */
+        // This is called on the server when a client has disconnected.
+        public void OnPlayerDisconnected(NetworkSandbox sandbox, Netick.NetworkPlayer player, TransportDisconnectReason reason)
+        {
+            _freePositions.Enqueue(((GameObject)player.PlayerObject).GetComponent<NetworkedPlayerController>().spawnPosition);
+            Players.Remove(((GameObject)player.PlayerObject).GetComponent<NetworkedPlayerController>());
+        }
+
+
+
+
+        public void RestartGame()
+        {
+            
+
+            // reset players.
+            foreach (var player in Players)
+                player.Respawn();
+        }
+
+        public void KillPlayer(NetworkedPlayerController fighter)
+        {
+            AlivePlayers.Remove(fighter);
+
+            if (AlivePlayers.Count == 1)
+            {
+                // TODO : Give player points/take away lives or whatever
+                RestartGame();
+            }
+
+            else if (AlivePlayers.Count < 1)
+                RestartGame();
+        }
+        public void RespawnPlayer(NetworkedPlayerController fighter)
+        {
+            if (!AlivePlayers.Contains(fighter))
+                AlivePlayers.Add(fighter);
+        }
+
+
+        public override void NetworkFixedUpdate()
+        {
+            base.NetworkFixedUpdate();
+            NetworkedGameController.Instance.TickSimulation();
+        }
+
+
+    }
+}

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Platformer.Gameplay;
-using static Platformer.Core.Simulation;
+using static Platformer.Core.SimulationNetick;
 using Platformer.Model;
 using Platformer.Core;
 using UnityEngine.InputSystem;
@@ -9,6 +9,7 @@ using LastMinuteJam;
 using Netick;
 using Unity.VisualScripting;
 using System;
+using UnityEngine.Windows;
 
 namespace Platformer.Mechanics
 {
@@ -48,7 +49,7 @@ namespace Platformer.Mechanics
 
 
         readonly PlatformerModel model = GetModel<PlatformerModel>();
-        
+
 
         // Data
         [SerializeField] PlayerStats playerStats;
@@ -86,6 +87,13 @@ namespace Platformer.Mechanics
 
         public Vector3 spawnPosition;
 
+        [Networked]
+        public FighterInput MyInput
+        {
+            get; set;
+        }
+
+        NetworkBool inputAvailabile = false;
 
         public enum JumpState
         {
@@ -163,8 +171,35 @@ namespace Platformer.Mechanics
 
 
         public override void NetworkFixedUpdate()
-        {           
-            if (FetchInput(out FighterInput input))
+        {
+            FighterInput input = new FighterInput();
+            if (FetchInput(out FighterInput frameInput))
+            {
+                input = frameInput;
+                if (IsServer)
+                {
+                    Debug.Log("Got and sent Input");
+                    SetInputRpc(input);
+                }
+                inputAvailabile = true;
+            }
+            else if(InputSource == null && inputAvailabile)
+            {
+                Debug.Log("Used external Input");
+                input = MyInput;
+            } 
+            else if (InputSource != null)
+            {
+                ResetInputRpc();
+                Debug.Log("Reset Input");
+                MyInput = new FighterInput();
+                inputAvailabile = false;
+            }
+
+
+
+
+            if (inputAvailabile)
             {
                 movementInput = input.movement;
 
@@ -213,11 +248,29 @@ namespace Platformer.Mechanics
             }
 
             UpdateJumpState();
-
+            CheckTickActions();
             base.NetworkFixedUpdate();
 
         }
 
+        public void CheckTickActions()
+        {
+
+        }
+        [Rpc(target: RpcPeers.Everyone)]
+        public void SetInputRpc(FighterInput input)        
+        {
+            Debug.Log("Set input from server");
+            MyInput = input;
+            inputAvailabile = true;
+        }
+        [Rpc(target:  RpcPeers.Everyone)]
+        public void ResetInputRpc()
+        {
+            Debug.Log("Reset input from server");
+            MyInput = new FighterInput();
+            inputAvailabile = false;
+        }
 
         public void Respawn()
         {
@@ -246,7 +299,7 @@ namespace Platformer.Mechanics
             animator.SetBool("dead", false);
             model.virtualCamera.Follow = transform;
             model.virtualCamera.LookAt = transform;
-            Schedule<EnablePlayerInputN>(2f).player = this;
+            Schedule<EnablePlayerInputN>(Sandbox.NetworkTime, 2f).player = this;
         }
 
 
@@ -310,7 +363,7 @@ namespace Platformer.Mechanics
             else if (!jumped)
             {
                 stopJump = true;
-                Schedule<PlayerStopJumpN>().player = this;
+                Schedule<PlayerStopJumpN>(Sandbox.NetworkTime).player = this;
             }
         }
 
@@ -326,7 +379,7 @@ namespace Platformer.Mechanics
                 SetAttackState(AttackState.WindUp);
                 UpdateAttackAnimations((int)type);
                 currentAttack = GetAttackType(type);
-                Schedule<WindupFinishedN>(currentAttack.windupTime).player = this;
+                Schedule<WindupFinishedN>(Sandbox.NetworkTime, currentAttack.windupTime).player = this;
             }
         }
 
@@ -366,7 +419,7 @@ namespace Platformer.Mechanics
             {
                 SetAttackState(AttackState.Active);
                 Attack(currentAttack);
-                Schedule<ActiveFinishedN>(currentAttack.activeTime).player = this;
+                Schedule<ActiveFinishedN>(Sandbox.NetworkTime, currentAttack.activeTime).player = this;
             }
         }
         
@@ -419,7 +472,7 @@ namespace Platformer.Mechanics
             {
                 SetAttackState(AttackState.Recovery);
                 EndActiveAttack();
-                Schedule<AttackFinishedN>(currentAttack.recoverTime).player = this;
+                Schedule<AttackFinishedN>(Sandbox.NetworkTime, currentAttack.recoverTime).player = this;
             }
         }
         public void OnAttackFinished()
@@ -435,7 +488,7 @@ namespace Platformer.Mechanics
             if (attackState == AttackState.Recovery)
             {
                 SetAttackState(AttackState.None);
-                Schedule<AttackFinishedN>(currentAttack.recoverTime).player = this;
+                Schedule<AttackFinishedN>(Sandbox.NetworkTime, currentAttack.recoverTime).player = this;
             }
         }
 
@@ -503,14 +556,14 @@ namespace Platformer.Mechanics
                 case JumpState.Jumping:
                     if (!IsGrounded)
                     {
-                        Schedule<PlayerJumpedN>().oneShotAudio = new AudioHelper.OneShot(audioSource, jumpAudio);
+                        Schedule<PlayerJumpedN>(Sandbox.NetworkTime).oneShotAudio = new AudioHelper.OneShot(audioSource, jumpAudio);
                         jumpState = JumpState.InFlight;
                     }
                     break;
                 case JumpState.InFlight:
                     if (IsGrounded)
                     {
-                        Schedule<PlayerLandedN>().player = this;
+                        Schedule<PlayerLandedN>(Sandbox.NetworkTime).player = this;
                         jumpState = JumpState.Landed;
                     }
                     break;
@@ -568,33 +621,33 @@ namespace Platformer.Mechanics
 
         private void OnTriggerEnter2D(Collider2D cldr)
         {
-            HitboxController hitboxController = cldr.GetComponent<HitboxController>();
+            NetworkAttackController attackController = cldr.GetComponent<NetworkAttackController>();
 
             // Check parry
-            if (hitboxController == null)
+            if (attackController == null)
             {
                 return;
             }
-            if (CheckParry(hitboxController))
+            if (CheckParry(attackController))
             {
                 // TODO: Don't get hit and do cool effect
             }
-            else if (hitboxController.playerId != id && !impactList.Contains(hitboxController.GetInstanceID()))
+            else if (attackController.playerId != id && !impactList.Contains(attackController.GetInstanceID()))
             { 
                 impactVector = Vector3.Normalize(transform.position - cldr.transform.position);
-                TakeHit(hitboxController);
-                hitboxController.HitEnemy();
+                TakeHit(attackController);
+                attackController.HitEnemy();
             }
 
         }
 
-        private bool CheckParry(HitboxController hitboxController)
+        private bool CheckParry(NetworkAttackController attackController)
         {
             return false;
             // TODO : Fix this to make super cool parry combos
             if (
                 (attackState == AttackState.WindUp || attackState == AttackState.Active) &&
-                hitboxController.playerAttack.id != currentAttack.id) 
+                attackController.playerAttack.id != currentAttack.id) 
             {
                 return true;
             }
@@ -602,16 +655,16 @@ namespace Platformer.Mechanics
         }
 
 
-        private void TakeHit(HitboxController hitboxController)
+        private void TakeHit(NetworkAttackController attackController)
         {
-            impactList.Add(hitboxController.GetInstanceID());
+            impactList.Add(attackController.GetInstanceID());
             SetHealthState(HealthState.Impacted);
             health.Decrement();
-            Schedule<PlayerImpactedN>().player = this;
-            ImpactFinishedN impactFinishedEvent = Schedule<ImpactFinishedN>(hitboxController.playerAttack.impactTime);
+            Schedule<PlayerImpactedN>(Sandbox.NetworkTime).player = this;
+            ImpactFinishedN impactFinishedEvent = Schedule<ImpactFinishedN>(Sandbox.NetworkTime, attackController.playerAttack.impactTime);
             impactFinishedEvent.player = this;
             impactFinishedEvent.impactId = ++impactNumber;
-            lastAttackTaken = hitboxController.playerAttack;
+            lastAttackTaken = attackController.playerAttack;
             controlEnabled = false;
 
         }
@@ -623,8 +676,8 @@ namespace Platformer.Mechanics
                 return;
             }
             SetHealthState(HealthState.Disabled);
-            Schedule<PlayerDisableN>().player = this;
-            Schedule<DisableFinishedN>(lastAttackTaken.disableTime).player = this;
+            Schedule<PlayerDisableN>(Sandbox.NetworkTime).player = this;
+            Schedule<DisableFinishedN>(Sandbox.NetworkTime,lastAttackTaken.disableTime).player = this;
         }
 
         private void SetHealthState(HealthState newState)
@@ -727,7 +780,7 @@ namespace Platformer.Mechanics
                 }
                 animator.SetTrigger("hurt");
                 animator.SetBool("dead", true);
-                Schedule<PlayerSpawn>(2);
+                Schedule<PlayerSpawnN>(Sandbox.NetworkTime,2);
             }
         }
 

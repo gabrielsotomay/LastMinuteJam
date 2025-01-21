@@ -2,7 +2,7 @@ using Platformer.Core;
 using Platformer.Mechanics;
 using UnityEngine;
 
-public class DisableFinishedN : Simulation.Event<DisableFinishedN>
+public class DisableFinishedN : SimulationNetick.Event<DisableFinishedN>
 {
     public NetworkedPlayerController player;
 

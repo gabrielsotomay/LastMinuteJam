@@ -2,7 +2,7 @@ using Platformer.Core;
 using Platformer.Mechanics;
 using UnityEngine;
 
-public class ImpactFinishedN : Simulation.Event<ImpactFinishedN>
+public class ImpactFinishedN : SimulationNetick.Event<ImpactFinishedN>
 {
     public NetworkedPlayerController player;
     public int impactId;

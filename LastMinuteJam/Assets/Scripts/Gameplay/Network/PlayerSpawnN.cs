@@ -7,7 +7,7 @@ namespace Platformer.Gameplay
     /// <summary>
     /// Fired when the player is spawned after dying.
     /// </summary>
-    public class PlayerSpawnN : Simulation.Event<PlayerSpawnN>
+    public class PlayerSpawnN : SimulationNetick.Event<PlayerSpawnN>
     {
         public NetworkedPlayerController player;
 

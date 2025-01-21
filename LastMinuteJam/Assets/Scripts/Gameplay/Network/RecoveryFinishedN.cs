@@ -2,7 +2,7 @@ using Platformer.Core;
 using Platformer.Mechanics;
 using UnityEngine;
 
-public class RecoveryFinishedN : Simulation.Event<RecoveryFinishedN>
+public class RecoveryFinishedN : SimulationNetick.Event<RecoveryFinishedN>
 {
     public NetworkedPlayerController player;
 

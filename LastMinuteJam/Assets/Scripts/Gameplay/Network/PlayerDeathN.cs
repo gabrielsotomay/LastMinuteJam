@@ -11,7 +11,7 @@ namespace Platformer.Gameplay
     /// Fired when the player has died.
     /// </summary>
     /// <typeparam name="PlayerDeath"></typeparam>
-    public class PlayerDeathN : Simulation.Event<PlayerDeathN>
+    public class PlayerDeathN : SimulationNetick.Event<PlayerDeathN>
     {
         public NetworkedPlayerController player;
         public override void Execute()

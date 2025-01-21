@@ -13,36 +13,41 @@ MonoBehaviour:
   m_Name: netickConfig
   m_EditorClassIdentifier: 
   _Prefabs:
+  - Obj: {fileID: 2900323890463934422, guid: 1e79d69d8f8da584abc3e3e8d83c31b4, type: 3}
+    Name: NetworkAttackPrefab
+    FileName: Assets/Prefabs/Network/NetworkAttackPrefab.prefab
+    GO: {fileID: 3901431683383411334, guid: 1e79d69d8f8da584abc3e3e8d83c31b4, type: 3}
+    Id: 1
   - Obj: {fileID: 7349908277165936739, guid: 2a14a4b78c7347341b296d6229a5c1bf, type: 3}
     Name: NetworkedPlayerPrefab
     FileName: Assets/Prefabs/Network/NetworkedPlayerPrefab.prefab
     GO: {fileID: 7142347752014638052, guid: 2a14a4b78c7347341b296d6229a5c1bf, type: 3}
-    Id: 1
+    Id: 2
   - Obj: {fileID: 6276855212308729943, guid: 84bdaf9c034444f408cc66234ee3344d, type: 3}
     Name: Bomb
     FileName: Assets/Samples/Netick/0.13.3/Bomberman/Network Prefabs/Bomb.prefab
     GO: {fileID: 8886278785656527844, guid: 84bdaf9c034444f408cc66234ee3344d, type: 3}
-    Id: 2
+    Id: 3
   - Obj: {fileID: 8143126971102408644, guid: 98e433893a4b70f41a8ab2145afe3e07, type: 3}
     Name: Bomberman Player
     FileName: Assets/Samples/Netick/0.13.3/Bomberman/Network Prefabs/Bomberman Player.prefab
     GO: {fileID: 2511112182317059464, guid: 98e433893a4b70f41a8ab2145afe3e07, type: 3}
-    Id: 3
+    Id: 4
   - Obj: {fileID: 4469672062832013922, guid: 8e254087cbaecc049ac87981c263d46c, type: 3}
     Name: DestroyableBlock
     FileName: Assets/Samples/Netick/0.13.3/Bomberman/Network Prefabs/DestroyableBlock.prefab
     GO: {fileID: 9137365252298567970, guid: 8e254087cbaecc049ac87981c263d46c, type: 3}
-    Id: 4
+    Id: 5
   - Obj: {fileID: 9177126579482737267, guid: 09a0cccbd8f361641bd963785a4b016c, type: 3}
     Name: Power Up
     FileName: Assets/Samples/Netick/0.13.3/Bomberman/Network Prefabs/Power Up.prefab
     GO: {fileID: 3064325587269614628, guid: 09a0cccbd8f361641bd963785a4b016c, type: 3}
-    Id: 5
+    Id: 6
   - Obj: {fileID: 5100633453439203130, guid: d66d5a97430d3364890108321123b309, type: 3}
     Name: FPS Player
     FileName: Assets/Samples/Netick/0.13.3/FPS/Network Prefabs/FPS Player.prefab
     GO: {fileID: 7011933354638177272, guid: d66d5a97430d3364890108321123b309, type: 3}
-    Id: 6
+    Id: 7
   TickRate: 33.333336
   MaxAllowedTimestep: 0.1
   MaxPlayers: 16
@@ -51,10 +56,10 @@ MonoBehaviour:
   StateAllocatorBlockSize: 131072
   MetaAllocatorBlockSize: 1048576
   AggressivePreAllocation: 0
-  MaxPredictedTicks: 64
+  MaxPredictedTicks: 125
   ServerDivisor: 1
-  PhysicsPrediction: 0
-  PhysicsType: 1
+  PhysicsPrediction: 1
+  PhysicsType: 2
   InvokeRenderInHeadless: 0
   InvokeUpdate: 1
   RenderInvokeOrder: 1

@@ -7,7 +7,7 @@ namespace Platformer.Gameplay
     /// <summary>
     /// This event is fired when user input should be enabled.
     /// </summary>
-    public class EnablePlayerInputN : Simulation.Event<EnablePlayerInputN>
+    public class EnablePlayerInputN : SimulationNetick.Event<EnablePlayerInputN>
     {
         public NetworkedPlayerController player;
 

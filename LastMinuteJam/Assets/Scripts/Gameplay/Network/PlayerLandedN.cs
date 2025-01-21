@@ -7,7 +7,7 @@ namespace Platformer.Gameplay
     /// Fired when the player character lands after being airborne.
     /// </summary>
     /// <typeparam name="PlayerLanded"></typeparam>
-    public class PlayerLandedN : Simulation.Event<PlayerLandedN>
+    public class PlayerLandedN : SimulationNetick.Event<PlayerLandedN>
     {
         public NetworkedPlayerController player;
 

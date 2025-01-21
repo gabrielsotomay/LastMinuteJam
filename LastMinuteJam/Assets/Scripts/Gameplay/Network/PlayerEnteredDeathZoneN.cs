@@ -8,15 +8,16 @@ namespace Platformer.Gameplay
     /// Fired when a player enters a trigger with a DeathZone component.
     /// </summary>
     /// <typeparam name="PlayerEnteredDeathZone"></typeparam>
-    public class PlayerEnteredDeathZoneN : Simulation.Event<PlayerEnteredDeathZoneN>
+    public class PlayerEnteredDeathZoneN : SimulationNetick.Event<PlayerEnteredDeathZoneN>
     {
         public DeathZone deathzone;
 
-        PlatformerModel model = Simulation.GetModel<PlatformerModel>();
+        PlatformerModel model = SimulationNetick.GetModel<PlatformerModel>();
+        public float time;
 
         public override void Execute()
         {
-            Simulation.Schedule<PlayerDeathN>(0);
+            SimulationNetick.Schedule<PlayerDeathN>(time);
         }
     }
 }
