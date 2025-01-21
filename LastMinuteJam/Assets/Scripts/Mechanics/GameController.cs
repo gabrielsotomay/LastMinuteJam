@@ -32,7 +32,16 @@ namespace Platformer.Mechanics
 
         void Update()
         {
-            if (Instance == this) Simulation.Tick();
+            //if (Instance == this) Simulation.Tick();
         }
+        public  void TickSimulation()
+        {
+            if (Instance == this)
+            {
+                Simulation.Tick();
+            }
+        }
+
+
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Platformer.Gameplay;
 using static Platformer.Core.Simulation;
@@ -7,10 +6,9 @@ using Platformer.Model;
 using Platformer.Core;
 using UnityEngine.InputSystem;
 using LastMinuteJam;
-using UnityEngine.Splines;
-using System.Net;
-using Netick.Samples.Bomberman;
-using UnityEngine.UIElements;
+using Netick;
+using Unity.VisualScripting;
+using System;
 
 namespace Platformer.Mechanics
 {
@@ -148,7 +146,7 @@ namespace Platformer.Mechanics
             spawnPosition = transform.position;
             bounds = collider2d.bounds;
 
-            id = (ulong)Random.Range(0, 10000);
+            id = (ulong)UnityEngine.Random.Range(0, 10000);
             direction = Direction.Right;
             // we store the spawn pos so that we use it later during respawn.
             spawnPosition = transform.position;
@@ -181,14 +179,14 @@ namespace Platformer.Mechanics
                     OnJump(false);
                 }
 
-                // Applies movement
+                // Attacks
 
-                if (input.lightAttack && !(IsResimulating && attackHitbox != null))
+                if (input.lightAttack)
                 {
-                    Debug.Log("Attempted Attack");
+                    Debug.Log("Attempted Attack at state " + attackState);
                     OnAttack(AttackTypes.Light);                    
                 }
-                if (input.heavyAttack && !(IsResimulating && attackHitbox != null))
+                if (input.heavyAttack )
                 {
                     OnAttack(AttackTypes.Heavy);
                 }
@@ -340,6 +338,7 @@ namespace Platformer.Mechanics
             AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
             if (id == 0)
             {
+                // 0,1,2 windup, active, recovery for basic, next for heavy attack
                 animatorOverrideController[attackAnimations[0]] = attackAnimations[0];
                 animatorOverrideController[attackAnimations[1]] = attackAnimations[1];
                 animatorOverrideController[attackAnimations[2]] = attackAnimations[2];
@@ -373,22 +372,45 @@ namespace Platformer.Mechanics
         
         private void Attack(PlayerAttack attack)
         {
+            activeAttacks.Add(attack.id);
+            NetworkAttackController newAttack;
+            int nextAttack = GetNextInactiveAttack();
+            if (nextAttack == -1)
+            {
+                throw new Exception("somehow made an attack while another attack was being made");
+            }
+            newAttack = attacks[nextAttack];
+            activeAttacks.Add(nextAttack);
             if (attack.type == PlayerAttack.Type.Projectile)
             {
-                //attackHitbox = Instantiate(hitboxPrefab, );
+                newAttack.FireProjectile(transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), attack, hitboxSprites[attack.id]);
             }
             else
             {
-                //attackHitbox = Instantiate(hitboxPrefab, transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), transform);
+                newAttack.FireMelee(transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), attack, hitboxSprites[attack.id] );
             }
-            attackHitbox.GetComponent<SpriteRenderer>().sprite = hitboxSprites[attack.id];
-            attackHitbox.transform.localScale = new Vector3(attack.hitboxScale.x, attack.hitboxScale.y, attackHitbox.transform.localScale.z);
             // TODO: Select the correct attack
 
 
             //hitboxController.playerAttack = attack;
             //hitboxController.Fire(transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), attack);
         }
+
+        private int GetNextInactiveAttack()
+        {
+            // returns -1 if all attacks are used
+            int nextAttack = 0;
+            while (activeAttacks.Contains(nextAttack))
+            {
+                nextAttack++;
+            }
+            if (nextAttack >= attacks.Count)
+            {
+                return -1;
+            }
+            return nextAttack;
+        }
+
 
 
         public void OnActiveFinished()
@@ -417,6 +439,10 @@ namespace Platformer.Mechanics
             }
         }
 
+        public void ClearAttack(int id)
+        {
+            activeAttacks.Remove(id);
+        }
         PlayerAttack GetAttackType(AttackTypes attackType)
         {
             // TODO: do this properly
@@ -701,7 +727,7 @@ namespace Platformer.Mechanics
                 }
                 animator.SetTrigger("hurt");
                 animator.SetBool("dead", true);
-                Simulation.Schedule<PlayerSpawn>(2);
+                Schedule<PlayerSpawn>(2);
             }
         }
 

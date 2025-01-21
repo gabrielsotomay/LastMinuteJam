@@ -193,7 +193,11 @@ namespace Platformer
         }
 
 
-
+        public override void NetworkFixedUpdate()
+        {
+            base.NetworkFixedUpdate();
+            GameController.Instance.TickSimulation();
+        }
 
 
     }
