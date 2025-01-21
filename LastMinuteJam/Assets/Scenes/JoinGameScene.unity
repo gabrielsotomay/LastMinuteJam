@@ -153,9 +153,15 @@ RectTransform:
   - {fileID: 364173831}
   m_Father: {fileID: 630176396}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< Updated upstream
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
+=======
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 383, y: -252.5}
+>>>>>>> Stashed changes
   m_SizeDelta: {x: 250, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &62416087
@@ -170,6 +176,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff7972ee9083a40b9a8ff20ae8150372, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< Updated upstream
+=======
+  m_IsQuitting: 0
+  <IsInitialized>k__BackingField: 0
+>>>>>>> Stashed changes
   m_Text: {fileID: 1380461541}
   m_CopyCodeButton: {fileID: 364173832}
 --- !u!1 &292548440
@@ -902,9 +913,15 @@ RectTransform:
   - {fileID: 821033551}
   m_Father: {fileID: 630176396}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< Updated upstream
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
+=======
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 383, y: -207.5}
+>>>>>>> Stashed changes
   m_SizeDelta: {x: 200, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &602654853
@@ -919,17 +936,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa2dfb4d8c3e4f7f9cc95929fc9773b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< Updated upstream
+=======
+  m_IsQuitting: 0
+  <IsInitialized>k__BackingField: 0
+>>>>>>> Stashed changes
   WidgetConfiguration: {fileID: 11400000, guid: 897306dedd40081449836c93f4fa0fb6,
     type: 2}
   JoiningSession:
     m_PersistentCalls:
       m_Calls: []
+<<<<<<< Updated upstream
   JoinedSession:
     m_PersistentCalls:
       m_Calls: []
   FailedToJoinSession:
     m_PersistentCalls:
       m_Calls: []
+=======
+    m_CallsDirty: 1
+  JoinedSession:
+    m_PersistentCalls:
+      m_Calls: []
+    m_CallsDirty: 1
+  FailedToJoinSession:
+    m_PersistentCalls:
+      m_Calls: []
+    m_CallsDirty: 1
+>>>>>>> Stashed changes
   m_EnterSessionButton: {fileID: 0}
   m_AutoCreateSession: 1
 --- !u!114 &602654854
@@ -1154,9 +1188,15 @@ RectTransform:
   - {fileID: 1587368784}
   m_Father: {fileID: 630176396}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< Updated upstream
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
+=======
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 383, y: -172.5}
+>>>>>>> Stashed changes
   m_SizeDelta: {x: 300, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &807676490
@@ -1171,11 +1211,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b894d3ecaad0434cbb21c3eec3b7c3da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< Updated upstream
+=======
+  m_IsQuitting: 0
+  <IsInitialized>k__BackingField: 0
+>>>>>>> Stashed changes
   WidgetConfiguration: {fileID: 11400000, guid: 897306dedd40081449836c93f4fa0fb6,
     type: 2}
   JoiningSession:
     m_PersistentCalls:
       m_Calls: []
+<<<<<<< Updated upstream
   JoinedSession:
     m_PersistentCalls:
       m_Calls: []
@@ -1183,6 +1229,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_EnterSessionButton: {fileID: 0}
+=======
+    m_CallsDirty: 1
+  JoinedSession:
+    m_PersistentCalls:
+      m_Calls: []
+    m_CallsDirty: 1
+  FailedToJoinSession:
+    m_PersistentCalls:
+      m_Calls: []
+    m_CallsDirty: 1
+  m_EnterSessionButton: {fileID: 0}
+  m_InputField: {fileID: 0}
+>>>>>>> Stashed changes
 --- !u!114 &807676491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1515,10 +1574,17 @@ RectTransform:
   - {fileID: 814265049}
   m_Father: {fileID: 1791173436}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< Updated upstream
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 30}
+=======
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 150, y: -15}
+  m_SizeDelta: {x: 300, y: 30}
+>>>>>>> Stashed changes
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1002036296
 MonoBehaviour:
@@ -1772,10 +1838,17 @@ RectTransform:
   - {fileID: 507708063}
   m_Father: {fileID: 807676489}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< Updated upstream
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 30}
+=======
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 227.50249, y: -15}
+  m_SizeDelta: {x: 144.995, y: 30}
+>>>>>>> Stashed changes
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1587368785
 MonoBehaviour:
@@ -1893,10 +1966,17 @@ RectTransform:
   - {fileID: 1785473742}
   m_Father: {fileID: 807676489}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< Updated upstream
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 30}
+=======
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 77.502495, y: -15}
+  m_SizeDelta: {x: 155.00499, y: 30}
+>>>>>>> Stashed changes
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1591675878
 MonoBehaviour:
@@ -2122,9 +2202,15 @@ RectTransform:
   - {fileID: 1002036295}
   m_Father: {fileID: 630176396}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< Updated upstream
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
+=======
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 383, y: -137.5}
+>>>>>>> Stashed changes
   m_SizeDelta: {x: 300, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1791173437
@@ -2139,11 +2225,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5743fb82daa4d83adec54bcbb3e9655, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< Updated upstream
+=======
+  m_IsQuitting: 0
+  <IsInitialized>k__BackingField: 0
+>>>>>>> Stashed changes
   WidgetConfiguration: {fileID: 11400000, guid: 897306dedd40081449836c93f4fa0fb6,
     type: 2}
   JoiningSession:
     m_PersistentCalls:
       m_Calls: []
+<<<<<<< Updated upstream
   JoinedSession:
     m_PersistentCalls:
       m_Calls: []
@@ -2151,6 +2243,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_EnterSessionButton: {fileID: 0}
+=======
+    m_CallsDirty: 1
+  JoinedSession:
+    m_PersistentCalls:
+      m_Calls: []
+    m_CallsDirty: 1
+  FailedToJoinSession:
+    m_PersistentCalls:
+      m_Calls: []
+    m_CallsDirty: 1
+  m_EnterSessionButton: {fileID: 0}
+  m_InputField: {fileID: 0}
+>>>>>>> Stashed changes
 --- !u!114 &1791173438
 MonoBehaviour:
   m_ObjectHideFlags: 0
