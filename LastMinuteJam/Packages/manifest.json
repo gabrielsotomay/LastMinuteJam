@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.karrar.netick": "https://github.com/NetickNetworking/NetickForUnity.git",
+    "com.karrar.unitytransportnetick": "https://github.com/karrarrahim/UnityTransport-Netick.git",
     "com.unity.cinemachine": "3.1.0",
     "com.unity.collab-proxy": "2.6.0",
     "com.unity.connect.share": "4.2.3",
@@ -9,9 +10,9 @@
     "com.unity.inputsystem": "1.11.2",
     "com.unity.learn.iet-framework": "4.0.3",
     "com.unity.multiplayer.center": "1.0.0",
-    "com.unity.multiplayer.widgets": "1.0.1",
     "com.unity.render-pipelines.universal": "17.0.3",
-    "com.unity.services.multiplayer": "1.1.0",
+    "com.unity.services.lobby": "1.2.2",
+    "com.unity.services.relay": "1.0.5",
     "com.unity.test-framework": "1.4.5",
     "com.unity.timeline": "1.8.7",
     "com.unity.ugui": "2.0.0",

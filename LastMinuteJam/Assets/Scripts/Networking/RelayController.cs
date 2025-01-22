@@ -1,29 +1,37 @@
 using System.Threading.Tasks;
-using Unity.Networking.Transport.Relay;
-using Unity.Services.Relay.Models;
 using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using StinkySteak.NShooter.Netick.Transport;
+using Netick.Unity;
+using static UnityEngine.RuleTile.TilingRuleOutput;
+using UnityEditor.Experimental.GraphView;
 public class RelayController : MonoBehaviour
 {
+    public static RelayController Instance;
     private void Awake()
     {
+        if (Instance != null)
+        {
+            Destroy(this);
+        }
+        Instance = this;
         DontDestroyOnLoad(gameObject);
     }
+    
     public async Task<string> CreateRelay()
     {
         try
         {
+
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
 
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-
+            NetickUnityTransport.Allocation = allocation;
             Debug.Log(joinCode);
-            RelayServerData relayServerData = new RelayServerData(allocation;
 
-
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            NetworkingController.Instance.StartHost();
 
             return joinCode;
         }
@@ -42,11 +50,11 @@ public class RelayController : MonoBehaviour
 
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
 
-            RelayServerData relayServerData = joinAllocation.ToRelayServerData("dtls");
 
+            NetickUnityTransport.JoinAllocation = joinAllocation;
 
-            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-
+            //NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            /*
             if (m_GameManager.isRunningMVP)
             {
                 SceneManager.LoadScene("MVPGame");
@@ -56,10 +64,13 @@ public class RelayController : MonoBehaviour
                 SceneManager.LoadScene("Game");
             }
             NetworkManager.Singleton.StartClient();
+            */
         }
         catch (RelayServiceException e)
         {
             Debug.Log(e);
         }
     }
+            
+
 }
