@@ -10,6 +10,7 @@ using Netick;
 using Unity.VisualScripting;
 using System;
 
+
 namespace Platformer.Mechanics
 {
     /// <summary>
@@ -28,12 +29,14 @@ namespace Platformer.Mechanics
         [SerializeField] AudioSource audioSource;
         [SerializeField] SpriteRenderer spriteRenderer;
         [SerializeField] Animator animator;
+        private Transform rayCastBeginPoint;
         private PlayerInput playerInput;
         private Bounds bounds;
 
         // Other local scripts
         public Health health;
-
+        [SerializeField] private ComboInput comboInput;
+        
         public JumpState jumpState = JumpState.Grounded;
         public AttackState attackState = AttackState.None;
         public HealthState healthState = HealthState.Normal;
@@ -45,10 +48,12 @@ namespace Platformer.Mechanics
         bool jump = false;
         Vector2 move = Vector2.zero;
         public Vector2 movementInput = Vector2.zero;
-
-
+        public int difficulty;
+        private Vector2 directionVector = Vector2.zero;
+        private float rayCastX = 0.3f;
+        private float rayCastY = -0.4f;
         readonly PlatformerModel model = GetModel<PlatformerModel>();
-        
+        private int layerMask = 1 << 6; // only check for layer 6
 
         // Data
         [SerializeField] PlayerStats playerStats;
@@ -85,7 +90,6 @@ namespace Platformer.Mechanics
         ulong id;
 
         public Vector3 spawnPosition;
-
 
         public enum JumpState
         {
@@ -133,7 +137,6 @@ namespace Platformer.Mechanics
         {
             health = GetComponent<Health>();
             collider2d = GetComponent<Collider2D>();
-            
         }
 
         public override void NetworkStart()
@@ -211,7 +214,18 @@ namespace Platformer.Mechanics
             {
                 move.x = 0;
             }
-
+            
+            directionVector = GetDirectionVector(direction);
+            RaycastHit2D ray = Sandbox.Physics2D.Raycast(rayCastBeginPoint.transform.position, 
+                directionVector, 1f, layerMask);
+            
+            Debug.DrawRay(rayCastBeginPoint.transform.position, directionVector * 1f, Color.red);
+            if (ray.collider != null) 
+            {
+                ray.collider.GetComponent<CollectableItem>().CollectItem();
+            }
+            
+            
             UpdateJumpState();
 
             base.NetworkFixedUpdate();
@@ -240,7 +254,8 @@ namespace Platformer.Mechanics
                 audioSource.PlayOneShot(respawnAudio);
             health.Increment();
             //Teleport(model.spawnPoint.transform.position);
-            
+
+            rayCastBeginPoint = transform.Find("RayCast");
             
             jumpState = JumpState.Grounded;
             animator.SetBool("dead", false);
@@ -551,6 +566,7 @@ namespace Platformer.Mechanics
                 if (direction == Direction.Right)
                 {
                     spriteRenderer.flipX = false;
+                    
                 }
                 else if (direction == Direction.Left)
                 {
@@ -585,7 +601,6 @@ namespace Platformer.Mechanics
                 TakeHit(hitboxController);
                 hitboxController.HitEnemy();
             }
-
         }
 
         private bool CheckParry(HitboxController hitboxController)
@@ -720,7 +735,7 @@ namespace Platformer.Mechanics
                 model.virtualCamera.LookAt = null;
                 // player.collider.enabled = false;
                 controlEnabled = false;
-
+                
                 if (audioSource && ouchAudio)
                 {
                     audioSource.PlayOneShot(ouchAudio);
@@ -733,5 +748,19 @@ namespace Platformer.Mechanics
 
 
 
+        private Vector2 GetDirectionVector(Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.Left:
+                    rayCastBeginPoint.transform.localPosition = new Vector3(-rayCastX, rayCastY, 0);
+                    return Vector2.left;
+                case Direction.Right:
+                    rayCastBeginPoint.transform.localPosition = new Vector3(rayCastX, rayCastY, 0);
+                    return Vector2.right;
+                default:
+                    return Vector2.zero;
+            }
+        }
     }
 }
