@@ -1,4 +1,6 @@
+using System.Linq;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace LastMinuteJam
 {
@@ -33,6 +35,51 @@ namespace LastMinuteJam
             Right, 
             Up,
             None
+
+        }
+        public struct AttackIdsSent
+        {
+            private int[] _attacks;
+            public int[] Attacks
+            {
+                get => _attacks;
+                set => _attacks = value.Length <= 5 ? value : value.Take(5).ToArray();
+            }
+
+            public AttackIdsSent(int[] attacks)
+            {
+                _attacks = new int[attacks.Length];
+                Attacks = attacks;
+            }
+        }
+        public PlayerAttack(bool isValid)
+        {
+            if(!isValid)
+            {
+                id = -1;
+            }
+            else
+            {
+                id = 0;
+            }
+            hitboxScale = Vector2.zero;
+            position = Vector2.zero;
+            rotation = 0;
+            activeTime = 0;            
+            windupTime = 0;
+            recoverTime = 0;
+            lifeTime = 0;
+            baseAttack = 0;
+            knockback = 0;
+            impactTime = 0;
+            disableTime = 0;
+            type = Type.None;
+            recoil = Vector2.zero;
+            velocity = Vector2.zero;
+            _instanceId = 0;
+
+
+
 
         }
         public enum Type

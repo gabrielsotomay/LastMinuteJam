@@ -36,7 +36,8 @@ namespace Platformer.Mechanics
         {
             if (Instance == this)
             {
-                SimulationNetick.Tick(Sandbox.NetworkTime);
+                //Debug.Log("Ticking " + Sandbox.Tick.TickValue);
+                SimulationNetick.Tick(Sandbox.Tick.TickValue);
             }
         }
 

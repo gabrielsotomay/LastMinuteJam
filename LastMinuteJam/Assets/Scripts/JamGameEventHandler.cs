@@ -4,7 +4,7 @@ using Netick.Unity;
 using System.Collections.Generic;
 using Platformer.Mechanics;
 using UnityEngine.InputSystem;
-
+using LastMinuteJam;
 namespace Platformer
 {
 
@@ -17,7 +17,6 @@ namespace Platformer
 
         private Vector3[] _spawnPositions = new Vector3[4] { new Vector3(11, 9, 0), new Vector3(11, 1, 0), new Vector3(1, 9, 0), new Vector3(1, 1, 0) };
         private Queue<Vector3> _freePositions = new(4);
-
 
 
 
@@ -62,12 +61,23 @@ namespace Platformer
             player.PlayerObject = playerObj.gameObject;
             AlivePlayers.Add(playerObj);
             Players.Add(playerObj);
+            if (Players.Count == 1)
+            {
+                playerObj.isPlayer1 = true;
+            }
             //SetPlayerInputsRpc();
             Debug.Log("Ran a thing and count is " + Sandbox.ConnectedPlayers.Count);
             foreach (NetworkPlayer networkPlayer in Sandbox.ConnectedPlayers)
             {
-                ((GameObject)networkPlayer.PlayerObject).GetComponent<NetworkedPlayerController>().InputSource = networkPlayer;
+                ((GameObject)networkPlayer.PlayerObject).GetComponent<NetworkedPlayerController>().InputSource = networkPlayer;                
             }
+
+
+            foreach (NetworkedPlayerController networkPlayer in Players)
+            {
+                networkPlayer.InitAttacksRpc(new PlayerAttack.AttackIdsSent(playerObj.GetAttackNetworkIds().ToArray()));
+            }
+
         }
         /*
         [Rpc(target:RpcPeers.Everyone)]

@@ -56,7 +56,7 @@ MonoBehaviour:
   StateAllocatorBlockSize: 131072
   MetaAllocatorBlockSize: 1048576
   AggressivePreAllocation: 0
-  MaxPredictedTicks: 125
+  MaxPredictedTicks: 64
   ServerDivisor: 1
   PhysicsPrediction: 1
   PhysicsType: 2

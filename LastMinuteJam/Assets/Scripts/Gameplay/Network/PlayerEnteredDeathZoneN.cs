@@ -17,7 +17,7 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
-            SimulationNetick.Schedule<PlayerDeathN>(time);
+            SimulationNetick.Schedule<PlayerDeathN>((int)time);
         }
     }
 }

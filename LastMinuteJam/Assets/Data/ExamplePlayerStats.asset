@@ -15,4 +15,4 @@ MonoBehaviour:
   knockbackModifier: 1
   moveSpeed: 1
   maxSpeed: 7
-  jumpSpeed: 7
+  jumpSpeed: 4

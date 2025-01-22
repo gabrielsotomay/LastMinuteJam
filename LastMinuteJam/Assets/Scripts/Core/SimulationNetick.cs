@@ -26,7 +26,7 @@ namespace Platformer.Core
             Stack<Event> pool;
             if (!eventPools.TryGetValue(typeof(T), out pool))
             {
-                pool = new Stack<Event>(4);
+                pool = new Stack<Event>(8);
                 pool.Push(new T());
                 eventPools[typeof(T)] = pool;
             }
@@ -50,10 +50,11 @@ namespace Platformer.Core
         /// <returns>The event.</returns>
         /// <param name="tick">Tick.</param>
         /// <typeparam name="T">The event type parameter.</typeparam>
-        static public T Schedule<T>(float time, float tick = 0) where T : Event, new()
+        static public T Schedule<T>(int currentTick, int scheduledTick = 1) where T : Event, new()
         {
             var ev = New<T>();
-            ev.tick = time + tick;
+            ev.tick = currentTick + Mathf.Max(scheduledTick, 1);
+            Debug.Log("Scheduled" + ev.ToString() +"  at " + currentTick + " for " + scheduledTick);
             eventQueue.Push(ev);
             return ev;
         }
@@ -64,9 +65,9 @@ namespace Platformer.Core
         /// <returns>The event.</returns>
         /// <param name="tick">Tick.</param>
         /// <typeparam name="T">The event type parameter.</typeparam>
-        static public T Reschedule<T>(T ev, float time, float tick ) where T : Event, new()
+        static public T Reschedule<T>(T ev, int currentTick, int scheduledTick) where T : Event, new()
         {
-            ev.tick = time + tick;
+            ev.tick = currentTick + scheduledTick;
             eventQueue.Push(ev);
             return ev;
         }
@@ -104,15 +105,16 @@ namespace Platformer.Core
         /// injected from an external system via a Schedule() call.
         /// </summary>
         /// <returns></returns>
-        static public int Tick(float timeIn)
+        static public int Tick(int  tickIn)
         {
-            var time = timeIn;
+            var time = tickIn;
             var executedEventCount = 0;
             while (eventQueue.Count > 0 && eventQueue.Peek().tick <= time)
             {
                 var ev = eventQueue.Pop();
                 var tick = ev.tick;
                 ev.ExecuteEvent();
+                Debug.Log("Executed " + ev + " at tick " + time);
                 if (ev.tick > tick)
                 {
                     //event was rescheduled, so do not return it to the pool.

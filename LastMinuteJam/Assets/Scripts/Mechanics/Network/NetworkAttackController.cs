@@ -9,7 +9,6 @@ namespace LastMinuteJam
     public class NetworkAttackController : NetworkedKinematicObject
     {
         NetworkedPlayerController playerController;
-        NetworkTransform networkTransform;
 
         public PlayerAttack playerAttack = new PlayerAttack();
         public ulong playerId = 0;
@@ -20,7 +19,7 @@ namespace LastMinuteJam
         Vector3 awayPosition = new Vector3(100, 100, 0);
         public SpriteRenderer spriteRenderer;
         //private int localId = 0; // Id inside the list of attacks in the player controller
-        
+        Coroutine delayDestroy;
         
         private void Awake()
         {
@@ -30,37 +29,41 @@ namespace LastMinuteJam
             groundNormal = Vector2.up;
             SimpleMovement = true;
         }
-        public void Init(NetworkedPlayerController playerController_, int id_)
+        public void Init(NetworkedPlayerController playerController_, int id_, ulong playerId_)
         {
             playerController = playerController_;
             id = id_;
-            networkTransform.Teleport(awayPosition);
+            playerId = playerId_;
+            Teleport(awayPosition);
         }
 
         public void FireProjectile(Vector3 spawnPosition, Quaternion spawnRotation, PlayerAttack playerAttack_, Sprite attackSprite)
         {
+            GetComponent<BoxCollider2D>().isTrigger = true;
             playerAttack = playerAttack_;
-            networkTransform.Teleport(spawnPosition, spawnRotation);            
+            transform.SetParent(null);
+            Teleport(spawnPosition, spawnRotation);            
             storedVelocity = playerAttack.velocity;
-            StartCoroutine(DisableDelayed(playerAttack.lifeTime));
+            delayDestroy = StartCoroutine(DisableDelayed(playerAttack.lifeTime));
 
 
             spriteRenderer.sprite = attackSprite;
             transform.localScale = new Vector3(playerAttack.hitboxScale.x, playerAttack.hitboxScale.y, transform.localScale.z);
-            GetComponent<BoxCollider2D>().size = playerAttack.hitboxScale;
+            GetComponent<BoxCollider2D>().size = new Vector2(Mathf.Abs(playerAttack.hitboxScale.x), Mathf.Abs(playerAttack.hitboxScale.y));
 
         }
 
         public void FireMelee(Vector3 spawnPosition, Quaternion spawnRotation, PlayerAttack playerAttack_, Sprite attackSprite)
         {
+            GetComponent<BoxCollider2D>().isTrigger = true;
             playerAttack = playerAttack_;
             storedVelocity = Vector2.zero;
-            networkTransform.Teleport(spawnPosition, spawnRotation);
+            Teleport(spawnPosition, spawnRotation);
             transform.SetParent(playerController.transform, true);
-            StartCoroutine(DisableDelayed(playerAttack.lifeTime));
+            delayDestroy = StartCoroutine(DisableDelayed(playerAttack.lifeTime));
             spriteRenderer.sprite = attackSprite;
             transform.localScale = new Vector3(playerAttack.hitboxScale.x, playerAttack.hitboxScale.y, transform.localScale.z);
-            GetComponent<BoxCollider2D>().size = playerAttack.hitboxScale;
+            GetComponent<BoxCollider2D>().size = new Vector2(Mathf.Abs(playerAttack.hitboxScale.x), Mathf.Abs(playerAttack.hitboxScale.y));
         }
 
 
@@ -82,14 +85,35 @@ namespace LastMinuteJam
         public void HitEnemy()
         {
             DisableAttack();
+            if (delayDestroy != null)
+            {
+                StopCoroutine(delayDestroy);
+            }
         }
 
 
         private void DisableAttack()
         {
             transform.SetParent(null);
-            networkTransform.Teleport(awayPosition);
+            Teleport(awayPosition);
             playerController.ClearAttack(id);
+            GetComponent<BoxCollider2D>().isTrigger = false;
+        }
+
+
+        public static NetworkAttackController FindAttackByNetworkId(int networkId)
+        {
+            NetworkAttackController[] attacks = FindObjectsByType<NetworkAttackController>(FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID);
+            foreach (NetworkAttackController attack in attacks)
+            {
+                Debug.Log("Found attack of id " + attack.GetComponent<NetworkObject>().Id + ", looking for " + networkId);
+                if (networkId == attack.GetComponent<NetworkObject>().Id)
+                {
+                    Debug.Log("Found matching attack");
+                    return attack;
+                }
+            }
+            return null;
         }
     }
 }

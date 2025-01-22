@@ -103,7 +103,7 @@ Animator:
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 1e5821f22c5a2d94ab77fc80db79ada9, type: 2}
   m_CullingMode: 0
-  m_UpdateMode: 0
+  m_UpdateMode: 2
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
@@ -217,12 +217,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2335425601369042302}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 1195339556, guid: da78c2c9df60edc4fb5f65b59fa57c41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Settings: 1
+  Settings: 0
   _interpolationSource: 0
   IndexToHash: 2b1a167c794069559b911935a8223c02b50c887daf9db29774dadf3e6e4be5d42638cb43a21b1dacf3b09ce077934a0f89f787200dd451cf35675cb7f7159d15cd35eee8d03229af4aa44fcba167c736939301a2f1046f6034f9b24c566edc8e9ff1350a333c9533
 --- !u!1 &6618287190789745965
@@ -317,7 +317,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: a081db771fea7d44fb77a3efe9159c8e, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -448,7 +448,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: a081db771fea7d44fb77a3efe9159c8e, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -531,6 +531,7 @@ MonoBehaviour:
   velocity: {x: 0, y: 0}
   IsGrounded: 0
   SimpleMovement: 0
+  networkTransform: {fileID: 0}
   jumpAudio: {fileID: 0}
   respawnAudio: {fileID: 0}
   ouchAudio: {fileID: 0}
@@ -581,7 +582,7 @@ MonoBehaviour:
   RenderTransform: {fileID: 7476294209994312490}
   TeleportDistance: 50
   PositionPrecision: 3
-  Settings: 31
+  Settings: -1
   TransformSpace: 1
   UseForAOIPosition: 1
   EnablePredictionErrorCorrectionSmoothing: 0
