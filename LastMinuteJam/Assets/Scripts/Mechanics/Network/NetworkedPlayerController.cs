@@ -11,6 +11,7 @@ using Unity.VisualScripting;
 using System;
 using UnityEngine.Windows;
 using Netick.Unity;
+using System.Collections;
 
 namespace Platformer.Mechanics
 {
@@ -54,13 +55,14 @@ namespace Platformer.Mechanics
 
         readonly PlatformerModel model = GetModel<PlatformerModel>();
 
-
+        [SerializeField]
+        GameObject attackPrefab;
         // Data
         [SerializeField] PlayerStats playerStats;
 
         // Prefabs
         [SerializeField] GameObject hitboxPrefab;
-        [SerializeField] List<NetworkAttackController> attacks;
+        [SerializeField] List<NetworkAttackController> attacks = new ();
         List<int> activeAttacks = new List<int>(); // list of attacks in "attacks" array that are active
 
         // Attacks
@@ -198,7 +200,7 @@ namespace Platformer.Mechanics
                 MyInput = new FighterInput();
                 inputAvailabile = false;
             }
-
+            /*
             if (IsServer)
             {
                 bounds = collider2d.bounds;
@@ -207,7 +209,7 @@ namespace Platformer.Mechanics
                     CheckAttackIntersection(attack);
                 }
             }
-
+            */
 
             if (inputAvailabile)
             {
@@ -383,7 +385,7 @@ namespace Platformer.Mechanics
             {
                 return;
             }
-            if (attackState == AttackState.None)
+            if (attackState == AttackState.None && attacks.Count <= 4)
             { 
                 SetAttackState(AttackState.WindUp);
                 UpdateAttackAnimations((int)type);
@@ -427,7 +429,10 @@ namespace Platformer.Mechanics
             if (attackState == AttackState.WindUp)
             {
                 SetAttackState(AttackState.Active);
-                Attack(currentAttack);
+                if (IsServer)
+                {
+                    Attack(currentAttack);
+                }
                 Schedule<ActiveFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.activeTime/Sandbox.FixedDeltaTime)).player = this;
             }
         }
@@ -435,21 +440,16 @@ namespace Platformer.Mechanics
         private void Attack(PlayerAttack attack)
         {
             //activeAttacks.Add(attack.id);
-            NetworkAttackController newAttack;
-            int nextAttack = GetNextInactiveAttack();
-            if (nextAttack == -1)
+
+
+            Vector3 attackPosition = transform.position + new Vector3(attack.position.x, attack.position.y, 0);
+            Quaternion attackRotation = Quaternion.Euler(0, 0, attack.rotation);
+
+            int attackId = Sandbox.NetworkInstantiate(attackPrefab,attackPosition, attackRotation).Id;
+            FireAttackRpc(attack.id, attackId);
+            if (attacks.Count >= 5)
             {
                 throw new Exception("somehow made an attack while another attack was being made");
-            }
-            newAttack = attacks[nextAttack];
-            activeAttacks.Add(nextAttack);
-            if (attack.type == PlayerAttack.Type.Projectile)
-            {
-                newAttack.FireProjectile(transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), attack, hitboxSprites[attack.id]);
-            }
-            else
-            {
-                newAttack.FireMelee(transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), attack, hitboxSprites[attack.id] );
             }
             // TODO: Select the correct attack
 
@@ -458,6 +458,23 @@ namespace Platformer.Mechanics
             //hitboxController.Fire(transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), attack);
         }
 
+        [Rpc(target: RpcPeers.Everyone, localInvoke:true)]
+        public void FireAttackRpc(int type, int networkId)
+        {
+            NetworkAttackController newAttack = NetworkAttackController.FindAttackByNetworkId(networkId);
+            PlayerAttack attack = GetAttackType((AttackTypes)type);
+            newAttack.Init(this, attacks.Count, id);
+            if (attack.type == PlayerAttack.Type.Projectile)
+            {
+                newAttack.FireProjectile( attack, hitboxSprites[attack.id]);
+            }
+            else
+            {
+                newAttack.FireMelee(attack, hitboxSprites[attack.id]);
+            }
+            attacks.Add(newAttack);
+            activeAttacks.Add(attacks.Count-1);
+        }
         private int GetNextInactiveAttack()
         {
             // returns -1 if all attacks are used
@@ -503,7 +520,21 @@ namespace Platformer.Mechanics
 
         public void ClearAttack(int id)
         {
+
             activeAttacks.Remove(id);
+            NetworkAttackController attackToRemove = null;
+            foreach (NetworkAttackController attack in attacks)
+            {
+                if(attack != null && attack.id == id)
+                {
+                    attackToRemove = attack;
+                }
+
+            }
+            if (attackToRemove != null)
+            {
+                attacks.Remove(attackToRemove);
+            }
         }
         PlayerAttack GetAttackType(AttackTypes attackType)
         {
@@ -511,6 +542,7 @@ namespace Platformer.Mechanics
             PlayerAttack attack ;
             if (attackType == AttackTypes.Light)
             {
+                Debug.Log("Got basic attack");
                 attack = playerAttackTypes.basicAttack;
             }
             else if (attackType == AttackTypes.Heavy)
@@ -669,7 +701,7 @@ gg                Debug.Log("Analysing");
             NetworkAttackController attackController = cldr.GetComponent<NetworkAttackController>();
 
             // Check parry
-            if (attackController == null || !IsServer)
+            if (attackController == null || !IsServer || attackController.playerId == 0)
             {
                 //Debug.Log("Player" + id + " entered non-atack trigger");
                 return;

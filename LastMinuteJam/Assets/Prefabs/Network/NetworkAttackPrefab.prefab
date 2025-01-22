@@ -215,7 +215,7 @@ MonoBehaviour:
   velocity: {x: 0, y: 0}
   IsGrounded: 0
   SimpleMovement: 0
-  networkTransform: {fileID: 0}
+  networkTransform: {fileID: 5474266722723004511}
   playerAttack:
     id: 0
     hitboxScale: {x: 0, y: 0}

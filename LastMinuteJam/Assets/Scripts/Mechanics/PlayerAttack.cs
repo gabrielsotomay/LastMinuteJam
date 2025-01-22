@@ -22,6 +22,7 @@ namespace LastMinuteJam
         [SerializeField] public Type type;
         [SerializeField] public Vector2 recoil;
         [SerializeField] public Vector2 velocity;
+        [SerializeField] public Vector2 imageScale;
 
         int _instanceId;
 
@@ -77,6 +78,7 @@ namespace LastMinuteJam
             recoil = Vector2.zero;
             velocity = Vector2.zero;
             _instanceId = 0;
+            imageScale = Vector2.zero;
 
 
 

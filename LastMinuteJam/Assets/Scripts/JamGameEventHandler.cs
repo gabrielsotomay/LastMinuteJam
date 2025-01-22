@@ -72,12 +72,12 @@ namespace Platformer
                 ((GameObject)networkPlayer.PlayerObject).GetComponent<NetworkedPlayerController>().InputSource = networkPlayer;                
             }
 
-
+            /*
             foreach (NetworkedPlayerController networkPlayer in Players)
             {
                 networkPlayer.InitAttacksRpc(new PlayerAttack.AttackIdsSent(playerObj.GetAttackNetworkIds().ToArray()));
             }
-
+            */
         }
         /*
         [Rpc(target:RpcPeers.Everyone)]

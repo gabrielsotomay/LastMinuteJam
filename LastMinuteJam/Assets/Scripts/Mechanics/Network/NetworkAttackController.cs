@@ -34,7 +34,7 @@ namespace LastMinuteJam
             playerController = playerController_;
             id = id_;
             playerId = playerId_;
-            Teleport(awayPosition);
+            //Teleport(awayPosition);
         }
 
         public void FireProjectile(Vector3 spawnPosition, Quaternion spawnRotation, PlayerAttack playerAttack_, Sprite attackSprite)
@@ -48,7 +48,7 @@ namespace LastMinuteJam
 
 
             spriteRenderer.sprite = attackSprite;
-            transform.localScale = new Vector3(playerAttack.hitboxScale.x, playerAttack.hitboxScale.y, transform.localScale.z);
+            transform.localScale = new Vector3(playerAttack.imageScale.x, playerAttack.imageScale.y, transform.localScale.z);
             GetComponent<BoxCollider2D>().size = new Vector2(Mathf.Abs(playerAttack.hitboxScale.x), Mathf.Abs(playerAttack.hitboxScale.y));
 
         }
@@ -62,9 +62,38 @@ namespace LastMinuteJam
             transform.SetParent(playerController.transform, true);
             delayDestroy = StartCoroutine(DisableDelayed(playerAttack.lifeTime));
             spriteRenderer.sprite = attackSprite;
-            transform.localScale = new Vector3(playerAttack.hitboxScale.x, playerAttack.hitboxScale.y, transform.localScale.z);
+            transform.localScale = new Vector3(playerAttack.imageScale.x, playerAttack.imageScale.y, transform.localScale.z);
             GetComponent<BoxCollider2D>().size = new Vector2(Mathf.Abs(playerAttack.hitboxScale.x), Mathf.Abs(playerAttack.hitboxScale.y));
         }
+
+        public void FireProjectile( PlayerAttack playerAttack_, Sprite attackSprite)
+        {
+            GetComponent<BoxCollider2D>().isTrigger = true;
+            playerAttack = playerAttack_;
+            transform.SetParent(null);
+            storedVelocity = playerAttack.velocity;
+            delayDestroy = StartCoroutine(DisableDelayed(playerAttack.lifeTime));
+
+
+            spriteRenderer.sprite = attackSprite;
+            transform.localScale = new Vector3(playerAttack.imageScale.x, playerAttack.imageScale.y, transform.localScale.z);
+            GetComponent<BoxCollider2D>().size = new Vector2(Mathf.Abs(playerAttack.hitboxScale.x), Mathf.Abs(playerAttack.hitboxScale.y));
+
+        }
+
+        public void FireMelee( PlayerAttack playerAttack_, Sprite attackSprite)
+        {
+            GetComponent<BoxCollider2D>().isTrigger = true;
+            playerAttack = playerAttack_;
+            storedVelocity = Vector2.zero;
+            transform.SetParent(playerController.transform, true);
+            delayDestroy = StartCoroutine(DisableDelayed(playerAttack.lifeTime));
+            spriteRenderer.sprite = attackSprite;
+            transform.localScale = new Vector3(playerAttack.imageScale.x, playerAttack.imageScale.y, transform.localScale.z);
+            GetComponent<BoxCollider2D>().size = new Vector2(Mathf.Abs(playerAttack.hitboxScale.x), Mathf.Abs(playerAttack.hitboxScale.y));
+        }
+
+
 
 
         protected override void ComputeVelocity()
@@ -85,19 +114,24 @@ namespace LastMinuteJam
         public void HitEnemy()
         {
             DisableAttack();
-            if (delayDestroy != null)
-            {
-                StopCoroutine(delayDestroy);
-            }
+            
         }
 
 
         private void DisableAttack()
         {
-            transform.SetParent(null);
-            Teleport(awayPosition);
-            playerController.ClearAttack(id);
+            //transform.SetParent(null);
+            //Teleport(awayPosition);
+            if (delayDestroy != null)
+            {
+                StopCoroutine(delayDestroy);
+            }
             GetComponent<BoxCollider2D>().isTrigger = false;
+            playerController.ClearAttack(id);
+            if (IsServer)
+            {
+                Sandbox.Destroy(GetComponent<NetworkObject>());
+            }
         }
 
 

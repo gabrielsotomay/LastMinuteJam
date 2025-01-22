@@ -190,9 +190,9 @@ namespace Platformer.Mechanics
                 }
             }
             Vector2 moveVector = move.normalized * distance;
-            if (InputSource != null && !(!IsServer && InputSource == Sandbox.LocalPlayer && yMovement))
+            if (!(!IsServer && InputSource == Sandbox.LocalPlayer && yMovement) && (IsServer || InputSource != null) )
             {
-                body.MovePosition(body.position + moveVector);
+                body.position = body.position + moveVector;
                 transform.position = transform.position + new Vector3(moveVector.x, moveVector.y, 0);
             }
         }

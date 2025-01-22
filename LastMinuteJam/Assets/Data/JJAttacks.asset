@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   basicAttack:
     id: 0
-    hitboxScale: {x: 2, y: 2}
+    hitboxScale: {x: 0.1, y: 0.1}
     position: {x: 0.38, y: 0.15}
     rotation: 0
     windupTime: 0.1
@@ -28,6 +28,7 @@ MonoBehaviour:
     type: 1
     recoil: {x: -0.2, y: 0}
     velocity: {x: 5, y: 0}
+    imageScale: {x: 1, y: 1}
   heavyAttack:
     id: 1
     hitboxScale: {x: 1, y: 1}
@@ -44,6 +45,7 @@ MonoBehaviour:
     type: 2
     recoil: {x: -0.1, y: 0}
     velocity: {x: 0, y: 0}
+    imageScale: {x: 0, y: 0}
   specialAttack:
     id: 2
     hitboxScale: {x: 2, y: 2}
@@ -60,3 +62,4 @@ MonoBehaviour:
     type: 0
     recoil: {x: 0, y: 0}
     velocity: {x: 0, y: 0}
+    imageScale: {x: 0, y: 0}
