@@ -261,7 +261,7 @@ public class LobbyController : MonoBehaviour
         {
             playerName = playerName_;
             string lobbyName = playerName + "'s Lobby";
-            int maxPlayers = 2;
+            int maxPlayers = 4;
             oldMapSent = "map0";
             CreateLobbyOptions createLobbyOptions = new()
             {
