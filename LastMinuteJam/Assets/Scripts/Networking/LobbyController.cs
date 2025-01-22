@@ -15,7 +15,7 @@ public class LobbyController : MonoBehaviour
 
     public Lobby hostLobby;
     public Lobby joinedLobby;
-    RelayController relayController;
+    public RelayController relayController;
     public static LobbyController Instance;
 
     public event EventHandler<EventArgs> OnGameStarted;

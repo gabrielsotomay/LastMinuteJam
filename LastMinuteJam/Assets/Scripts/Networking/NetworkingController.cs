@@ -44,11 +44,11 @@ public class NetworkingController : NetworkEventsListener
 
     public void StartHost()
     {        
-        Network.StartAsHost(Transport, Port, SandboxPrefab);
+        Network.StartAsHost(Transport, NetickUnityTransport.Allocation.ServerEndpoints[0].Port, SandboxPrefab);
     }
     public void StartClient()
     {
-        var sandbox = Network.StartAsClient(Transport, Port, SandboxPrefab);
-        sandbox.Connect(Port,Transport.ToString()); 
+        var sandbox = Network.StartAsClient(Transport, NetickUnityTransport.JoinAllocation.ServerEndpoints[0].Port, SandboxPrefab);
+        sandbox.Connect(NetickUnityTransport.JoinAllocation.ServerEndpoints[0].Port, NetickUnityTransport.JoinAllocation.ServerEndpoints[0].Host); 
     }
 }

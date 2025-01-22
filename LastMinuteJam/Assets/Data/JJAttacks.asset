@@ -45,7 +45,7 @@ MonoBehaviour:
     type: 2
     recoil: {x: -0.1, y: 0}
     velocity: {x: 0, y: 0}
-    imageScale: {x: 0, y: 0}
+    imageScale: {x: 1, y: 1}
   specialAttack:
     id: 2
     hitboxScale: {x: 2, y: 2}

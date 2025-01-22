@@ -159,7 +159,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Elvira Idle Animation_0: -3265970674330752587
+      Elvira Idle Animation_1: 3344767081805542164
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using StinkySteak.NShooter.Netick.Transport;
 using Netick.Unity;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 using UnityEditor.Experimental.GraphView;
 public class RelayController : MonoBehaviour
 {
@@ -53,6 +52,8 @@ public class RelayController : MonoBehaviour
 
             NetickUnityTransport.JoinAllocation = joinAllocation;
 
+
+            NetworkingController.Instance.StartClient();
             //NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             /*
             if (m_GameManager.isRunningMVP)
