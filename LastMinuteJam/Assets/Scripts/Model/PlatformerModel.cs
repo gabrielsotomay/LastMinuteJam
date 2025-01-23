@@ -18,6 +18,7 @@ namespace Platformer.Model
         public Unity.Cinemachine.CinemachineCamera virtualCamera;
 
         public GameUIController UIcontroller;
+        public ComboUIController comboUIcontroller;
 
         /// <summary>
         /// The main component which controls the player sprite, controlled 

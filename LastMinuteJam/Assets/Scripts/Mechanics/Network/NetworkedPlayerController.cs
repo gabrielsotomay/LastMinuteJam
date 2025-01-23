@@ -223,7 +223,7 @@ namespace Platformer.Mechanics
             {
                 movementInput = input.movement;
 
-                UpdateDirection();
+                direction = UpdateDirection(movementInput, direction);
 
                 if (input.jumpPress )
                 {
@@ -265,16 +265,18 @@ namespace Platformer.Mechanics
             {
                 move.x = 0;
             }
-
-            directionVector = GetDirectionVector(direction);
-            
-            RaycastHit2D ray = Sandbox.Physics2D.Raycast(rayCastBeginPoint.transform.position, 
-                directionVector, 1f, layerMask);
-            
-            if (ray.collider != null && !ray.collider.IsDestroyed())
+            if (IsServer)
             {
-                ray.collider.GetComponent<CollectableItem>()?.CollectItem();
+                directionVector = GetDirectionVector(direction);
+                RaycastHit2D ray = Sandbox.Physics2D.Raycast(rayCastBeginPoint.transform.position,
+                    directionVector, 1f, layerMask);
+
+                if (ray.collider != null && !ray.collider.IsDestroyed())
+                {
+                    ray.collider.GetComponent<CollectableItem>()?.CollectItem(InputSource);
+                }
             }
+            
             
             
             UpdateJumpState();
@@ -339,46 +341,48 @@ namespace Platformer.Mechanics
 
 
 
-        private void UpdateDirection()
+        public static Direction UpdateDirection(Vector2 movement, Direction oldDirection)
         {
-            if (movementInput.x > 0)
+            Direction newDirection = oldDirection;
+            if (movement.x > 0)
             {
-                if (Mathf.Abs(movementInput.x) > Mathf.Abs(movementInput.y))
+                if (Mathf.Abs(movement.x) > Mathf.Abs(movement.y))
                 {
-                    direction = Direction.Right;
+                    newDirection = Direction.Right;
                 }
-                else if (movementInput.y > 0)
+                else if (movement.y > 0)
                 {
-                    direction = Direction.Up;
+                    newDirection = Direction.Up;
                 }
-                else if (movementInput.y < 0)
+                else if (movement.y < 0)
                 {
-                    direction = Direction.Down;
+                    newDirection = Direction.Down;
                 }
             }
-            else if (movementInput.x < 0)
+            else if (movement.x < 0)
             {
-                if (Mathf.Abs(movementInput.x) > Mathf.Abs(movementInput.y))
+                if (Mathf.Abs(movement.x) > Mathf.Abs(movement.y))
                 {
-                    direction = Direction.Left;
+                    newDirection = Direction.Left;
                 }
-                else if (movementInput.y > 0)
+                else if (movement.y > 0)
                 {
-                    direction = Direction.Up;
+                    newDirection = Direction.Up;
                 }
-                else if (movementInput.y < 0)
+                else if (movement.y < 0)
                 {
-                    direction = Direction.Down;
+                    newDirection = Direction.Down;
                 }
             }
-            else if (movementInput.y < 0)
+            else if (movement.y < 0)
             {
-                direction = Direction.Up;
+                newDirection = Direction.Up;
             }
-            else if (movementInput.y > 0)
+            else if (movement.y > 0)
             {
-                direction = Direction.Down;
+                newDirection = Direction.Down;
             }
+            return newDirection;
             
         }
 

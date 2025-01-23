@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public class GameplayManager : NetworkEventsListener
 {
+
+    // Movement/attaacks
     private InputAction moveAction;
     private InputAction jumpAction;
     private InputAction basicAttackAction;
@@ -17,9 +19,13 @@ public class GameplayManager : NetworkEventsListener
     private bool lightAttacked;
     private bool heavyAttacked;
 
+
+    // Combo related
+
+
+
     private void Start()
     {
-
         basicAttackAction = InputSystem.actions["BasicAttack"];
         heavyAttackAction = InputSystem.actions["HeavyAttack"];
         jumpAction = InputSystem.actions["Jump"];

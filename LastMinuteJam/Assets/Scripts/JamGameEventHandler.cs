@@ -25,6 +25,8 @@ namespace Platformer
 
         readonly PlatformerModel model = GetModel<PlatformerModel>();
 
+        public ComboController comboController;
+
 
         public override void NetworkStart()
         {
@@ -36,7 +38,6 @@ namespace Platformer
             */
 
             _playerPrefab = Sandbox.GetPrefab("NetworkedPlayerPrefab");
-            _collectableItem = Sandbox.GetPrefab("Square");
             Sandbox.Events.OnConnectRequest += OnConnectRequest;
             Sandbox.Events.OnPlayerConnected += OnPlayerConnected;
             Sandbox.Events.OnPlayerDisconnected += OnPlayerDisconnected;
@@ -50,7 +51,6 @@ namespace Platformer
                 _freePositions.Enqueue(_spawnPositions[i]);
             }
             base.NetworkStart();
-
             if (IsServer)
                 RestartGame();
         }
@@ -80,9 +80,10 @@ namespace Platformer
             {
                 ((GameObject)networkPlayer.PlayerObject).GetComponent<NetworkedPlayerController>().InputSource = networkPlayer;                
             }
-            FindFirstObjectByType<CinemachineTargetGroup>().AddMember(playerObj.transform, 1, 4);
 
-            AddPlayerToCamera(playerObj.GetComponent<NetworkObject>().Id);
+            
+
+            AddPlayerToCameraRpc(playerObj.GetComponent<NetworkObject>().Id);
 
 
             /*
@@ -93,13 +94,15 @@ namespace Platformer
             */
         }
 
-        [Rpc(target: RpcPeers.Everyone)]
-        public void AddPlayerToCamera(int playerObjectId)
+        [Rpc(target: RpcPeers.Everyone, localInvoke: true)]
+        public void AddPlayerToCameraRpc(int newPlayerId)
         {
             CinemachineTargetGroup targetGroup = FindFirstObjectByType<CinemachineTargetGroup>();
             NetworkedPlayerController[] foundPlayers = FindObjectsByType<NetworkedPlayerController>(FindObjectsSortMode.InstanceID);
-            if (targetGroup.IsEmpty)
+            
+            if (targetGroup.IsEmpty) 
             {
+                // received by new player, add all players to the camera
                 foreach (NetworkedPlayerController player in foundPlayers)
                 {
                     FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
@@ -107,9 +110,10 @@ namespace Platformer
             }
             else
             {
+                // received by existing player, add new player to the camera
                 foreach (NetworkedPlayerController player in foundPlayers)
                 {
-                    if (player.GetComponent<NetworkObject>().Id == playerObjectId)
+                    if (player.GetComponent<NetworkObject>().Id == newPlayerId)
                     {
                         FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
                     }
