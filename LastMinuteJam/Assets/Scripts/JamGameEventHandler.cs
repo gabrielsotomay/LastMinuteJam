@@ -19,7 +19,7 @@ namespace Platformer
 
         private GameObject _playerPrefab;
         private GameObject _collectableItem;
-        private GameObject _healthBarPrefab;
+        //private GameObject _healthBarPrefab;
 
         private Vector3[] _spawnPositions = new Vector3[4] { new Vector3(11, 9, 0), new Vector3(11, 1, 0), new Vector3(1, 9, 0), new Vector3(1, 1, 0) };
         private Queue<Vector3> _freePositions = new(4);
@@ -124,7 +124,7 @@ namespace Platformer
                     {
                         comboController.allPlayers.Add(player);
                         FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
-                        Instantiate(_healthBarPrefab, player.transform.position, Quaternion.identity).transform.SetParent(healthBar.transform);
+                        //Instantiate(_healthBarPrefab, player.transform.position, Quaternion.identity).transform.SetParent(healthBar.transform);
                         Debug.Log("THIS ISRUNINGIGGGGGGGG");
                     }
                 }
