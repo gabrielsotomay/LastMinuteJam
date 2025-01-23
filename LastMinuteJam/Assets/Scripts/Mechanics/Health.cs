@@ -1,6 +1,7 @@
 using System;
 using Platformer.Gameplay;
 using UnityEngine;
+using UnityEngine.UI;
 using static Platformer.Core.Simulation;
 
 namespace Platformer.Mechanics
@@ -20,7 +21,15 @@ namespace Platformer.Mechanics
         /// </summary>
         public bool IsAlive => currentHP > 0;
 
-        int currentHP;
+        public float currentHP;
+
+        private Image healthBar;
+
+
+        public void Start()
+        {
+            
+        }
 
         /// <summary>
         /// Increment the HP of the entity.
@@ -44,6 +53,10 @@ namespace Platformer.Mechanics
             }
         }
 
+        public void DisplayHealthBar()
+        {
+            healthBar.fillAmount = currentHP / maxHP;
+        }
         /// <summary>
         /// Decrement the HP of the entitiy until HP reaches 0.
         /// </summary>

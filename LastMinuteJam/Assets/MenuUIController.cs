@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
+using UnityEditor.U2D.Animation;
+
 public class MenuUIController : MonoBehaviour
 {
     public Button createGameButton;
@@ -23,6 +25,14 @@ public class MenuUIController : MonoBehaviour
 
     public GameObject playerContainer;
     public GameObject startContainer;
+
+    public GameObject charactersContainer;
+    public GameObject playerOneElvira;
+    public GameObject playerOneJj;
+    public GameObject playerTwoElvira;
+    public GameObject playerTwoJj;
+    
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -31,6 +41,7 @@ public class MenuUIController : MonoBehaviour
         startGameButton.onClick.AddListener(() => StartGame());
         quickJoinButton.onClick.AddListener(() => QuickJoin());
         lobbyPanel.SetActive(false);
+        charactersContainer.SetActive(false);
         lobbyController.OnLobbyUpdate += QueryLobby;
     }
     private void OnDestroy()
@@ -48,6 +59,13 @@ public class MenuUIController : MonoBehaviour
             lobbyName.gameObject.SetActive(false);
             startGameButton.gameObject.SetActive(true);
             startContainer.SetActive(false);
+            charactersContainer.SetActive(true);
+            playerOneJj.SetActive(true);
+            playerTwoJj.SetActive(true);
+            playerTwoElvira.SetActive(false);
+            playerOneElvira.SetActive(false);
+            
+            
         }
 
     }

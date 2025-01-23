@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class GameUIController : MonoBehaviour
 {
     public GameObject loadingPanel;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // Start is called once before the first execution of Update after the MonoBehaviour is createdw
     void Start()
     {
         
