@@ -137,7 +137,7 @@ public class LobbyController : MonoBehaviour
 
     private void StartClientGame()
     {
-
+        SceneManager.LoadScene("MultiGame");
         relayController.JoinRelay(joinedLobby.Data[KEY_RELAY_CODE].Value);
         gameRunning = true;
         UpdatePlayerState(KEY_ALIVE);
@@ -320,7 +320,7 @@ public class LobbyController : MonoBehaviour
             {
                 Player = GetPlayer()
             };
-            Lobby lobby = await LobbyService.Instance.QuickJoinLobbyAsync(options);
+            Lobby lobby = await Lobbies.Instance.QuickJoinLobbyAsync(options);
             JoinLobby(lobby);
             return true;
             // ...

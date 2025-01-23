@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using Platformer.Mechanics;
 using UnityEngine.InputSystem;
 using LastMinuteJam;
+using Unity.Cinemachine;
+using Platformer.Model;
+using static Platformer.Core.SimulationNetick;
 namespace Platformer
 {
 
@@ -19,6 +22,7 @@ namespace Platformer
         private Queue<Vector3> _freePositions = new(4);
 
 
+        readonly PlatformerModel model = GetModel<PlatformerModel>();
 
 
         public override void NetworkStart()
@@ -71,6 +75,10 @@ namespace Platformer
             {
                 ((GameObject)networkPlayer.PlayerObject).GetComponent<NetworkedPlayerController>().InputSource = networkPlayer;                
             }
+            FindFirstObjectByType<CinemachineTargetGroup>().AddMember(playerObj.transform, 1, 4);
+
+            AddPlayerToCamera(playerObj.GetComponent<NetworkObject>().Id);
+
 
             /*
             foreach (NetworkedPlayerController networkPlayer in Players)
@@ -78,6 +86,31 @@ namespace Platformer
                 networkPlayer.InitAttacksRpc(new PlayerAttack.AttackIdsSent(playerObj.GetAttackNetworkIds().ToArray()));
             }
             */
+        }
+
+        [Rpc(target: RpcPeers.Everyone)]
+        public void AddPlayerToCamera(int playerObjectId)
+        {
+            CinemachineTargetGroup targetGroup = FindFirstObjectByType<CinemachineTargetGroup>();
+            NetworkedPlayerController[] foundPlayers = FindObjectsByType<NetworkedPlayerController>(FindObjectsSortMode.InstanceID);
+            if (targetGroup.IsEmpty)
+            {
+                foreach (NetworkedPlayerController player in foundPlayers)
+                {
+                    FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
+                }
+            }
+            else
+            {
+                foreach (NetworkedPlayerController player in foundPlayers)
+                {
+                    if (player.GetComponent<NetworkObject>().Id == playerObjectId)
+                    {
+                        FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
+                    }
+                }
+            }
+
         }
         /*
         [Rpc(target:RpcPeers.Everyone)]

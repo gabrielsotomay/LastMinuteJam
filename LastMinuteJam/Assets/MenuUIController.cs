@@ -22,12 +22,14 @@ public class MenuUIController : MonoBehaviour
     public GameObject playerPanelPrefab;
 
     public GameObject playerContainer;
+    public GameObject startContainer;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         createGameButton.onClick.AddListener(() => CreateGame());
         joinGameButton.onClick.AddListener(() => JoinGame());
-        startGameButton.onClick.AddListener(() => StartGame()); 
+        startGameButton.onClick.AddListener(() => StartGame());
+        quickJoinButton.onClick.AddListener(() => QuickJoin());
         lobbyPanel.SetActive(false);
         lobbyController.OnLobbyUpdate += QueryLobby;
     }
@@ -45,7 +47,7 @@ public class MenuUIController : MonoBehaviour
             joinGameButton.gameObject.SetActive(false);
             lobbyName.gameObject.SetActive(false);
             startGameButton.gameObject.SetActive(true);
-
+            startContainer.SetActive(false);
         }
 
     }
@@ -58,6 +60,7 @@ public class MenuUIController : MonoBehaviour
             joinGameButton.gameObject.SetActive(false);
             lobbyName.gameObject.SetActive(false);
             startGameButton.gameObject.SetActive(false);
+            startContainer.SetActive(false);
         }
     }
     public async void StartGame()
@@ -67,7 +70,15 @@ public class MenuUIController : MonoBehaviour
 
     public async void QuickJoin()
     {
-        lobbyController.QuickJoinLobby(playerName.text);
+        if (await lobbyController.QuickJoinLobby(playerName.text))
+        {
+            lobbyPanel.SetActive(true);
+            createGameButton.gameObject.SetActive(false);
+            joinGameButton.gameObject.SetActive(false);
+            lobbyName.gameObject.SetActive(false);
+            startGameButton.gameObject.SetActive(false);
+            startContainer.SetActive(false);
+        }
     }
 
 

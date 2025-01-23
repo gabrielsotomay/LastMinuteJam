@@ -168,6 +168,7 @@ namespace Platformer.Mechanics
             SetHealthState(HealthState.Normal);
             lastAttackTaken = new PlayerAttack(false);
             Spawn();
+            model.UIcontroller.PrepareGame();
             base.NetworkStart();
         }
         public override void OnInputSourceLeft()
@@ -308,8 +309,10 @@ namespace Platformer.Mechanics
             
             jumpState = JumpState.Grounded;
             animator.SetBool("dead", false);
+            /*
             model.virtualCamera.Follow = transform;
             model.virtualCamera.LookAt = transform;
+            */
             Schedule<EnablePlayerInputN>(Sandbox.Tick.TickValue, (int)(2/Sandbox.FixedDeltaTime)).player = this;
         }
 

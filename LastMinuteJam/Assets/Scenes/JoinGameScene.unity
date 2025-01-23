@@ -2900,6 +2900,7 @@ MonoBehaviour:
   playerPanelPrefab: {fileID: 5720605730090195008, guid: 2c08b0703fa17264cac90f66b912cddc,
     type: 3}
   playerContainer: {fileID: 629659113}
+  startContainer: {fileID: 1940214622}
 --- !u!4 &1533902794
 Transform:
   m_ObjectHideFlags: 0
