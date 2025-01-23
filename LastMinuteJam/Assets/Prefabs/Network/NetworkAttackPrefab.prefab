@@ -232,6 +232,7 @@ MonoBehaviour:
     type: 0
     recoil: {x: 0, y: 0}
     velocity: {x: 0, y: 0}
+    imageScale: {x: 0, y: 0}
   playerId: 0
   id: 0
   spriteRenderer: {fileID: 5698095895123568388}

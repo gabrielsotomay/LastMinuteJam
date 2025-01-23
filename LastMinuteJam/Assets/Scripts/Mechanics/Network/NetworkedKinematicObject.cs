@@ -119,15 +119,13 @@ namespace Platformer.Mechanics
             {
                 velocity.y = targetVelocity.y;
             }
-            else if (velocity.y < 0 )
+            else if (velocity.y < 0 && !IsGrounded)
             {
                 velocity += gravityModifier * Physics2D.gravity * Time.fixedDeltaTime;
-
             }
-            else
+            else if (!IsGrounded)
             {
                 velocity += Physics2D.gravity * Time.fixedDeltaTime;
-
             }
             velocity.x = targetVelocity.x;
 
@@ -175,22 +173,22 @@ namespace Platformer.Mechanics
                         if (projection < 0)
                         {
                             //slower velocity if moving against the normal (up a hill).
-                            velocity = velocity - projection * currentNormal;
+                            //velocity = velocity - projection * currentNormal;
                         }
                     }
                     else
                     {
-                        //We are airborne, but hit something, so cancel vertical up and horizontal velocity.
+                        // We are airborne, but hit something, so cancel vertical up and horizontal velocity.
                         velocity.x *= 0;
                         velocity.y = Mathf.Min(velocity.y, 0);
                     }
-                    //remove shellDistance from actual move distance.
+                    // remove shellDistance from actual move distance.
                     var modifiedDistance = hitBuffer[i].distance - shellRadius;
                     distance = modifiedDistance < distance ? modifiedDistance : distance;
                 }
             }
             Vector2 moveVector = move.normalized * distance;
-            if (!(!IsServer && InputSource == Sandbox.LocalPlayer && yMovement) && (IsServer || InputSource != null) )
+            if (IsServer) //if (!(!IsServer && InputSource == Sandbox.LocalPlayer && yMovement) && (IsServer || InputSource != null) )
             {
                 body.position = body.position + moveVector;
                 transform.position = transform.position + new Vector3(moveVector.x, moveVector.y, 0);

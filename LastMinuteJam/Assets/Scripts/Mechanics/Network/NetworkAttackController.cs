@@ -8,7 +8,7 @@ namespace LastMinuteJam
 {
     public class NetworkAttackController : NetworkedKinematicObject
     {
-        NetworkedPlayerController playerController;
+        public NetworkedPlayerController playerController;
 
         public PlayerAttack playerAttack = new PlayerAttack();
         public ulong playerId = 0;

@@ -32,20 +32,20 @@ MonoBehaviour:
   heavyAttack:
     id: 1
     hitboxScale: {x: 1, y: 1}
-    position: {x: 1, y: 0}
+    position: {x: 0.5, y: 0}
     rotation: 0
     windupTime: 0.1
-    activeTime: 0.5
+    activeTime: 0.3
     recoverTime: 0.3
     lifeTime: 0.5
     baseAttack: 10
-    knockback: 0
-    impactTime: 1
-    disableTime: 0
+    knockback: 4
+    impactTime: 0.1
+    disableTime: 0.5
     type: 2
-    recoil: {x: -0.1, y: 0}
+    recoil: {x: 0.5, y: 0}
     velocity: {x: 0, y: 0}
-    imageScale: {x: 1, y: 1}
+    imageScale: {x: 0.5, y: 1}
   specialAttack:
     id: 2
     hitboxScale: {x: 2, y: 2}

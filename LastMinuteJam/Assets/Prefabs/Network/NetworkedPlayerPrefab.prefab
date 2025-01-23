@@ -299,10 +299,10 @@ GameObject:
   - component: {fileID: 7567554416534825873}
   - component: {fileID: 8264790974675180519}
   - component: {fileID: 1138830968241058160}
-  - component: {fileID: 4041852512434159348}
   - component: {fileID: 7349908277165936739}
   - component: {fileID: 5437070535002535846}
   - component: {fileID: 5795076534449500483}
+  - component: {fileID: -2464111510340329638}
   m_Layer: 0
   m_Name: NetworkedPlayerPrefab
   m_TagString: Player
@@ -465,52 +465,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 1
---- !u!61 &4041852512434159348
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7142347752014638052}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 6200000, guid: a081db771fea7d44fb77a3efe9159c8e, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.4, y: 0.96}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.4, y: 0.96}
-  m_EdgeRadius: 0
 --- !u!114 &7349908277165936739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -548,7 +502,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05875c23a00a70f4ea537bd48478662e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minGroundNormalY: 0.9
+  minGroundNormalY: 0.2
   gravityModifier: 1
   velocity: {x: 0, y: 0}
   IsGrounded: 0
@@ -560,9 +514,9 @@ MonoBehaviour:
   audioSource: {fileID: 1513500698877243372}
   spriteRenderer: {fileID: 7479734947705083220}
   animator: {fileID: 5956421473153333409}
+  comboEffectData: {fileID: 11400000, guid: 44c0bbe334fdaf74aa08fa5fd700cef1, type: 2}
   health: {fileID: 0}
-  comboInput: {fileID: 3354084728260034801, guid: f0a20125b2ad788458b7bdf6da5d012d,
-    type: 3}
+  comboInput: {fileID: 0}
   jumpState: 0
   attackState: 0
   healthState: 0
@@ -570,6 +524,10 @@ MonoBehaviour:
   controlEnabled: 0
   movementInput: {x: 0, y: 0}
   difficulty: 2
+  speedModifier: 1
+  damageModifier: 1
+  attackSpeedModifier: 1
+  attackSizeModifier: 1
   attackPrefab: {fileID: 3901431683383411334, guid: 1e79d69d8f8da584abc3e3e8d83c31b4,
     type: 3}
   playerStats: {fileID: 11400000, guid: f3297a0b01243884cb1fac6bdb2779f1, type: 2}
@@ -589,6 +547,8 @@ MonoBehaviour:
   - {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
   isPlayer1: 0
   spawnPosition: {x: 0, y: 0, z: 0}
+  inputAvailabile:
+    RawValue: 0
 --- !u!114 &5795076534449500483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -613,3 +573,40 @@ MonoBehaviour:
   CorrectionMaxBlendAlpha: 0.7
   TeleportErrorThreshold: 50
   _interpolationSource: 0
+--- !u!70 &-2464111510340329638
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7142347752014638052}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 0.5, y: 1}
+  m_Direction: 0

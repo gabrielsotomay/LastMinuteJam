@@ -23,8 +23,7 @@ public class RelayController : MonoBehaviour
     {
         try
         {
-
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(4);
 
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
             NetickUnityTransport.Allocation = allocation;

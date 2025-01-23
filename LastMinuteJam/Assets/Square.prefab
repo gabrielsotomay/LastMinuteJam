@@ -213,7 +213,7 @@ MonoBehaviour:
   PrefabRoot: {fileID: 0}
   Children: []
   PrefabIndex: -1
-  _PrefabId: 8
+  _PrefabId: 10
   SceneId: -1
 --- !u!114 &5028032847789758759
 MonoBehaviour:
@@ -227,5 +227,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b38c45271adb2a441a0d5c461f8b125e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  comboInput: {fileID: 0}
-  comboDifficulty: 2
+  difficulty: 0

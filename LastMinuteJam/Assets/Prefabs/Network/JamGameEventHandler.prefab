@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Players: []
   AlivePlayers: []
+  comboController: {fileID: 184996159638992906}
 --- !u!114 &2783881968890189856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81,3 +82,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b89eee4d5f6df3d4397fb4aab2ea8d8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pickupPrefab: {fileID: 477596204867562033, guid: e9aa2f9deed54b945ae4a6e27bbc1429,
+    type: 3}
+  comboData: {fileID: 11400000, guid: 685193aaeef8f1e4e8ed3630cb976fa5, type: 2}
+  comboEffectData: {fileID: 11400000, guid: 44c0bbe334fdaf74aa08fa5fd700cef1, type: 2}
+  lastInput: 6
+  requiredInput: 6
+  myPlayer: {fileID: 0}
+  allPlayers: []
+  failable: 0

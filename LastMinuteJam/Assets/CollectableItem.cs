@@ -17,8 +17,6 @@ public class CollectableItem : NetworkBehaviour
         {
         // Only happens in server
             comboController.OnComboCollected(this, player);
-            
-            Destroy(this);
             Debug.Log("destroyed");
         }
 

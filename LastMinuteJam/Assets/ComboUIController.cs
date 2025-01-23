@@ -21,6 +21,7 @@ public class ComboUIController : MonoBehaviour
     [SerializeField] private Sprite failHeavyAttack;
 
     [SerializeField] private Transform comboContainer;
+    [SerializeField] private GameObject comboPanel;
 
     [SerializeField] List<GameObject> comboPrompts;
 
@@ -37,6 +38,7 @@ public class ComboUIController : MonoBehaviour
     public float scrollSpeed = 100f;
     public float _arrowAnimSpeed = 1000f;
 
+    Coroutine hidePanel;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -55,6 +57,7 @@ public class ComboUIController : MonoBehaviour
     {
         combo = combo_;
         offset = 0;
+        comboText.text = "";
         for (int i = 0; i < comboPrompts.Count; i++) 
         {
             if (comboPrompts[i] != null)
@@ -62,6 +65,15 @@ public class ComboUIController : MonoBehaviour
                 Destroy(comboPrompts[i]);
             }
         }
+        comboPrompts.Clear();
+        if (hidePanel != null)
+        {
+            StopCoroutine(hidePanel);
+        }
+        StopAllCoroutines();
+
+
+        comboPanel.SetActive(true);
         foreach (Combo.Input input in combo.sequence)
         {
             GameObject newInputObject = Instantiate(comboUIInputPrefab, comboContainer);
@@ -181,9 +193,18 @@ public class ComboUIController : MonoBehaviour
                 UnityEngine.Random.Range(0, 360), UnityEngine.Random.Range(0, 360));
             yield return null;
         }
-        Destroy(target);
     }
 
+    IEnumerator DelayedHide(GameObject target, float delay)
+    {
+        float time = 0;
+        while (time < delay)
+        {
+            time += Time.deltaTime;
+            yield return null;
+        }
+        target.SetActive(false);
+    }
     public void OnComboFail(int index)
     {
         comboPrompts[index].GetComponent<Image>().sprite = GetFailSprite(combo.sequence[index]);
@@ -192,11 +213,31 @@ public class ComboUIController : MonoBehaviour
             StartCoroutine(ArrowFallAnimation(prompt));
         }
         comboText.text = "You failed the combo :(";
+        hidePanel = StartCoroutine(DelayedHide(comboPanel,2f));
     }
 
     public void OnComboCompleted()
     {
-        comboText.text = "You completed the combo!";
+        switch (combo.comboEffect.type)
+        {
+            case ComboEffect.Type.Speed:
+                comboText.text = "SPEED BOOST";
+                break;
+            case ComboEffect.Type.Damage:
+                comboText.text = "DAMAGE BOOST";
+                break;
+            case ComboEffect.Type.AttackSpeed:
+                comboText.text = "ATTACK SPEED BOOST";
+                break;
+
+            case ComboEffect.Type.AttackSize:
+                comboText.text = "ATTACK SIZE BOOST";
+                break;
+
+            default:
+                break;
+        }
+        hidePanel = StartCoroutine(DelayedHide(comboPanel,2f));
 
     }
 }

@@ -162,7 +162,7 @@ MonoBehaviour:
   PrefabRoot: {fileID: 0}
   Children: []
   PrefabIndex: -1
-  _PrefabId: 2
+  _PrefabId: 4
   SceneId: -1
 --- !u!50 &6961540172947422958
 Rigidbody2D:
@@ -227,6 +227,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b38c45271adb2a441a0d5c461f8b125e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  comboInput: {fileID: 3354084728260034801, guid: f0a20125b2ad788458b7bdf6da5d012d,
-    type: 3}
-  comboDifficulty: 2
+  difficulty: 0

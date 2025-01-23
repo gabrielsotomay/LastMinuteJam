@@ -27,14 +27,14 @@ namespace Platformer.Mechanics
         public AudioClip ouchAudio;
 
         // Components
-        private BoxCollider2D collider2d;
+        private CapsuleCollider2D collider2d;
         [SerializeField] AudioSource audioSource;
         [SerializeField] SpriteRenderer spriteRenderer;
         [SerializeField] Animator animator;
         private Transform rayCastBeginPoint;
         private PlayerInput playerInput;
         private Bounds bounds;
-
+        public ComboEffectData comboEffectData;
         List<NetworkAttackController> allAttacks = new ();
 
 
@@ -61,6 +61,12 @@ namespace Platformer.Mechanics
         private int layerMask = 1 << 6; // only check for layer 6
         private bool flagVariable = false;
 
+        public float speedModifier = 1f;
+        public float damageModifier = 1f;
+        public float attackSpeedModifier = 1f;
+        public float attackSizeModifier = 1f;
+
+
         [SerializeField]
         GameObject attackPrefab;
         // Data
@@ -82,9 +88,9 @@ namespace Platformer.Mechanics
         PlayerAttack lastAttackTaken;
         Vector2 impactVector;
         List<int> impactList = new List<int>();
-        
-        // Networked things?!
 
+        // Networked things?!
+        public FighterInput latestInput = new FighterInput();
 
         // Attack animations
         [SerializeField] List<AnimationClip> attackAnimations = new List<AnimationClip>();
@@ -105,7 +111,7 @@ namespace Platformer.Mechanics
             get; set;
         }
 
-        NetworkBool inputAvailabile = false;
+        public NetworkBool inputAvailabile = false;
 
         public enum JumpState
         {
@@ -152,7 +158,7 @@ namespace Platformer.Mechanics
         private void Awake()
         {
             health = GetComponent<Health>();
-            collider2d = GetComponent<BoxCollider2D>();
+            collider2d = GetComponent<CapsuleCollider2D>();
             
         }
         
@@ -192,6 +198,7 @@ namespace Platformer.Mechanics
             if (FetchInput(out FighterInput frameInput))
             {
                 input = frameInput;
+                latestInput = input;
                 if (IsServer && isPlayer1)
                 {
                     SetInputRpc(input);
@@ -250,16 +257,20 @@ namespace Platformer.Mechanics
                 // TODO: change direction based on movement
                 if (movementInput.x > 0)
                 {
-                    move.x = playerStats.moveSpeed;
+                    move.x = playerStats.moveSpeed * speedModifier;
                 }
                 else if (movementInput.x < 0)
                 {
-                    move.x = -playerStats.moveSpeed;
+                    move.x = -playerStats.moveSpeed * speedModifier;
                 }
                 else
                 {
                     move.x = 0;
                 }
+            }
+            else if (!controlEnabled && attackState == AttackState.WindUp || attackState == AttackState.Active)
+            {
+                move.x = currentAttack.recoil.x * speedModifier;
             }
             else
             {
@@ -284,6 +295,44 @@ namespace Platformer.Mechanics
             base.NetworkFixedUpdate();
 
         }
+        public void ApplyComboEffect(ComboEffect effect)
+        {
+            switch (effect.type)
+            {
+                case ComboEffect.Type.Speed:
+                    speedModifier = effect.value;
+                    break;
+                case ComboEffect.Type.Damage:
+                    damageModifier = effect.value;
+                    break;
+
+
+                case ComboEffect.Type.AttackSpeed:
+                    attackSpeedModifier = effect.value;
+                    break;
+
+                case ComboEffect.Type.AttackSize:
+                    attackSizeModifier = effect.value;
+                    break;
+
+                default:
+                    break;
+            }
+            Schedule<ComboEffectFinishedN>(Sandbox.Tick.TickValue, (int)(comboEffectData.comboEffectTime / Sandbox.FixedDeltaTime)).player = this;
+
+
+        }
+
+
+
+        public void ComboEffectFinished()
+        {
+            speedModifier = 1f;
+            damageModifier = 1f;
+            attackSpeedModifier = 1f;
+            attackSizeModifier = 1f;
+        }
+
 
         public void CheckTickActions()
         {
@@ -341,7 +390,7 @@ namespace Platformer.Mechanics
 
 
 
-        public static Direction UpdateDirection(Vector2 movement, Direction oldDirection)
+    public static Direction UpdateDirection(Vector2 movement, Direction oldDirection)
         {
             Direction newDirection = oldDirection;
             if (movement.x > 0)
@@ -352,11 +401,11 @@ namespace Platformer.Mechanics
                 }
                 else if (movement.y > 0)
                 {
-                    newDirection = Direction.Up;
+                    newDirection = Direction.Down;
                 }
                 else if (movement.y < 0)
                 {
-                    newDirection = Direction.Down;
+                    newDirection = Direction.Up;
                 }
             }
             else if (movement.x < 0)
@@ -367,20 +416,20 @@ namespace Platformer.Mechanics
                 }
                 else if (movement.y > 0)
                 {
-                    newDirection = Direction.Up;
+                    newDirection = Direction.Down;
                 }
                 else if (movement.y < 0)
                 {
-                    newDirection = Direction.Down;
+                    newDirection = Direction.Up;
                 }
             }
             else if (movement.y < 0)
             {
-                newDirection = Direction.Up;
+                newDirection = Direction.Down;
             }
             else if (movement.y > 0)
             {
-                newDirection = Direction.Down;
+                newDirection = Direction.Up;
             }
             return newDirection;
             
@@ -398,7 +447,7 @@ namespace Platformer.Mechanics
             {
                 jumpState = JumpState.PrepareToJump;
             }
-            else if (!jumped && jumpState == JumpState.Jumping)
+            else if (!jumped && (jumpState == JumpState.Jumping || jumpState == JumpState.InFlight))
             {
                 stopJump = true;
                 Schedule<PlayerStopJumpN>(Sandbox.Tick.TickValue).player = this;
@@ -412,12 +461,16 @@ namespace Platformer.Mechanics
             {
                 return;
             }
-            if (attackState == AttackState.None && attacks.Count <= 4)
+            if (attackState == AttackState.None && attacks.Count <= 8)
             { 
                 SetAttackState(AttackState.WindUp);
                 UpdateAttackAnimations((int)type);
                 currentAttack = GetAttackType(type);
-                Schedule<WindupFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.windupTime/Sandbox.FixedDeltaTime)).player = this;
+                if (type == AttackTypes.Heavy)
+                {
+                    controlEnabled = false;
+                }
+                Schedule<WindupFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.windupTime * attackSpeedModifier / Sandbox.FixedDeltaTime)).player = this;
             }
         }
 
@@ -460,7 +513,7 @@ namespace Platformer.Mechanics
                 {
                     Attack(currentAttack);
                 }
-                Schedule<ActiveFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.activeTime/Sandbox.FixedDeltaTime)).player = this;
+                Schedule<ActiveFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.activeTime * attackSpeedModifier / Sandbox.FixedDeltaTime)).player = this;
             }
         }
         
@@ -474,7 +527,7 @@ namespace Platformer.Mechanics
 
             int attackId = Sandbox.NetworkInstantiate(attackPrefab,attackPosition, attackRotation).Id;
             FireAttackRpc(attack.id, attackId);
-            if (attacks.Count >= 5)
+            if (attacks.Count >= 10)
             {
                 throw new Exception("somehow made an attack while another attack was being made");
             }
@@ -525,7 +578,8 @@ namespace Platformer.Mechanics
             {
                 SetAttackState(AttackState.Recovery);
                 EndActiveAttack();
-                Schedule<RecoveryFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.recoverTime/Sandbox.FixedDeltaTime)).player = this;
+                Schedule<RecoveryFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.recoverTime*attackSpeedModifier/Sandbox.FixedDeltaTime)).player = this;
+                controlEnabled = true;
             }
         }
         public void OnAttackFinished()
@@ -580,8 +634,10 @@ namespace Platformer.Mechanics
             {
                 attack = playerAttackTypes.basicAttack;
             }
+            attack.baseAttack = attack.baseAttack * damageModifier;
             attack = SetAttackDirection(attack);
             attack.SetInstanceId(attackNumber++);
+            attack.imageScale = attack.imageScale * attackSizeModifier;
             return attack;
         }
 
@@ -593,6 +649,7 @@ namespace Platformer.Mechanics
                     attack.position.x = -attack.position.x;
                     attack.hitboxScale.x = -attack.hitboxScale.x;
                     attack.velocity.x = -attack.velocity.x;
+                    attack.recoil.x = -attack.recoil.x;
                     break;
                 case Direction.None:
                 case Direction.Right:
@@ -602,6 +659,7 @@ namespace Platformer.Mechanics
                     attack.velocity.y = attack.velocity.x;
                     attack.velocity.x = 0;
                     attack.rotation = attack.rotation + 90;
+                    attack.recoil.x = 0;
                     break;
                 default:
                     break;
@@ -660,23 +718,19 @@ namespace Platformer.Mechanics
                     }
                 }
             }
-            else if (impactFinished)
-            {
-                impactFinished = false;
-                velocity.y = lastAttackTaken.knockback * impactVector.x * playerStats.knockbackModifier;
-                velocity.x = lastAttackTaken.knockback * impactVector.y * playerStats.knockbackModifier;
-            }
 
             if (attackState == AttackState.None)
             {
                 if (direction == Direction.Right)
                 {
-                    spriteRenderer.flipX = false;
+                    spriteRenderer.transform.localScale = Vector3.one;
+                    //spriteRenderer.flipX = false;
                     
                 }
                 else if (direction == Direction.Left)
                 {
-                    spriteRenderer.flipX = true;
+                    spriteRenderer.transform.localScale = new Vector3(-1, 1, 1);
+                    //spriteRenderer.flipX = true;
                 }
             }
             
@@ -686,15 +740,28 @@ namespace Platformer.Mechanics
             if (InputSource != null)
             {
                 animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / playerStats.maxSpeed);
-                targetVelocity = move * playerStats.maxSpeed;
+                if (healthState == HealthState.Disabled)
+                {
+                    targetVelocity = new Vector2(lastAttackTaken.knockback * impactVector.x * playerStats.knockbackModifier, 0);
+                }
+                else
+                {
+                    targetVelocity = move * playerStats.maxSpeed;
+
+                }
             }
             else
             {
                 animator.SetFloat("velocityX", Mathf.Abs((move * playerStats.maxSpeed).x) / playerStats.maxSpeed);
-                targetVelocity = move * playerStats.maxSpeed;
-
-            }
-
+                if (healthState == HealthState.Disabled)
+                {
+                    targetVelocity = new Vector2(lastAttackTaken.knockback * impactVector.x * playerStats.knockbackModifier, 0);
+                }
+                else
+                {
+                    targetVelocity = move * playerStats.maxSpeed;
+                }
+            }   
         }
         /*
         public void CheckAttackIntersection(NetworkAttackController attack)
@@ -724,8 +791,6 @@ gg                Debug.Log("Analysing");
         
         private void OnTriggerEnter2D(Collider2D cldr)
         {
-            
-
             NetworkAttackController attackController = cldr.GetComponent<NetworkAttackController>();
 
             // Check parry
@@ -741,8 +806,15 @@ gg                Debug.Log("Analysing");
             }
             else if (attackController.playerId != id && !impactList.Contains(attackController.GetInstanceID()))
             { 
-                impactVector = Vector3.Normalize(transform.position - cldr.transform.position);
-                TakeHitRpc(attackController.GetComponent<NetworkObject>().Id, impactVector);;
+                if (attackController.playerAttack.type == PlayerAttack.Type.Projectile)
+                {
+                    impactVector = Vector3.Normalize(transform.position - attackController.transform.position) + new Vector3(0, 1, 0);
+                }
+                else
+                {
+                    impactVector = Vector3.Normalize(transform.position - attackController.playerController.transform.position) + new Vector3(0, 1, 0);
+                }
+                TakeHitRpc(attackController.GetComponent<NetworkObject>().Id, impactVector);
             }
             return;
         }
@@ -818,6 +890,8 @@ gg                Debug.Log("Analysing");
             {
                 return;
             }
+            velocity.y = lastAttackTaken.knockback * impactVector.y * playerStats.knockbackModifier;
+            velocity.x = lastAttackTaken.knockback * impactVector.x * playerStats.knockbackModifier;
             SetHealthState(HealthState.Disabled);
             Schedule<PlayerDisableN>(Sandbox.Tick.TickValue).player = this;
             Schedule<DisableFinishedN>(Sandbox.Tick.TickValue, (int)(lastAttackTaken.disableTime/Sandbox.FixedDeltaTime)).player = this;

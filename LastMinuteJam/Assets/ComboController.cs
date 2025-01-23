@@ -7,6 +7,8 @@ using Netick;
 using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 using System;
 using Platformer.Mechanics;
+using System.Collections;
+using static Unity.Cinemachine.AxisState;
 
 
 public class ComboController : NetworkBehaviour
@@ -14,19 +16,24 @@ public class ComboController : NetworkBehaviour
 
     List<CollectableItem> comboItems = new();
 
-    GameObject pickupPrefab;
+    [SerializeField] GameObject pickupPrefab;
     PlatformerModel model;
 
-    bool comboIsActive = true;
+    bool comboIsActive = false;
     [SerializeField] ComboData comboData;
+    [SerializeField] ComboEffectData comboEffectData;
     int playerId;
 
-    Combo activeCombo;
-    Combo.Input lastInput;
+    public Combo activeCombo;
+    public Combo.Input lastInput = Combo.Input.None;
+    public Combo.Input requiredInput = Combo.Input.None;
     Combo inputCombo;
     List<Combo> activeCombos = new();
+    public NetworkedPlayerController myPlayer;
+    public List<NetworkedPlayerController> allPlayers = new();
 
     int comboProgressIndex = 0;
+    public bool failable = false;
     public void Init(PlatformerModel model_)
     {
         model = model_;
@@ -36,7 +43,7 @@ public class ComboController : NetworkBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void NetworkStart()
     {
-        pickupPrefab = Sandbox.GetPrefab("Square");
+        
     }
 
 
@@ -44,20 +51,22 @@ public class ComboController : NetworkBehaviour
 
     // TODO: Spawn pickups periodically
     public void SpawnPickup()
-    {
-        GameObject newPickup = Sandbox.NetworkInstantiate(pickupPrefab, GetPickupSkySpawn(), Quaternion.identity).gameObject;
-
-        comboItems.Add(newPickup.GetComponent<CollectableItem>());
+    {        
+        CollectableItem newPickup = Sandbox.NetworkInstantiate(pickupPrefab, GetPickupSkySpawn(), Quaternion.identity).GetComponent<CollectableItem>();
+        newPickup.Init(this, UnityEngine.Random.Range(1, 4));
+        comboItems.Add(newPickup);
     }
 
     public void OnComboCollected(CollectableItem item, NetworkPlayer player)
     {
         // this runs on server
-        int comboSeed = UnityEngine.Random.Range(0, 1000);
+        int comboSeed = (int)Time.time;
 
         GetComboRpc(player.PlayerId, comboSeed, item.difficulty, false);
         UnityEngine.Random.InitState(comboSeed);
         activeCombos.Add(GenerateRandomCombo(item.difficulty));
+        comboItems.Remove(item);
+        Sandbox.Destroy(item.GetComponent<NetworkObject>());
     }
 
     [Rpc(target: RpcPeers.Everyone, localInvoke:true)]
@@ -66,18 +75,20 @@ public class ComboController : NetworkBehaviour
         
         if (Sandbox.LocalPlayer.PlayerId == playerId)
         {
+            //InputSource = Sandbox.LocalPlayer;
             UnityEngine.Random.InitState(seed);
             activeCombo = GenerateRandomCombo(difficulty);
+            requiredInput = activeCombo.sequence[0];
             activeCombo.isGlobal = isGlobal;
             comboIsActive = true;
             model.comboUIcontroller.DisplayCombo(activeCombo);
             inputCombo = new();
             comboProgressIndex = 0;
+            StopAllCoroutines();
+            StartCoroutine(DelayFailable(1f));
+            StartCoroutine(FailComboOnTime(comboData.timeToComplete));
         }
     }
-
-
-
 
 
 
@@ -99,40 +110,131 @@ public class ComboController : NetworkBehaviour
         }
         for (int i = 0; i < comboLength; i++)
         {
-            activeCombo.sequence.Add((Combo.Input)UnityEngine.Random.Range(0, System.Enum.GetValues(typeof(Combo.Input)).Length));
+            combo.sequence.Add((Combo.Input)UnityEngine.Random.Range(0, System.Enum.GetValues(typeof(Combo.Input)).Length - 1));
         }
+        ComboEffect.Type effectType = (ComboEffect.Type)UnityEngine.Random.Range(0, System.Enum.GetValues(typeof(ComboEffect.Type)).Length);
+        combo.comboEffect = new ComboEffect(effectType, GetDifficultyValue(difficulty, effectType));
+
         return combo;
+    }
+
+
+    public float GetDifficultyValue(int difficulty, ComboEffect.Type effectType)
+    {
+        switch (effectType)
+        {
+            case ComboEffect.Type.Speed:
+                if (difficulty == 1)
+                {
+                    return comboEffectData.speedEasy.value;
+                }
+                else if (difficulty == 2)
+                {
+                    return comboEffectData.speedMedium.value;
+
+                }
+                else if (difficulty == 3)
+                {
+                    return comboEffectData.speedHard.value;
+                }
+                return 0;
+            case ComboEffect.Type.Damage:
+                if (difficulty == 1)
+                {
+                    return comboEffectData.damageEasy.value;
+                }
+                else if (difficulty == 2)
+                {
+                    return comboEffectData.damageMedium.value;
+                }
+                else if (difficulty == 3)
+                {
+                    return comboEffectData.damageHard.value;
+                }
+                return 0;
+            case ComboEffect.Type.AttackSpeed:
+                if (difficulty == 1)
+                { 
+                    return comboEffectData.attackSpeedEasy.value;
+                }
+                else if (difficulty == 2)
+                {
+                    return comboEffectData.attackSpeedMedium.value;
+                }
+                else if (difficulty == 3)
+                {
+                    return comboEffectData.attackSpeedHard.value;
+                }
+                return 0;
+            case ComboEffect.Type.AttackSize:
+                if (difficulty == 1)
+                {
+                    return comboEffectData.attackSizeEasy.value;
+
+                }
+                else if (difficulty == 2)
+                {
+                    return comboEffectData.attackSizeMedium.value;
+                }
+                else if (difficulty == 3)
+                {
+                    return comboEffectData.attackSizeHard.value;
+                }
+                return 0;
+            default:
+                return 0;
+        }
     }
 
     public override void NetworkFixedUpdate()
     {
+        if (IsServer)
+        {
+            if (comboItems.Count == 0)
+            {
+                SpawnPickup();
+            }
+        }
         if (comboIsActive)
         {
             ProcessInput();
         }
+        
+
     }
         public void ProcessInput()
         {
+        /*
         if (!FetchInput(out FighterInput frameInput))
         {
             return;
         }
-        Combo.Input newInput = FighterInputToComboInput(frameInput);
-        if (newInput != lastInput)
+        */
+        Combo.Input newInput = FighterInputToComboInput(myPlayer.latestInput);
+        if (newInput == Combo.Input.None || lastInput == newInput)
         {
             lastInput = newInput;
-        } 
-        else
-        {
+            Debug.Log("No input!");
             return;
         }
+        lastInput = newInput;
         inputCombo.sequence.Add(newInput);
 
         if (newInput == activeCombo.sequence[comboProgressIndex] && comboProgressIndex < activeCombo.sequence.Count)
         {
+            Debug.Log("Hit combo " + requiredInput);
             model.comboUIcontroller.OnComboHit(comboProgressIndex++);
+            if (comboProgressIndex < activeCombo.sequence.Count)
+            {
+                requiredInput = activeCombo.sequence[comboProgressIndex];
+            }
+            else
+            {
+                requiredInput = Combo.Input.None;
+            }
+            StartCoroutine(DelayFailable(0.2f));
         }
-        else
+        else if(failable)
         {
             OnComboFail();
         }
@@ -147,10 +249,29 @@ public class ComboController : NetworkBehaviour
     void OnComboComplete()
     {
         model.comboUIcontroller.OnComboCompleted();
+        comboIsActive = false;
+        StopAllCoroutines();
+        ApplyComboEffectRpc(myPlayer.GetComponent<NetworkedKinematicObject>().Id, activeCombo.comboEffect);
+
     }
+
+    [Rpc(target: RpcPeers.Everyone, localInvoke: true)]
+    public void ApplyComboEffectRpc(int playerId, ComboEffect comboEffect)
+    {
+        foreach (NetworkedPlayerController player in allPlayers)
+        {
+            if (playerId == player.GetComponent<NetworkedKinematicObject>().Id)
+            {
+                player.ApplyComboEffect(comboEffect);
+            }
+        }
+    }
+
+
     void OnComboFail()
     {
         model.comboUIcontroller.OnComboFail(comboProgressIndex);
+        comboIsActive = false;
 
     }
 
@@ -205,5 +326,27 @@ public class ComboController : NetworkBehaviour
         return Vector3.Lerp(model.topLeft.position, model.topRight.position, UnityEngine.Random.Range(0, 1f));
     }
 
+    IEnumerator DelayFailable(float delay)
+    {
+        failable = false;
+        float time = 0;
+        while (time < delay)
+        {
+            time += Time.deltaTime;
+            yield return null;
+        }
+        failable = true;
+    }
 
+
+    IEnumerator FailComboOnTime(float maxTime)
+    {
+        float time = 0;
+        while (time < maxTime)
+        {
+            time += Time.deltaTime;
+            yield return null;
+        }
+        OnComboFail();
+    }
 }

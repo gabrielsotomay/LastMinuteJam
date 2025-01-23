@@ -8,6 +8,7 @@ using LastMinuteJam;
 using Unity.Cinemachine;
 using Platformer.Model;
 using static Platformer.Core.SimulationNetick;
+using Unity.VisualScripting;
 namespace Platformer
 {
 
@@ -44,8 +45,8 @@ namespace Platformer
 
             // TODO: Make this for the powerups or something Sandbox.InitializePool(Sandbox.GetPrefab("Bomb"), 5);
             Sandbox.InitializePool(_playerPrefab, 4);
-            Sandbox.InitializePool(_collectableItem, 1);
-
+            //Sandbox.InitializePool(_collectableItem, 1);
+            comboController.Init(model);
             for (int i = 0; i < 4; i++)
             {
                 _freePositions.Enqueue(_spawnPositions[i]);
@@ -64,9 +65,9 @@ namespace Platformer
         public void OnPlayerConnected(NetworkSandbox sandbox, NetworkPlayer player)
         {
             var playerObj = sandbox.NetworkInstantiate(_playerPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
-            sandbox.NetworkInstantiate(_collectableItem, new Vector3(0, -0.5f, 0),
+            /*sandbox.NetworkInstantiate(_collectableItem, new Vector3(0, -0.5f, 0),
                 Quaternion.identity, null);
-            
+            */
             player.PlayerObject = playerObj.gameObject;
             AlivePlayers.Add(playerObj);
             Players.Add(playerObj);
@@ -106,6 +107,11 @@ namespace Platformer
                 foreach (NetworkedPlayerController player in foundPlayers)
                 {
                     FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
+                    comboController.allPlayers.Add(player);
+                    if (player.GetComponent<NetworkObject>().Id == newPlayerId)
+                    {
+                        comboController.myPlayer = player;
+                    }
                 }
             }
             else
@@ -115,6 +121,7 @@ namespace Platformer
                 {
                     if (player.GetComponent<NetworkObject>().Id == newPlayerId)
                     {
+                        comboController.allPlayers.Add(player);
                         FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
                     }
                 }

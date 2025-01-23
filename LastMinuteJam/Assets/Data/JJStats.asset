@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: JJStats
   m_EditorClassIdentifier: 
   knockbackModifier: 1
-  moveSpeed: 1
+  moveSpeed: 0.7
   maxSpeed: 7
   jumpSpeed: 7

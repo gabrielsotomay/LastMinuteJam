@@ -6,4 +6,5 @@ public class ComboData : ScriptableObject
     public int easyLength;
     public int mediumLength;
     public int hardLength;
+    public float timeToComplete;
 }
