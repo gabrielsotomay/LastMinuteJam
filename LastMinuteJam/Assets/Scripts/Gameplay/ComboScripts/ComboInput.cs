@@ -37,6 +37,7 @@ using Vector3 = UnityEngine.Vector3;
         [SerializeField] private Sprite blueArrow;
         [SerializeField] private Sprite greenArrow;
         [SerializeField] private Sprite redArrow;
+        private float _arrowAnimSpeed = 1000f;
 
         [SerializeField] private Transform spawnPosition;
 
@@ -50,6 +51,8 @@ using Vector3 = UnityEngine.Vector3;
         [SerializeField] private AudioSource _audioSource;
 
         [SerializeField] public bool _playComboEvent = true;
+        
+        
 
         void Start()
         {
@@ -245,8 +248,8 @@ using Vector3 = UnityEngine.Vector3;
         {
             while (target.transform.localPosition.y > -1100f)
             {
-                target.transform.position = new Vector3(target.transform.position.x - 0.05f,
-                    target.transform.position.y - 0.05f,
+                target.transform.position = new Vector3(target.transform.position.x - _arrowAnimSpeed * Time.deltaTime,
+                    target.transform.position.y - _arrowAnimSpeed * Time.deltaTime,
                     target.transform.position.z);
                 target.transform.rotation = Quaternion.Euler(UnityEngine.Random.Range(0, 360),
                     UnityEngine.Random.Range(0, 360), UnityEngine.Random.Range(0, 360));

@@ -48,6 +48,11 @@ MonoBehaviour:
     FileName: Assets/Samples/Netick/0.13.3/FPS/Network Prefabs/FPS Player.prefab
     GO: {fileID: 7011933354638177272, guid: d66d5a97430d3364890108321123b309, type: 3}
     Id: 7
+  - Obj: {fileID: 4061050001342022686, guid: a9097bce8b4aaae4583db21c360c8301, type: 3}
+    Name: Square
+    FileName: Assets/Square.prefab
+    GO: {fileID: 8906417647839176156, guid: a9097bce8b4aaae4583db21c360c8301, type: 3}
+    Id: 8
   TickRate: 33.333336
   MaxAllowedTimestep: 0.1
   MaxPlayers: 16

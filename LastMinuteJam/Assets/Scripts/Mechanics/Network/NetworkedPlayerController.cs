@@ -9,6 +9,7 @@ using LastMinuteJam;
 using Netick;
 using Unity.VisualScripting;
 using System;
+using Netick.Unity;
 
 
 namespace Platformer.Mechanics
@@ -54,6 +55,7 @@ namespace Platformer.Mechanics
         private float rayCastY = -0.4f;
         readonly PlatformerModel model = GetModel<PlatformerModel>();
         private int layerMask = 1 << 6; // only check for layer 6
+        private bool flagVariable = false;
 
         // Data
         [SerializeField] PlayerStats playerStats;
@@ -74,7 +76,7 @@ namespace Platformer.Mechanics
         PlayerAttack lastAttackTaken;
         Vector2 impactVector;
         List<int> impactList = new List<int>();
-
+        
         // Networked things?!
 
 
@@ -138,10 +140,11 @@ namespace Platformer.Mechanics
             health = GetComponent<Health>();
             collider2d = GetComponent<Collider2D>();
         }
-
+        
         public override void NetworkStart()
         {
             int attackId = 0;
+            
             foreach (NetworkAttackController attack in attacks)
             {
                 attack.Init(this, attackId++);
@@ -214,15 +217,15 @@ namespace Platformer.Mechanics
             {
                 move.x = 0;
             }
-            
+
             directionVector = GetDirectionVector(direction);
+            
             RaycastHit2D ray = Sandbox.Physics2D.Raycast(rayCastBeginPoint.transform.position, 
                 directionVector, 1f, layerMask);
             
-            Debug.DrawRay(rayCastBeginPoint.transform.position, directionVector * 1f, Color.red);
-            if (ray.collider != null) 
+            if (ray.collider != null && !ray.collider.IsDestroyed())
             {
-                ray.collider.GetComponent<CollectableItem>().CollectItem();
+                ray.collider.GetComponent<CollectableItem>()?.CollectItem();
             }
             
             
@@ -256,6 +259,7 @@ namespace Platformer.Mechanics
             //Teleport(model.spawnPoint.transform.position);
 
             rayCastBeginPoint = transform.Find("RayCast");
+            Debug.Log(rayCastBeginPoint.transform.position);
             
             jumpState = JumpState.Grounded;
             animator.SetBool("dead", false);

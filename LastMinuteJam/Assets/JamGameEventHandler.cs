@@ -14,7 +14,7 @@ namespace Platformer
         public List<NetworkedPlayerController> AlivePlayers = new(4);
 
         private GameObject _playerPrefab;
-        private GameObject _colletableItem;
+        private GameObject _collectableItem;
 
         private Vector3[] _spawnPositions = new Vector3[4] { new Vector3(11, 9, 0), new Vector3(11, 1, 0), new Vector3(1, 9, 0), new Vector3(1, 1, 0) };
         private Queue<Vector3> _freePositions = new(4);
@@ -52,7 +52,7 @@ namespace Platformer
             */
 
             _playerPrefab = Sandbox.GetPrefab("NetworkedPlayerPrefab");
-            _colletableItem = Sandbox.GetPrefab("Square");
+            _collectableItem = Sandbox.GetPrefab("Square");
             Sandbox.Events.OnInputRead += OnInput;
             Sandbox.Events.OnConnectRequest += OnConnectRequest;
             Sandbox.Events.OnPlayerConnected += OnPlayerConnected;
@@ -60,7 +60,7 @@ namespace Platformer
 
             // TODO: Make this for the powerups or something Sandbox.InitializePool(Sandbox.GetPrefab("Bomb"), 5);
             Sandbox.InitializePool(_playerPrefab, 4);
-            Sandbox.InitializePool(_colletableItem, 1);
+            Sandbox.InitializePool(_collectableItem, 1);
 
             for (int i = 0; i < 4; i++)
             {
@@ -131,8 +131,8 @@ namespace Platformer
         public void OnPlayerConnected(NetworkSandbox sandbox, NetworkPlayer player)
         {
             var playerObj = sandbox.NetworkInstantiate(_playerPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
-            //sandbox.NetworkInstantiate(_colletableItem, new Vector3(0, -0.5f, 0),
-            //    Quaternion.identity, null);
+            sandbox.NetworkInstantiate(_collectableItem, new Vector3(0, -0.5f, 0),
+                Quaternion.identity, null);
             
             player.PlayerObject = playerObj.gameObject;
             AlivePlayers.Add(playerObj);

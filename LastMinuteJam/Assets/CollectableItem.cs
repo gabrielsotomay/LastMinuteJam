@@ -2,19 +2,26 @@ using System;
 using Netick.Unity;
 using UnityEditor.UI;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
+using UnityEngine.SceneManagement;
 
 
-    public class CollectableItem : MonoBehaviour
+public class CollectableItem : NetworkBehaviour
     {
         [SerializeField] ComboInput comboInput;
         [SerializeField] private int comboDifficulty;
 
         public void CollectItem()
         {
-            Debug.Log("trigger is working");
-            comboInput._playComboEvent = true;
-            comboInput.GenerateRandomCombo(comboDifficulty);
-            comboInput.DisplayCombo();
-            Destroy(gameObject);
+
+            if (Sandbox.LocalPlayer == InputSource)
+            {
+                comboInput._playComboEvent = true;
+                comboInput.GenerateRandomCombo(comboDifficulty);
+                comboInput.DisplayCombo();
+                gameObject.SetActive(false);
+                Debug.Log("destroyed");
+            }
+            
         }
     }
