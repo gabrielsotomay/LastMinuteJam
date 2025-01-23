@@ -101,6 +101,7 @@ GameObject:
   - component: {fileID: 7908723542019291586}
   - component: {fileID: -6516995111205976413}
   - component: {fileID: 5474266722723004511}
+  - component: {fileID: 2900323890463934422}
   m_Layer: 0
   m_Name: NetworkAttackPrefab
   m_TagString: Untagged
@@ -134,7 +135,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 6fa1a12dc4bf5834192b770564e3a2b6, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -186,7 +187,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 6fa1a12dc4bf5834192b770564e3a2b6, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -214,6 +215,7 @@ MonoBehaviour:
   velocity: {x: 0, y: 0}
   IsGrounded: 0
   SimpleMovement: 0
+  networkTransform: {fileID: 5474266722723004511}
   playerAttack:
     id: 0
     hitboxScale: {x: 0, y: 0}
@@ -257,3 +259,28 @@ MonoBehaviour:
   CorrectionMaxBlendAlpha: 0.7
   TeleportErrorThreshold: 50
   _interpolationSource: 0
+--- !u!114 &2900323890463934422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3901431683383411334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1923973434, guid: da78c2c9df60edc4fb5f65b59fa57c41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _AoILayer: 0
+  _BroadPhaseFilter: 0
+  _NarrowPhaseFilter: 0
+  _PredictionMode: 1
+  _SpatialPrioritization: 0
+  AddToNetworkLoop: 1
+  _isPersistent: 0
+  GlobalObjectIdHash: 0
+  PrefabRoot: {fileID: 0}
+  Children: []
+  PrefabIndex: -1
+  _PrefabId: 1
+  SceneId: -1

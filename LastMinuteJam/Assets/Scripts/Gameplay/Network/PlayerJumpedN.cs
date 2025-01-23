@@ -7,7 +7,7 @@ namespace Platformer.Gameplay
     /// Fired when the player performs a Jump.
     /// </summary>
     /// <typeparam name="PlayerJumped"></typeparam>
-    public class PlayerJumpedN : Simulation.Event<PlayerJumpedN>
+    public class PlayerJumpedN : SimulationNetick.Event<PlayerJumpedN>
     {
         public AudioHelper.OneShot oneShotAudio;
 

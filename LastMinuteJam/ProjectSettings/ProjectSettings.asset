@@ -634,7 +634,7 @@ PlayerSettings:
     PS4: UNITY_POST_PROCESSING_STACK_V2
     PS5: UNITY_POST_PROCESSING_STACK_V2
     Stadia: UNITY_POST_PROCESSING_STACK_V2
-    Standalone: UNITY_POST_PROCESSING_STACK_V2;UNITY_TEMPLATE_PLATFORMER
+    Standalone: UNITY_POST_PROCESSING_STACK_V2;UNITY_TEMPLATE_PLATFORMER;RELAY_SDK_INSTALLED
     WebGL: UNITY_POST_PROCESSING_STACK_V2;UNITY_TEMPLATE_PLATFORMER
     Windows Store Apps: UNITY_POST_PROCESSING_STACK_V2
     XboxOne: UNITY_POST_PROCESSING_STACK_V2
@@ -752,11 +752,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: 9e48c5d9-49d3-4c8a-a96b-2b555419c3fa
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: LastMinuteJam
+  organizationId: auto-goose
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

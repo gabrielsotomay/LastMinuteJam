@@ -2,7 +2,7 @@ using Platformer.Core;
 using Platformer.Mechanics;
 using UnityEngine;
 
-public class AttackFinishedN : Simulation.Event<AttackFinishedN>
+public class AttackFinishedN : SimulationNetick.Event<AttackFinishedN>
 {
     public NetworkedPlayerController player;
 

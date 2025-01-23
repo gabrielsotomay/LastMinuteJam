@@ -2,7 +2,7 @@ using Platformer.Core;
 using Platformer.Mechanics;
 using UnityEngine;
 
-public class PlayerImpactedN : Simulation.Event<PlayerImpactedN>
+public class PlayerImpactedN : SimulationNetick.Event<PlayerImpactedN>
 {
     public NetworkedPlayerController player;
 

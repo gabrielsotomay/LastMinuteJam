@@ -42,7 +42,7 @@ namespace Platformer.Mechanics
         protected const float minMoveDistance = 0.001f;
         protected const float shellRadius = 0.01f;
 
-
+        public NetworkTransform networkTransform;
         /// <summary>
         /// Bounce the object's vertical velocity.
         /// </summary>
@@ -66,11 +66,21 @@ namespace Platformer.Mechanics
         /// Teleport to some position.
         /// </summary>
         /// <param name="position"></param>
-        public void Teleport(Vector3 position)
+        public void Teleport(Vector3 position, Quaternion rotation)
         {
-            body.position = position;
             velocity *= 0;
             body.linearVelocity *= 0;
+            networkTransform.Teleport(position, rotation);
+            body.position = position;
+            transform.position = position;
+        }
+        public void Teleport(Vector3 position)
+        {
+            velocity *= 0;
+            body.linearVelocity *= 0;
+            networkTransform.Teleport(position);
+            body.position = position;
+            transform.position = position;
         }
 
         protected virtual void OnEnable()
@@ -86,9 +96,12 @@ namespace Platformer.Mechanics
 
         public override void NetworkStart()
         {
-            contactFilter.useTriggers = false;
-            contactFilter.SetLayerMask(Physics2D.GetLayerCollisionMask(gameObject.layer));
-            contactFilter.useLayerMask = true;
+            if (!SimpleMovement)
+            {
+                contactFilter.useTriggers = false;
+                contactFilter.SetLayerMask(Physics2D.GetLayerCollisionMask(gameObject.layer));
+                contactFilter.useLayerMask = true;
+            }
             base.NetworkStart();
         }
 
@@ -118,13 +131,14 @@ namespace Platformer.Mechanics
             }
             velocity.x = targetVelocity.x;
 
+            IsGrounded = false;
 
             var deltaPosition = velocity * Time.fixedDeltaTime;
 
             var moveAlongGround = new Vector2(groundNormal.y, -groundNormal.x);
 
             var move = moveAlongGround * deltaPosition.x;
-
+            
             PerformMovement(move, false);
 
             move = Vector2.up * deltaPosition.y;
@@ -176,8 +190,11 @@ namespace Platformer.Mechanics
                 }
             }
             Vector2 moveVector = move.normalized * distance;
-            body.position = body.position + moveVector;
-            transform.position = transform.position + new Vector3(moveVector.x, moveVector.y, 0);
+            if (!(!IsServer && InputSource == Sandbox.LocalPlayer && yMovement) && (IsServer || InputSource != null) )
+            {
+                body.position = body.position + moveVector;
+                transform.position = transform.position + new Vector3(moveVector.x, moveVector.y, 0);
+            }
         }
 
     }

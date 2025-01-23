@@ -3,7 +3,7 @@ using Platformer.Gameplay;
 using Platformer.Mechanics;
 using UnityEngine;
 
-public class WindupFinishedN : Simulation.Event<WindupFinishedN>
+public class WindupFinishedN : SimulationNetick.Event<WindupFinishedN>
 {
     public NetworkedPlayerController player;
 

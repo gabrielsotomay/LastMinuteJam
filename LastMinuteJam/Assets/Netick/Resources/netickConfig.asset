@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: netickConfig
   m_EditorClassIdentifier: 
   _Prefabs:
+  - Obj: {fileID: 2900323890463934422, guid: 1e79d69d8f8da584abc3e3e8d83c31b4, type: 3}
+    Name: NetworkAttackPrefab
+    FileName: Assets/Prefabs/Network/NetworkAttackPrefab.prefab
+    GO: {fileID: 3901431683383411334, guid: 1e79d69d8f8da584abc3e3e8d83c31b4, type: 3}
+    Id: 1
   - Obj: {fileID: 7349908277165936739, guid: 2a14a4b78c7347341b296d6229a5c1bf, type: 3}
     Name: NetworkedPlayerPrefab
     FileName: Assets/Prefabs/Network/NetworkedPlayerPrefab.prefab
@@ -63,8 +68,8 @@ MonoBehaviour:
   AggressivePreAllocation: 0
   MaxPredictedTicks: 64
   ServerDivisor: 1
-  PhysicsPrediction: 0
-  PhysicsType: 1
+  PhysicsPrediction: 1
+  PhysicsType: 2
   InvokeRenderInHeadless: 0
   InvokeUpdate: 1
   RenderInvokeOrder: 1

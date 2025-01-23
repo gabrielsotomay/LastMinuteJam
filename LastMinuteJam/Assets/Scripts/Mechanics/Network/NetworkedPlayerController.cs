@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Platformer.Gameplay;
-using static Platformer.Core.Simulation;
+using static Platformer.Core.SimulationNetick;
 using Platformer.Model;
 using Platformer.Core;
 using UnityEngine.InputSystem;
@@ -9,8 +9,9 @@ using LastMinuteJam;
 using Netick;
 using Unity.VisualScripting;
 using System;
+using UnityEngine.Windows;
 using Netick.Unity;
-
+using System.Collections;
 
 namespace Platformer.Mechanics
 {
@@ -26,13 +27,16 @@ namespace Platformer.Mechanics
         public AudioClip ouchAudio;
 
         // Components
-        private Collider2D collider2d;
+        private BoxCollider2D collider2d;
         [SerializeField] AudioSource audioSource;
         [SerializeField] SpriteRenderer spriteRenderer;
         [SerializeField] Animator animator;
         private Transform rayCastBeginPoint;
         private PlayerInput playerInput;
         private Bounds bounds;
+
+        List<NetworkAttackController> allAttacks = new ();
+
 
         // Other local scripts
         public Health health;
@@ -57,12 +61,14 @@ namespace Platformer.Mechanics
         private int layerMask = 1 << 6; // only check for layer 6
         private bool flagVariable = false;
 
+        [SerializeField]
+        GameObject attackPrefab;
         // Data
         [SerializeField] PlayerStats playerStats;
 
         // Prefabs
         [SerializeField] GameObject hitboxPrefab;
-        [SerializeField] List<NetworkAttackController> attacks;
+        [SerializeField] List<NetworkAttackController> attacks = new ();
         List<int> activeAttacks = new List<int>(); // list of attacks in "attacks" array that are active
 
         // Attacks
@@ -92,6 +98,14 @@ namespace Platformer.Mechanics
         ulong id;
 
         public Vector3 spawnPosition;
+
+        [Networked]
+        public FighterInput MyInput
+        {
+            get; set;
+        }
+
+        NetworkBool inputAvailabile = false;
 
         public enum JumpState
         {
@@ -138,26 +152,30 @@ namespace Platformer.Mechanics
         private void Awake()
         {
             health = GetComponent<Health>();
-            collider2d = GetComponent<Collider2D>();
+            collider2d = GetComponent<BoxCollider2D>();
+            
         }
         
         public override void NetworkStart()
         {
+            id = (ulong)UnityEngine.Random.Range(0, 10000);
             int attackId = 0;
             
             foreach (NetworkAttackController attack in attacks)
             {
-                attack.Init(this, attackId++);
+                attack.Init(this, attackId++, id);
             }
             spawnPosition = transform.position;
             bounds = collider2d.bounds;
 
-            id = (ulong)UnityEngine.Random.Range(0, 10000);
             direction = Direction.Right;
             // we store the spawn pos so that we use it later during respawn.
             spawnPosition = transform.position;
-
+            SetAttackState(AttackState.None);
+            SetHealthState(HealthState.Normal);
+            lastAttackTaken = new PlayerAttack(false);
             Spawn();
+            model.UIcontroller.PrepareGame();
             base.NetworkStart();
         }
         public override void OnInputSourceLeft()
@@ -169,8 +187,39 @@ namespace Platformer.Mechanics
 
 
         public override void NetworkFixedUpdate()
-        {           
-            if (FetchInput(out FighterInput input))
+        {
+            FighterInput input = new FighterInput();
+            if (FetchInput(out FighterInput frameInput))
+            {
+                input = frameInput;
+                if (IsServer && isPlayer1)
+                {
+                    SetInputRpc(input);
+                }
+                inputAvailabile = true;
+            }
+            else if(InputSource == null && inputAvailabile)
+            {
+                input = MyInput;
+            } 
+            else if (InputSource != null)
+            {
+                ResetInputRpc();
+                MyInput = new FighterInput();
+                inputAvailabile = false;
+            }
+            /*
+            if (IsServer)
+            {
+                bounds = collider2d.bounds;
+                foreach ( NetworkAttackController attack in allAttacks)
+                {
+                    CheckAttackIntersection(attack);
+                }
+            }
+            */
+
+            if (inputAvailabile)
             {
                 movementInput = input.movement;
 
@@ -189,7 +238,6 @@ namespace Platformer.Mechanics
 
                 if (input.lightAttack)
                 {
-                    Debug.Log("Attempted Attack at state " + attackState);
                     OnAttack(AttackTypes.Light);                    
                 }
                 if (input.heavyAttack )
@@ -230,11 +278,29 @@ namespace Platformer.Mechanics
             
             
             UpdateJumpState();
-
+            CheckTickActions();
             base.NetworkFixedUpdate();
 
         }
 
+        public void CheckTickActions()
+        {
+
+        }
+        [Rpc(target: RpcPeers.Everyone)]
+        public void SetInputRpc(FighterInput input)        
+        {
+            
+            MyInput = input;
+            inputAvailabile = true;
+        }
+        [Rpc(target:  RpcPeers.Everyone)]
+        public void ResetInputRpc()
+        {
+            
+            MyInput = new FighterInput();
+            inputAvailabile = false;
+        }
 
         public void Respawn()
         {
@@ -263,9 +329,11 @@ namespace Platformer.Mechanics
             
             jumpState = JumpState.Grounded;
             animator.SetBool("dead", false);
+            /*
             model.virtualCamera.Follow = transform;
             model.virtualCamera.LookAt = transform;
-            Schedule<EnablePlayerInputN>(2f).player = this;
+            */
+            Schedule<EnablePlayerInputN>(Sandbox.Tick.TickValue, (int)(2/Sandbox.FixedDeltaTime)).player = this;
         }
 
 
@@ -326,10 +394,10 @@ namespace Platformer.Mechanics
             {
                 jumpState = JumpState.PrepareToJump;
             }
-            else if (!jumped)
+            else if (!jumped && jumpState == JumpState.Jumping)
             {
                 stopJump = true;
-                Schedule<PlayerStopJumpN>().player = this;
+                Schedule<PlayerStopJumpN>(Sandbox.Tick.TickValue).player = this;
             }
         }
 
@@ -340,12 +408,12 @@ namespace Platformer.Mechanics
             {
                 return;
             }
-            if (attackState == AttackState.None)
+            if (attackState == AttackState.None && attacks.Count <= 4)
             { 
                 SetAttackState(AttackState.WindUp);
                 UpdateAttackAnimations((int)type);
                 currentAttack = GetAttackType(type);
-                Schedule<WindupFinishedN>(currentAttack.windupTime).player = this;
+                Schedule<WindupFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.windupTime/Sandbox.FixedDeltaTime)).player = this;
             }
         }
 
@@ -384,29 +452,27 @@ namespace Platformer.Mechanics
             if (attackState == AttackState.WindUp)
             {
                 SetAttackState(AttackState.Active);
-                Attack(currentAttack);
-                Schedule<ActiveFinishedN>(currentAttack.activeTime).player = this;
+                if (IsServer)
+                {
+                    Attack(currentAttack);
+                }
+                Schedule<ActiveFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.activeTime/Sandbox.FixedDeltaTime)).player = this;
             }
         }
         
         private void Attack(PlayerAttack attack)
         {
-            activeAttacks.Add(attack.id);
-            NetworkAttackController newAttack;
-            int nextAttack = GetNextInactiveAttack();
-            if (nextAttack == -1)
+            //activeAttacks.Add(attack.id);
+
+
+            Vector3 attackPosition = transform.position + new Vector3(attack.position.x, attack.position.y, 0);
+            Quaternion attackRotation = Quaternion.Euler(0, 0, attack.rotation);
+
+            int attackId = Sandbox.NetworkInstantiate(attackPrefab,attackPosition, attackRotation).Id;
+            FireAttackRpc(attack.id, attackId);
+            if (attacks.Count >= 5)
             {
                 throw new Exception("somehow made an attack while another attack was being made");
-            }
-            newAttack = attacks[nextAttack];
-            activeAttacks.Add(nextAttack);
-            if (attack.type == PlayerAttack.Type.Projectile)
-            {
-                newAttack.FireProjectile(transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), attack, hitboxSprites[attack.id]);
-            }
-            else
-            {
-                newAttack.FireMelee(transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), attack, hitboxSprites[attack.id] );
             }
             // TODO: Select the correct attack
 
@@ -415,6 +481,23 @@ namespace Platformer.Mechanics
             //hitboxController.Fire(transform.position + new Vector3(attack.position.x, attack.position.y, 0), Quaternion.Euler(0, 0, attack.rotation), attack);
         }
 
+        [Rpc(target: RpcPeers.Everyone, localInvoke:true)]
+        public void FireAttackRpc(int type, int networkId)
+        {
+            NetworkAttackController newAttack = NetworkAttackController.FindAttackByNetworkId(networkId);
+            PlayerAttack attack = GetAttackType((AttackTypes)type);
+            newAttack.Init(this, attacks.Count, id);
+            if (attack.type == PlayerAttack.Type.Projectile)
+            {
+                newAttack.FireProjectile( attack, hitboxSprites[attack.id]);
+            }
+            else
+            {
+                newAttack.FireMelee(attack, hitboxSprites[attack.id]);
+            }
+            attacks.Add(newAttack);
+            activeAttacks.Add(attacks.Count-1);
+        }
         private int GetNextInactiveAttack()
         {
             // returns -1 if all attacks are used
@@ -438,12 +521,12 @@ namespace Platformer.Mechanics
             {
                 SetAttackState(AttackState.Recovery);
                 EndActiveAttack();
-                Schedule<AttackFinishedN>(currentAttack.recoverTime).player = this;
+                Schedule<RecoveryFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.recoverTime/Sandbox.FixedDeltaTime)).player = this;
             }
         }
         public void OnAttackFinished()
         {
-            SetAttackState(AttackState.None);
+            //SetAttackState(AttackState.None);
         }
         private void EndActiveAttack()
         {
@@ -454,13 +537,27 @@ namespace Platformer.Mechanics
             if (attackState == AttackState.Recovery)
             {
                 SetAttackState(AttackState.None);
-                Schedule<AttackFinishedN>(currentAttack.recoverTime).player = this;
+                Schedule<AttackFinishedN>(Sandbox.Tick.TickValue).player = this;
             }
         }
 
         public void ClearAttack(int id)
         {
+
             activeAttacks.Remove(id);
+            NetworkAttackController attackToRemove = null;
+            foreach (NetworkAttackController attack in attacks)
+            {
+                if(attack != null && attack.id == id)
+                {
+                    attackToRemove = attack;
+                }
+
+            }
+            if (attackToRemove != null)
+            {
+                attacks.Remove(attackToRemove);
+            }
         }
         PlayerAttack GetAttackType(AttackTypes attackType)
         {
@@ -468,6 +565,7 @@ namespace Platformer.Mechanics
             PlayerAttack attack ;
             if (attackType == AttackTypes.Light)
             {
+                Debug.Log("Got basic attack");
                 attack = playerAttackTypes.basicAttack;
             }
             else if (attackType == AttackTypes.Heavy)
@@ -522,14 +620,14 @@ namespace Platformer.Mechanics
                 case JumpState.Jumping:
                     if (!IsGrounded)
                     {
-                        Schedule<PlayerJumpedN>().oneShotAudio = new AudioHelper.OneShot(audioSource, jumpAudio);
+                        Schedule<PlayerJumpedN>(Sandbox.Tick.TickValue).oneShotAudio = new AudioHelper.OneShot(audioSource, jumpAudio);
                         jumpState = JumpState.InFlight;
                     }
                     break;
                 case JumpState.InFlight:
                     if (IsGrounded)
                     {
-                        Schedule<PlayerLandedN>().player = this;
+                        Schedule<PlayerLandedN>(Sandbox.Tick.TickValue).player = this;
                         jumpState = JumpState.Landed;
                     }
                     break;
@@ -581,39 +679,77 @@ namespace Platformer.Mechanics
 
 
             animator.SetBool("grounded", IsGrounded);
-            animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / playerStats.maxSpeed);
+            if (InputSource != null)
+            {
+                animator.SetFloat("velocityX", Mathf.Abs(velocity.x) / playerStats.maxSpeed);
+                targetVelocity = move * playerStats.maxSpeed;
+            }
+            else
+            {
+                animator.SetFloat("velocityX", Mathf.Abs((move * playerStats.maxSpeed).x) / playerStats.maxSpeed);
+                targetVelocity = move * playerStats.maxSpeed;
 
-            targetVelocity = move * playerStats.maxSpeed;
+            }
+
         }
+        /*
+        public void CheckAttackIntersection(NetworkAttackController attack)
+        {
 
+            Bounds otherBounds = attack.GetComponent<BoxCollider2D>().bounds;
+            otherBounds.SetMinMax(new Vector3(otherBounds.min.x, otherBounds.min.y, -0.5f), new Vector3(otherBounds.max.x, otherBounds.max.y, 0.5f));
+            if (bounds.Intersects(otherBounds))
+            {
+                Debug.Log("Player " + id + " + got hit by player " + attack.playerId + " with attack" + attack.id);
+                if (CheckParry(attack))
+                {
+                    // TODO: Don't get hit and do cool effect
+                }
+                else if (attack.playerId != id && !impactList.Contains(attack.GetInstanceID()))
+                {
+                    impactVector = Vector3.Normalize(transform.position - attack.transform.position);
+                    TakeHitRpc(attack.GetComponent<NetworkObject>().Id, impactVector); ;
+                }
+            }
+            if(UnityEngine.Input.GetKeyDown(KeyCode.G))
+            {
+gg                Debug.Log("Analysing");
+            }
+        }
+        */
+        
         private void OnTriggerEnter2D(Collider2D cldr)
         {
-            HitboxController hitboxController = cldr.GetComponent<HitboxController>();
+            
+
+            NetworkAttackController attackController = cldr.GetComponent<NetworkAttackController>();
 
             // Check parry
-            if (hitboxController == null)
+            if (attackController == null || !IsServer || attackController.playerId == 0)
             {
+                //Debug.Log("Player" + id + " entered non-atack trigger");
                 return;
             }
-            if (CheckParry(hitboxController))
+            Debug.Log("Player " + id + " + got hit by player " + attackController.playerId + " with attack" + attackController.id);
+            if (CheckParry(attackController))
             {
                 // TODO: Don't get hit and do cool effect
             }
-            else if (hitboxController.playerId != id && !impactList.Contains(hitboxController.GetInstanceID()))
+            else if (attackController.playerId != id && !impactList.Contains(attackController.GetInstanceID()))
             { 
                 impactVector = Vector3.Normalize(transform.position - cldr.transform.position);
-                TakeHit(hitboxController);
-                hitboxController.HitEnemy();
+                TakeHitRpc(attackController.GetComponent<NetworkObject>().Id, impactVector);;
             }
+            return;
         }
-
-        private bool CheckParry(HitboxController hitboxController)
+        
+        private bool CheckParry(NetworkAttackController attackController)
         {
             return false;
             // TODO : Fix this to make super cool parry combos
             if (
                 (attackState == AttackState.WindUp || attackState == AttackState.Active) &&
-                hitboxController.playerAttack.id != currentAttack.id) 
+                attackController.playerAttack.id != currentAttack.id) 
             {
                 return true;
             }
@@ -621,19 +757,56 @@ namespace Platformer.Mechanics
         }
 
 
-        private void TakeHit(HitboxController hitboxController)
+
+        [Rpc(target: RpcPeers.Everyone, localInvoke: true)]
+        public void InitAttacksRpc(PlayerAttack.AttackIdsSent attackIds)
         {
-            impactList.Add(hitboxController.GetInstanceID());
-            SetHealthState(HealthState.Impacted);
-            health.Decrement();
-            Schedule<PlayerImpactedN>().player = this;
-            ImpactFinishedN impactFinishedEvent = Schedule<ImpactFinishedN>(hitboxController.playerAttack.impactTime);
-            impactFinishedEvent.player = this;
-            impactFinishedEvent.impactId = ++impactNumber;
-            lastAttackTaken = hitboxController.playerAttack;
-            controlEnabled = false;
+            foreach (int attackId in attackIds.Attacks)
+            {
+                allAttacks.Add(NetworkAttackController.FindAttackByNetworkId(attackId));
+            }
+        }
+
+        public List<int> GetAttackNetworkIds()
+        {
+            List<int> ids = new();
+            foreach (NetworkAttackController attackController in attacks)
+            {
+                ids.Add(attackController.GetComponent<NetworkObject>().Id);
+            }
+            return ids;
+        }
+
+
+        [Rpc(target: RpcPeers.Everyone, localInvoke: true)]
+        public void TakeHitRpc(int attackId, Vector3 impactVector_)
+        {
+            impactVector = impactVector_;
+            TakeHitN hitEvent = Schedule<TakeHitN>(Sandbox.Tick.TickValue);
+            hitEvent.player = this;
+            hitEvent.attackController = NetworkAttackController.FindAttackByNetworkId(attackId);
+            //hitEvent.attackController = attacks[attackId];
 
         }
+
+        public void TakeHit(NetworkAttackController attackController)
+        {
+            impactList.Add(attackController.GetInstanceID());
+            SetHealthState(HealthState.Impacted);
+            health.Decrement();
+            Schedule<PlayerImpactedN>(Sandbox.Tick.TickValue).player = this;
+            ImpactFinishedN impactFinishedEvent = Schedule<ImpactFinishedN>(Sandbox.Tick.TickValue, (int)(attackController.playerAttack.impactTime/Sandbox.FixedDeltaTime));
+            impactFinishedEvent.player = this;
+            impactFinishedEvent.impactId = ++impactNumber;
+            if (lastAttackTaken.id == -1)
+            {
+                lastAttackTaken = attackController.playerAttack;
+            }
+            controlEnabled = false;
+            attackController.HitEnemy();
+        }
+        
+
 
         public void OnImpactFinished(int impactId)
         {
@@ -642,43 +815,58 @@ namespace Platformer.Mechanics
                 return;
             }
             SetHealthState(HealthState.Disabled);
-            Schedule<PlayerDisableN>().player = this;
-            Schedule<DisableFinishedN>(lastAttackTaken.disableTime).player = this;
+            Schedule<PlayerDisableN>(Sandbox.Tick.TickValue).player = this;
+            Schedule<DisableFinishedN>(Sandbox.Tick.TickValue, (int)(lastAttackTaken.disableTime/Sandbox.FixedDeltaTime)).player = this;
         }
 
         private void SetHealthState(HealthState newState)
         {
-            AnimateHealthState(healthState, false);
-            AnimateHealthState(newState, true);
+            AnimateHealthState(newState);
             healthState = newState;
 
         }
-        private void AnimateHealthState(HealthState newState, bool isActive)
+        private void AnimateHealthState(HealthState newState)
         {
             switch (newState)
             {
                 case HealthState.Normal:
-                    
+                    animator.SetBool("normal", true);
+                    animator.SetBool("disabled", false);
+                    animator.SetBool("impacted", false);
+                    animator.SetBool("reenable", false);
+                    animator.SetBool("dead", false);
                     break;
                 case HealthState.Disabled:
-                    animator.SetBool("disabled", isActive);
+                    animator.SetBool("normal", false);
+                    animator.SetBool("disabled", true);
+                    animator.SetBool("impacted", false);
+                    animator.SetBool("reenable", false);
+                    animator.SetBool("dead", false);
+                    SetAttackState(AttackState.None);
                     jumpState = JumpState.InFlight;
                     break;
                 case HealthState.Impacted:
-                    animator.SetBool("impacted", isActive);
-                    if (isActive)
-                    {
-                        SetAttackState(AttackState.None);
-                        animator.SetBool("windup", false);
-                        animator.SetBool("active", false);
-                        animator.SetBool("recover", false);
-                    }
+                    animator.SetBool("normal", false);
+                    animator.SetBool("disabled", false);
+                    animator.SetBool("impacted", true);
+                    animator.SetBool("reenable", false);
+                    animator.SetBool("dead", false);
+                    SetAttackState(AttackState.None);
                     break;
                 case HealthState.Recovering:
-                    animator.SetBool("reenable", isActive);
+                    animator.SetBool("normal", false);
+                    animator.SetBool("disabled", false);
+                    animator.SetBool("impacted", false);
+                    animator.SetBool("reenable", true);
+                    animator.SetBool("dead", false);
+                    SetAttackState(AttackState.None);
                     break;
                 case HealthState.Dead:
-                    animator.SetBool("dead", isActive);
+                    animator.SetBool("normal", false);
+                    animator.SetBool("disabled", false);
+                    animator.SetBool("impacted", false);
+                    animator.SetBool("reenable", false);
+                    animator.SetBool("dead", true);
                     break;
                 default:
                     break;
@@ -687,30 +875,39 @@ namespace Platformer.Mechanics
 
         private void SetAttackState(AttackState newState)
         {
-            if(newState == AttackState.WindUp)
-            {
-
-            }
-            AnimateAttackState(attackState, false);
-            AnimateAttackState(newState, true);
+            
+            AnimateAttackState(newState);
             attackState = newState;
 
         }
-        private void AnimateAttackState(AttackState newState, bool isActive)
+        private void AnimateAttackState(AttackState newState)
         {
             switch (newState)
             {
                 case AttackState.None:
-
+                    animator.SetBool("none", true);
+                    animator.SetBool("windup", false);
+                    animator.SetBool("active", false);
+                    animator.SetBool("recover", false); 
+                    
                     break;
                 case AttackState.WindUp:
-                    animator.SetBool("windup", isActive);
+                    animator.SetBool("none", false);
+                    animator.SetBool("windup", true);
+                    animator.SetBool("active", false);
+                    animator.SetBool("recover", false);
                     break;
                 case AttackState.Active:
-                    animator.SetBool("active", isActive);
+                    animator.SetBool("none", false);
+                    animator.SetBool("windup", false);
+                    animator.SetBool("active", true);
+                    animator.SetBool("recover", false);
                     break;
                 case AttackState.Recovery:
-                    animator.SetBool("recover", isActive);
+                    animator.SetBool("none", false);
+                    animator.SetBool("windup", false);
+                    animator.SetBool("active", false);
+                    animator.SetBool("recover", true);
                     break;
                 default:
                     break;
@@ -723,10 +920,16 @@ namespace Platformer.Mechanics
             {
                 return;
             }
-            SetHealthState(HealthState.Normal);
+            SetHealthState(HealthState.Recovering);
+            Schedule<ReenableFinishedN>(Sandbox.Tick.TickValue).player = this;
             controlEnabled = true;
         }
 
+        public void OnReenableFinish()
+        {
+            SetHealthState(HealthState.Normal);
+            lastAttackTaken = new PlayerAttack(false);
+        }
         
 
         public void OnDeath()
@@ -746,7 +949,7 @@ namespace Platformer.Mechanics
                 }
                 animator.SetTrigger("hurt");
                 animator.SetBool("dead", true);
-                Schedule<PlayerSpawn>(2);
+                Schedule<PlayerSpawnN>(Sandbox.Tick.TickValue, (int)(2/Sandbox.FixedDeltaTime));
             }
         }
 
