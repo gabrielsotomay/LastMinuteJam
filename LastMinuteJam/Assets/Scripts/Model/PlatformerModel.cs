@@ -1,6 +1,7 @@
+using NUnit.Framework;
 using Platformer.Mechanics;
 using UnityEngine;
-
+using System.Collections.Generic;
 namespace Platformer.Model
 {
     /// <summary>
@@ -16,6 +17,8 @@ namespace Platformer.Model
         /// </summary>
         public Unity.Cinemachine.CinemachineCamera virtualCamera;
 
+        public GameUIController UIcontroller;
+
         /// <summary>
         /// The main component which controls the player sprite, controlled 
         /// by the user.
@@ -25,7 +28,9 @@ namespace Platformer.Model
         /// <summary>
         /// The spawn point in the scene.
         /// </summary>
-        public Transform spawnPoint;
+        public List<Transform> spawnPoints;
+        public Transform topLeft;
+        public Transform topRight;
 
         /// <summary>
         /// A global jump modifier applied to all initial jump velocities.

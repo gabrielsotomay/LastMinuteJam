@@ -1,16 +1,27 @@
 using System;
+using Netick.Unity;
 using UnityEditor.UI;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
+using UnityEngine.SceneManagement;
 
-public class CollectableItem : MonoBehaviour
-{
-    [SerializeField] private ComboInput comboInput;
-    [SerializeField] private int comboDifficulty = 3;
-    private void OnTriggerEnter2D(Collider2D other)
+
+public class CollectableItem : NetworkBehaviour
     {
-        comboInput._playComboEvent = true;
-        comboInput.GenerateRandomCombo(comboDifficulty);
-        comboInput.DisplayCombo();
-        Destroy(this.gameObject);
+        [SerializeField] ComboInput comboInput;
+        [SerializeField] private int comboDifficulty;
+
+        public void CollectItem()
+        {
+
+            if (Sandbox.LocalPlayer == InputSource)
+            {
+                comboInput._playComboEvent = true;
+                comboInput.GenerateRandomCombo(comboDifficulty);
+                comboInput.DisplayCombo();
+                gameObject.SetActive(false);
+                Debug.Log("destroyed");
+            }
+            
+        }
     }
-}

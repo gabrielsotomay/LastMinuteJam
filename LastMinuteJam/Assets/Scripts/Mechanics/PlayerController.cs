@@ -378,16 +378,6 @@ namespace Platformer.Mechanics
         }
 
 
-        private void SetAttackAnimations(int id)
-        {
-            if (id == 1)
-            {
-                AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
-                animator.runtimeAnimatorController = animatorOverrideController;
-            }
-
-
-        }
         public void OnWindupFinished()
         {
             if (attackState == AttackState.WindUp)
@@ -489,6 +479,7 @@ namespace Platformer.Mechanics
 
         void UpdateJumpState()
         {
+            // In a frame, has to happen before ComputeVelocity for jump to work
             jump = false;
             switch (jumpState)
             {

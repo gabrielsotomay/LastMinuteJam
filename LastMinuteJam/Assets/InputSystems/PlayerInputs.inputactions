@@ -222,50 +222,50 @@
             ]
         },
         {
-            "name": "Combo",
-            "id": "d66ffbfa-135d-4c95-89fd-e141f94c2127",
+            "name": "UI",
+            "id": "df9380f9-7bb1-4e4b-a2c7-e7d98576b544",
             "actions": [
                 {
                     "name": "Up",
                     "type": "Button",
-                    "id": "fc40ce18-1dde-4dde-9d5e-f7fcfc508c76",
+                    "id": "68d45a2f-d978-43e1-872c-26bc84aefcbe",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "Tap",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
                     "name": "Down",
                     "type": "Button",
-                    "id": "58a60055-335e-44b0-8e72-6c2081d0cc18",
+                    "id": "2af17456-500d-4151-aed3-150488ff6c18",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "Tap",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Left",
-                    "type": "Button",
-                    "id": "37c761ec-0972-42e2-8f98-8ef2d80af670",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "Tap",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
                     "name": "Right",
                     "type": "Button",
-                    "id": "25d98598-b82d-4bb4-a6d3-28ade39f9838",
+                    "id": "e72a80ec-e625-48b5-a746-82828f41e70b",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "Tap",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Left",
+                    "type": "Button",
+                    "id": "698d1786-0a33-41f1-9e30-31496a6e26b6",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
                     "initialStateCheck": false
                 }
             ],
             "bindings": [
                 {
                     "name": "",
-                    "id": "1bb03892-b5e6-4774-954c-674d184a2006",
+                    "id": "99b96d65-f313-49e9-915d-5d059dff355c",
                     "path": "<Keyboard>/numpad8",
                     "interactions": "",
                     "processors": "",
@@ -276,18 +276,18 @@
                 },
                 {
                     "name": "",
-                    "id": "2cbc32b0-bbe9-4189-b32c-0168c0b62bd7",
-                    "path": "<Keyboard>/numpad4",
+                    "id": "8b046cb6-2e6e-4ab2-b875-481bbe04327b",
+                    "path": "<Keyboard>/numpad5",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Left",
+                    "action": "Down",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "267e5218-d1cd-480e-b7ff-021e7e5e703a",
+                    "id": "c00b1f23-7c8e-4229-a9fc-fb884b45ed96",
                     "path": "<Keyboard>/numpad6",
                     "interactions": "",
                     "processors": "",
@@ -298,12 +298,12 @@
                 },
                 {
                     "name": "",
-                    "id": "b9c10fd0-ee97-4d13-84a9-13247cf5cffc",
-                    "path": "<Keyboard>/numpad5",
+                    "id": "0a39fc84-7db7-4e93-bb32-1339e66204d9",
+                    "path": "<Keyboard>/numpad4",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Down",
+                    "action": "Left",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
