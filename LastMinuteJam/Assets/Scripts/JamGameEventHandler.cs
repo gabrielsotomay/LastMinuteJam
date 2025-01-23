@@ -18,13 +18,14 @@ namespace Platformer
 
         private GameObject _playerPrefab;
         private GameObject _collectableItem;
+        private GameObject _healthBarPrefab;
 
         private Vector3[] _spawnPositions = new Vector3[4] { new Vector3(11, 9, 0), new Vector3(11, 1, 0), new Vector3(1, 9, 0), new Vector3(1, 1, 0) };
         private Queue<Vector3> _freePositions = new(4);
 
 
         readonly PlatformerModel model = GetModel<PlatformerModel>();
-
+        
 
         public override void NetworkStart()
         {
@@ -37,6 +38,7 @@ namespace Platformer
 
             _playerPrefab = Sandbox.GetPrefab("NetworkedPlayerPrefab");
             _collectableItem = Sandbox.GetPrefab("Square");
+            _healthBarPrefab = Sandbox.GetPrefab("HealthBar");  
             Sandbox.Events.OnConnectRequest += OnConnectRequest;
             Sandbox.Events.OnPlayerConnected += OnPlayerConnected;
             Sandbox.Events.OnPlayerDisconnected += OnPlayerDisconnected;
@@ -44,7 +46,15 @@ namespace Platformer
             // TODO: Make this for the powerups or something Sandbox.InitializePool(Sandbox.GetPrefab("Bomb"), 5);
             Sandbox.InitializePool(_playerPrefab, 4);
             Sandbox.InitializePool(_collectableItem, 1);
-
+            if (_healthBarPrefab != null)
+            {
+                Sandbox.InitializePool(_healthBarPrefab, 4);
+            }
+            else
+            {
+                Debug.Log("No Health Bar Prefabbbb");
+            }
+            
             for (int i = 0; i < 4; i++)
             {
                 _freePositions.Enqueue(_spawnPositions[i]);
@@ -66,6 +76,11 @@ namespace Platformer
             var playerObj = sandbox.NetworkInstantiate(_playerPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
             sandbox.NetworkInstantiate(_collectableItem, new Vector3(0, -0.5f, 0),
                 Quaternion.identity, null);
+            if (_healthBarPrefab != null)
+            {
+                sandbox.NetworkInstantiate(_healthBarPrefab, new Vector3(0, 200, 0), Quaternion.identity, null);
+            }
+
             
             player.PlayerObject = playerObj.gameObject;
             AlivePlayers.Add(playerObj);
@@ -98,11 +113,15 @@ namespace Platformer
         {
             CinemachineTargetGroup targetGroup = FindFirstObjectByType<CinemachineTargetGroup>();
             NetworkedPlayerController[] foundPlayers = FindObjectsByType<NetworkedPlayerController>(FindObjectsSortMode.InstanceID);
+            HealthBarController healthBar = FindFirstObjectByType<HealthBarController>();
+            
             if (targetGroup.IsEmpty)
             {
                 foreach (NetworkedPlayerController player in foundPlayers)
                 {
                     FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
+                    Instantiate(_healthBarPrefab, player.transform.position, Quaternion.identity).transform.SetParent(healthBar.transform);
+                    Debug.Log("THIS ISRUNINGIGGGGGGGG");
                 }
             }
             else
@@ -112,10 +131,12 @@ namespace Platformer
                     if (player.GetComponent<NetworkObject>().Id == playerObjectId)
                     {
                         FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
+                        Instantiate(_healthBarPrefab, player.transform.position, Quaternion.identity).transform.SetParent(healthBar.transform);
+                        Debug.Log("THIS ISRUNINGIGGGGGGGG");
                     }
                 }
             }
-
+    
         }
         /*
         [Rpc(target:RpcPeers.Everyone)]

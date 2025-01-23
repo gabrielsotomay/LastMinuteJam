@@ -499,7 +499,7 @@ public class LobbyController : MonoBehaviour
 
     public bool CheckLobbyReady()
     {
-        if (joinedLobby.Players.Count < 2)
+        if (joinedLobby.Players.Count < 1)
         {
             return false;
         }
