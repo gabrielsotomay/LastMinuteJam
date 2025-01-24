@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Elvira Block Animation_0: -421121297267066211
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

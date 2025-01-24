@@ -37,6 +37,8 @@ public class MenuUIController : MonoBehaviour
 
     public List<Button> characterButtons;
     public Button readyButton;
+
+    public AudioSource startGameAudio;
     /*public GameObject playerOneElvira;
     public GameObject playerOneJj;
     public GameObject playerTwoElvira;
@@ -69,9 +71,11 @@ public class MenuUIController : MonoBehaviour
         }
     public async void CreateGame()
     {
+        
         if (await lobbyController.CreateLobby(playerName.text))
         {
             OnLobbyEnter();
+            startGameAudio.Play();
             startGameButton.gameObject.SetActive(true);
 
             /*playerOneJj.SetActive(true);
@@ -85,6 +89,7 @@ public class MenuUIController : MonoBehaviour
     public async void SetReady()
     {
          lobbyController.UpdatePlayerState(LobbyController.KEY_READY);
+         startGameAudio.Play();
     }
 
     public void SwapCharacter()
@@ -92,6 +97,7 @@ public class MenuUIController : MonoBehaviour
         characterActive = (characterActive + 1) % 2;
         lobbyController.ChangeCharacter(characterActive);
         ToggleCharButtonsEnable(false);
+        startGameAudio.Play();
     }
 
     public void ToggleCharButtonsEnable(bool enable)
@@ -110,6 +116,7 @@ public class MenuUIController : MonoBehaviour
     public async void StartGame()
     {
         lobbyController.StartGame();
+        startGameAudio.Play();
     }
 
     public async void QuickJoin()
@@ -118,6 +125,7 @@ public class MenuUIController : MonoBehaviour
         {
             OnLobbyEnter();
             startGameButton.gameObject.SetActive(false);
+            startGameAudio.Play();
         }
     }
 

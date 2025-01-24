@@ -159,7 +159,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Elvira in Air Animation_0: -3623665928972925327
+      Elvira in Air Animation_1: -3737591910447768116
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

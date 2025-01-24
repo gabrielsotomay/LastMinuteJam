@@ -159,7 +159,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      JJ Idle Animation v2_0: -2469213393551277664
+      JJ Idle Animation v2_1: -7805698712557454626
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

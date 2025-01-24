@@ -309,7 +309,15 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      JJ Heavy Attack Animation v2_0: -4864279245795521057
+      JJ Heavy Attack Animation v2_1: 9144058871208126226
+      JJ Heavy Attack Animation v2_2: -4324742869460985542
+      JJ Heavy Attack Animation v2_3: -1954212590396272215
+      JJ Heavy Attack Animation v2_4: -1141662867865834376
+      JJ Heavy Attack Animation v2_5: -2455940094531861
+      JJ Heavy Attack Animation v2_6: -8979500292607678150
+      JJ Heavy Attack Animation v2_7: -7088419908558850915
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
