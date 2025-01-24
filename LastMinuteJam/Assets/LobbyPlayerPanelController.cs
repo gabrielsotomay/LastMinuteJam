@@ -7,57 +7,57 @@ public class LobbyPlayerPanelController : MonoBehaviour
 
     public Button readyButton;
     public TMP_Text name;
-    public List<RectTransform> characterBorders;
+    //public List<RectTransform> characterBorders;
     public List<Button> characterButtons;
-
+    public int NumOfChararacters;
+    public List<GameObject> characterAnims;
+    private int characterActive = 0;
     LobbyController lobbyController;
+
+    public Sprite readyBarNormal;
+    public Sprite readyBarClicked;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     public void Init(LobbyController lobbyController_)
     {
         lobbyController = lobbyController_;
-        characterButtons[0].onClick.AddListener(SetCharacterToJJ);
-        characterButtons[1].onClick.AddListener(SetCharacterToElvira);
+          characterButtons[0].onClick.AddListener(SwapCharacter);
+        characterButtons[1].onClick.AddListener(SwapCharacter);
         readyButton.onClick.AddListener(SetReady);
     }
     public void UpdateCharacterChoice(int character)
     {
-        for (int i = 0; i < characterBorders.Count; i++)
+        for (int i = 0; i < NumOfChararacters; i++)
         {
             if (i == character)
             {
-                characterBorders[i].gameObject.SetActive(true);
+                characterAnims[i].gameObject.SetActive(true);
             }
             else
             {
-                characterBorders[i].gameObject.SetActive(false);
+                characterAnims[i].gameObject.SetActive(false);
 
             }
         }
     }
 
-    public void SetCharacterToJJ()
+    public void SwapCharacter()
     {
-        lobbyController.ChangeCharacter(0);
+        lobbyController.ChangeCharacter((characterActive + 1) % 2);
     }
-
-    public void SetCharacterToElvira()
-    {
-        lobbyController.ChangeCharacter(1);
-    }
+    
     // Update is called once per frame
     public void UpdateInfo(LobbyUIData info)
     {
         name.text = info.name;
         UpdateCharacterChoice(info.character);
         if (info.state == LobbyController.KEY_READY)
-        {
-            readyButton.GetComponent<Image>().color = Color.green;
+        {   
+            readyButton.GetComponent<Image>().sprite = readyBarClicked;
         }
         else
         {
-            readyButton.GetComponent<Image>().color = Color.white;
-
+            readyButton.GetComponent<Image>().sprite = readyBarNormal;
         }
     }
 
