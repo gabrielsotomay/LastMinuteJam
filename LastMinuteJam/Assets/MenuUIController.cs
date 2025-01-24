@@ -104,6 +104,7 @@ public class MenuUIController : MonoBehaviour
         if (await lobbyController.JoinLobbyByCode(playerName.text, lobbyName.text))
         {
             OnLobbyEnter();
+            startGameButton.gameObject.SetActive(false);
         }
     }
     public async void StartGame()
@@ -116,6 +117,7 @@ public class MenuUIController : MonoBehaviour
         if (await lobbyController.QuickJoinLobby(playerName.text))
         {
             OnLobbyEnter();
+            startGameButton.gameObject.SetActive(false);
         }
     }
 

@@ -26,7 +26,7 @@ public class HealthBarController : MonoBehaviour
         Sprite newIcon = JJIcons[0];
         Sprite newEmptySprite;
         Sprite newFullSprite;
-        bool isLeft = healthBars.Count == 1; // second character faces left
+        bool isLeft = healthBars.Count == 0; // second character is on right (!isLeft)
         switch (player.character)
         {
             case PlayerData.Character.JJ:

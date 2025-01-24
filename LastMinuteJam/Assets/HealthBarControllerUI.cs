@@ -18,12 +18,12 @@ public class HealthBarControllerUI : MonoBehaviour
     float _oldHealth = 0f;
 
     Tween damageTween;
-    public void Init(bool isLeft, Sprite playerIcon_, Sprite emptyHealthBar_, Sprite fullHealthBar_, Sprite damageHealthBar_)
+    public void Init(bool isLeft_, Sprite playerIcon_, Sprite emptyHealthBar_, Sprite fullHealthBar_, Sprite damageHealthBar_)
     {
-        if (!isLeft)
+        if (!isLeft_)
         {
             HorizontalLayoutGroup.reverseArrangement = true;
-            isLeft = true;
+            isLeft = isLeft_;
             damageHealthBar.fillOrigin = 1;
             fullHealthBar.fillOrigin = 1;
             RectTransform rectTransform = GetComponent<RectTransform>();
@@ -35,7 +35,7 @@ public class HealthBarControllerUI : MonoBehaviour
         else
         {
             HorizontalLayoutGroup.reverseArrangement = false;
-            isLeft = false;
+            isLeft = isLeft_;
             damageHealthBar.fillOrigin = 0;
             fullHealthBar.fillOrigin = 0;
         }
