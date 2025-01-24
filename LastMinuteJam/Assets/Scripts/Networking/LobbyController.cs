@@ -540,7 +540,7 @@ public class LobbyController : MonoBehaviour
         return true;
     }
 
-    public void ChangeCharacter(int characterId)
+    public async void ChangeCharacter(int characterId)
     {
         switch(characterId)
         {

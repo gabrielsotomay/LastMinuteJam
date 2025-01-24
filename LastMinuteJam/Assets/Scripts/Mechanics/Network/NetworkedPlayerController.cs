@@ -74,6 +74,7 @@ namespace Platformer.Mechanics
         // Prefabs
         [SerializeField] GameObject hitboxPrefab;
         [SerializeField] List<NetworkAttackController> attacks = new ();
+        [SerializeField] List<RuntimeAnimatorController> animatorControllers = new();
         List<int> activeAttacks = new List<int>(); // list of attacks in "attacks" array that are active
 
         // Attacks
@@ -118,6 +119,12 @@ namespace Platformer.Mechanics
         List<AnimationClip> JJMoveAnimations = new List<AnimationClip>();
         [SerializeField]
         List<AnimationClip> ElviraMoveAnimations = new List<AnimationClip>();
+        [SerializeField]
+        Sprite JJ_BaseSprite;
+        [SerializeField]
+        Sprite Elvira_BaseSprite;
+
+
 
         // TODO: input queue
         // private Queue<InputAction> actionQueue = new Queue<InputAction>();
@@ -186,7 +193,9 @@ namespace Platformer.Mechanics
         {
             health = GetComponent<Health>();
             collider2d = GetComponent<CapsuleCollider2D>();
-            
+            playerStats = JJStats;
+            playerAttackTypes = JJAttackTypes;
+
         }
         
         public void Init(PlayerData playerData)
@@ -202,6 +211,8 @@ namespace Platformer.Mechanics
                     hitboxSprites = JJHitboxSprites;
                     attackAnimations = JJAttackAnimations;
                     moveAnimations = JJMoveAnimations;
+                    //animator.runtimeAnimatorController = animatorControllers[0];
+                    spriteRenderer.sprite = JJ_BaseSprite;
                     break;
                 case PlayerData.Character.Elvira:
                     Debug.Log("Added " + PlayerData.Character.Elvira);
@@ -210,14 +221,16 @@ namespace Platformer.Mechanics
                     hitboxSprites = ElviraHitboxSprites;
                     attackAnimations = ElviraAttackAnimations;
                     moveAnimations = ElviraMoveAnimations;
+                    //animator.runtimeAnimatorController = animatorControllers[1];
+                    spriteRenderer.sprite = Elvira_BaseSprite;
                     break;
                 default:
                     Debug.Log("Invalid character :(");
                     break;
             }
-            InitAnimations();
+            //InitAnimations();
         }
-
+        /*
         public void InitAnimations()
         {
             AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
@@ -230,9 +243,18 @@ namespace Platformer.Mechanics
             animatorOverrideController[JJMoveAnimations[0]] = moveAnimations[0];
             animatorOverrideController[JJMoveAnimations[1]] = moveAnimations[1];
             animatorOverrideController[JJMoveAnimations[2]] = moveAnimations[2];
+            animatorOverrideController[ElviraAttackAnimations[0]] = attackAnimations[0];
+            animatorOverrideController[ElviraAttackAnimations[1]] = attackAnimations[1];
+            animatorOverrideController[ElviraAttackAnimations[2]] = attackAnimations[2];
+            animatorOverrideController[ElviraAttackAnimations[3]] = attackAnimations[3];
+            animatorOverrideController[ElviraAttackAnimations[4]] = attackAnimations[4];
+            animatorOverrideController[ElviraAttackAnimations[5]] = attackAnimations[5];
+            animatorOverrideController[ElviraMoveAnimations[0]] = moveAnimations[0];
+            animatorOverrideController[ElviraMoveAnimations[1]] = moveAnimations[1];
+            animatorOverrideController[ElviraMoveAnimations[2]] = moveAnimations[2];
             animator.runtimeAnimatorController = animatorOverrideController;
         }
-
+        */
         public override void NetworkStart()
         {
             id = (ulong)UnityEngine.Random.Range(0, 10000);
