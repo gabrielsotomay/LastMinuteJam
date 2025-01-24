@@ -5,65 +5,61 @@ using System.Collections.Generic;
 public class LobbyPlayerPanelController : MonoBehaviour
 {
 
-    public Button readyButton;
     public TMP_Text name;
     //public List<RectTransform> characterBorders;
-    public List<Button> characterButtons;
     public int NumOfChararacters;
     public List<GameObject> characterAnims;
-    private int characterActive = 0;
-    LobbyController lobbyController;
-
+    public GameObject readyIndicator;
     public Sprite readyBarNormal;
     public Sprite readyBarClicked;
+    public TMP_Text readyText;
+    int characterActive = 0;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
-    public void Init(LobbyController lobbyController_)
+    
+    private void Start()
     {
-        lobbyController = lobbyController_;
-          characterButtons[0].onClick.AddListener(SwapCharacter);
-        characterButtons[1].onClick.AddListener(SwapCharacter);
-        readyButton.onClick.AddListener(SetReady);
+        //characterAnims[0].gameObject.SetActive(false);
+        //characterAnims[1].gameObject.SetActive(false);
     }
     public void UpdateCharacterChoice(int character)
     {
+
         for (int i = 0; i < NumOfChararacters; i++)
         {
             if (i == character)
             {
-                characterAnims[i].gameObject.SetActive(true);
-            }
-            else
-            {
-                characterAnims[i].gameObject.SetActive(false);
-
+                Debug.Log("Changed to " + i);
+                characterAnims[i].SetActive(true);
+                characterAnims[(i+1)%2].SetActive(false);
+                
             }
         }
     }
-
-    public void SwapCharacter()
+    public void Init(LobbyUIData info)
     {
-        lobbyController.ChangeCharacter((characterActive + 1) % 2);
+        name.text = info.name;
+        UpdateCharacterChoice(info.character);
     }
     
     // Update is called once per frame
     public void UpdateInfo(LobbyUIData info)
     {
         name.text = info.name;
-        UpdateCharacterChoice(info.character);
+        if (characterActive != info.character)
+        {
+            UpdateCharacterChoice(info.character);
+            characterActive = info.character;
+        }
         if (info.state == LobbyController.KEY_READY)
-        {   
-            readyButton.GetComponent<Image>().sprite = readyBarClicked;
+        {
+            readyText.text = "Ready!";
         }
         else
         {
-            readyButton.GetComponent<Image>().sprite = readyBarNormal;
+            readyText.text = "Not ready";
         }
-    }
-
-    public async void SetReady()
-    {
-        lobbyController.UpdatePlayerState(LobbyController.KEY_READY);
     }
 
 

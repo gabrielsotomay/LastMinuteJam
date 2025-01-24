@@ -107,13 +107,13 @@ namespace Platformer.Mechanics
         [SerializeField]
         List<Sprite> ElviraHitboxSprites = new List<Sprite>();
         [SerializeField]
-        PlayerStats JJStats = new PlayerStats();
+        PlayerStats JJStats;
         [SerializeField]
-        PlayerStats ElviraStats = new PlayerStats();
+        PlayerStats ElviraStats;
         [SerializeField]
-        PlayerAttackTypes JJAttackTypes = new PlayerAttackTypes();
+        PlayerAttackTypes JJAttackTypes;
         [SerializeField]
-        PlayerAttackTypes ElviraAttackTypes = new PlayerAttackTypes();
+        PlayerAttackTypes ElviraAttackTypes;
         [SerializeField]
         List<AnimationClip> JJMoveAnimations = new List<AnimationClip>();
         [SerializeField]
@@ -196,6 +196,7 @@ namespace Platformer.Mechanics
             switch (character)
             {
                 case PlayerData.Character.JJ:
+                    Debug.Log("Added " + PlayerData.Character.JJ);
                     playerStats = JJStats;
                     playerAttackTypes = JJAttackTypes;
                     hitboxSprites = JJHitboxSprites;
@@ -203,6 +204,7 @@ namespace Platformer.Mechanics
                     moveAnimations = JJMoveAnimations;
                     break;
                 case PlayerData.Character.Elvira:
+                    Debug.Log("Added " + PlayerData.Character.Elvira);
                     playerStats = ElviraStats;
                     playerAttackTypes = ElviraAttackTypes;
                     hitboxSprites = ElviraHitboxSprites;
@@ -210,8 +212,10 @@ namespace Platformer.Mechanics
                     moveAnimations = ElviraMoveAnimations;
                     break;
                 default:
+                    Debug.Log("Invalid character :(");
                     break;
             }
+            InitAnimations();
         }
 
         public void InitAnimations()

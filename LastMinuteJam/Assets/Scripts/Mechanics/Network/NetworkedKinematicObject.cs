@@ -24,7 +24,7 @@ namespace Platformer.Mechanics
         /// <summary>
         /// The current velocity of the entity.
         /// </summary>
-        public Vector2 velocity;
+        public Vector2 velocity = Vector2.zero;
 
         /// <summary>
         /// Is the entity currently sitting on a surface?

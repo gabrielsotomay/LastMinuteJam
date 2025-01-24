@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
 using UnityEditor.U2D.Animation;
+using System.Linq;
 
 public class MenuUIController : MonoBehaviour
 {
@@ -20,19 +21,28 @@ public class MenuUIController : MonoBehaviour
     public TMP_Text lobbyCode;
 
     public GameObject lobbyPanel;
-    List<LobbyPlayerPanelController> lobbyPlayers = new();
+    public List<LobbyPlayerPanelController> playerPanels = new();
     public GameObject playerPanelPrefab;
 
-    public GameObject playerContainer;
     public GameObject startContainer;
     
     public List<GameObject> characterContainers;
+
+    private int characterActive = 0;
+    private int playersActive = 0;
+
+    public Sprite LandingPageSprite;
+    public Sprite LandingPageNoTitleSprite;
+    public Image landingPage;
+
+    public List<Button> characterButtons;
+    public Button readyButton;
     /*public GameObject playerOneElvira;
     public GameObject playerOneJj;
     public GameObject playerTwoElvira;
     public GameObject playerTwoJj;*/
-    
-    
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -40,53 +50,60 @@ public class MenuUIController : MonoBehaviour
         joinGameButton.onClick.AddListener(() => JoinGame());
         startGameButton.onClick.AddListener(() => StartGame());
         quickJoinButton.onClick.AddListener(() => QuickJoin());
+        landingPage.sprite = LandingPageSprite;
         lobbyPanel.SetActive(false);
         foreach (GameObject character in characterContainers)
         {
             character.SetActive(false);
         }
+        foreach (Button button in characterButtons)
+        {
+            button.onClick.AddListener(() => SwapCharacter());
+        }
         lobbyController.OnLobbyUpdate += QueryLobby;
         
-    }
-    private void OnDestroy()
-    {
-
-        lobbyController.OnLobbyUpdate -= QueryLobby;
-    }
+        }
+        private void OnDestroy()
+        {
+            lobbyController.OnLobbyUpdate -= QueryLobby;
+        }
     public async void CreateGame()
     {
         if (await lobbyController.CreateLobby(playerName.text))
         {
-            lobbyPanel.SetActive(true);
-            createGameButton.gameObject.SetActive(false);
-            joinGameButton.gameObject.SetActive(false);
-            lobbyName.gameObject.SetActive(false);
+            OnLobbyEnter();
             startGameButton.gameObject.SetActive(true);
-            startContainer.SetActive(false);
-            foreach (GameObject character in characterContainers)
-            {
-                character.SetActive(true);
-            }
-            
+
             /*playerOneJj.SetActive(true);
             playerTwoJj.SetActive(true);
             playerTwoElvira.SetActive(false);
             playerOneElvira.SetActive(false);*/
-            
-            
-        }
 
+
+        }
+    }
+    public async void SetReady()
+    {
+         lobbyController.UpdatePlayerState(LobbyController.KEY_READY);
+    }
+
+    public void SwapCharacter()
+    {
+        characterActive = (characterActive + 1) % 2;
+        lobbyController.ChangeCharacter(characterActive);
+        ToggleCharButtonsEnable(false);
+    }
+
+    public void ToggleCharButtonsEnable(bool enable)
+    {
+            characterButtons[0].enabled = enable;
+            characterButtons[1].enabled = enable;        
     }
     public async void JoinGame()
     {
         if (await lobbyController.JoinLobbyByCode(playerName.text, lobbyName.text))
         {
-            lobbyPanel.SetActive(true);
-            createGameButton.gameObject.SetActive(false);
-            joinGameButton.gameObject.SetActive(false);
-            lobbyName.gameObject.SetActive(false);
-            startGameButton.gameObject.SetActive(false);
-            startContainer.SetActive(false);
+            OnLobbyEnter();
         }
     }
     public async void StartGame()
@@ -98,49 +115,67 @@ public class MenuUIController : MonoBehaviour
     {
         if (await lobbyController.QuickJoinLobby(playerName.text))
         {
-            lobbyPanel.SetActive(true);
-            createGameButton.gameObject.SetActive(false);
-            joinGameButton.gameObject.SetActive(false);
-            lobbyName.gameObject.SetActive(false);
-            startGameButton.gameObject.SetActive(false);
-            startContainer.SetActive(false);
+            OnLobbyEnter();
         }
+    }
+
+    private void OnLobbyEnter()
+    {
+        landingPage.sprite = LandingPageNoTitleSprite;
+        lobbyPanel.SetActive(true);
+        createGameButton.gameObject.SetActive(false);
+        joinGameButton.gameObject.SetActive(false);
+        lobbyName.gameObject.SetActive(false);
+        startContainer.SetActive(false);
+        characterContainers[0].SetActive(true);
+        playerPanels[0].Init(new LobbyUIData { name = playerName.text, state = "not ready", character = 0 });
+        characterButtons[0].onClick.AddListener(SwapCharacter);
+        characterButtons[1].onClick.AddListener(SwapCharacter);
+        readyButton.onClick.AddListener(SetReady);
+        playersActive = 1;
     }
 
 
     public void UpdateUI(List<LobbyUIData> lobbyUIData)
     {
         lobbyCode.text = lobbyController.GetLobbyCode();
+        if (lobbyUIData.Count == 2 && playersActive == 1)
+        {
+            characterContainers[1].SetActive(true);
+            if (playerPanels[0].name.text.Equals(lobbyUIData[0].name))
+            {
+                playerPanels[1].Init(lobbyUIData[1]);
+                playersActive++;
+                Debug.Log("Added player " + lobbyUIData[1].name);
+            }
+            else
+            {
+                playerPanels[1].Init(lobbyUIData[0]);
+                playersActive++;
+                Debug.Log("Added player " + lobbyUIData[0].name);
+            }
+            
+        }
         foreach (LobbyUIData player in lobbyUIData)
         {
-            bool foundPanel = false;
-            foreach (LobbyPlayerPanelController panel in lobbyPlayers)
+            if (player.name.Equals(playerPanels[0].name.text))
             {
-                if (panel.name.text == player.name)
+                if (player.character == characterActive)
+                {
+                    ToggleCharButtonsEnable(true);
+                }
+            }
+            bool foundPanel = false;
+            foreach (LobbyPlayerPanelController panel in playerPanels)
+            {
+                if (panel.name.text.Equals(player.name))
                 {
                     foundPanel = true;
                     panel.UpdateInfo(player);
                 }
             }
-            if (!foundPanel)
-            {
-                foreach (GameObject character in characterContainers)
-                {
-                    lobbyPlayers.Add(Instantiate(playerPanelPrefab, character.transform).GetComponent<LobbyPlayerPanelController>());
-                    
-                }
-                //lobbyPlayers.Add(Instantiate(playerPanelPrefab, playerContainer.transform).GetComponent<LobbyPlayerPanelController>());
-                lobbyPlayers[^1].Init(lobbyController);
-                lobbyPlayers[^1].UpdateInfo(player);
-            }   
         }
-
-
-
-
     }
-
-
     public void QueryLobby(object o, EventArgs args)
     {
         UpdateUI(lobbyController.playerData);

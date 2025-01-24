@@ -30,8 +30,8 @@ public class NetworkingController : NetworkEventsListener
     public bool ShowDisconnectButton = true;
     public bool ShowConnectButton = true;
     public Vector2 Offset = new Vector2(36, 0);
-    public List<PlayerData> playerData;
-
+    public List<PlayerData> playerData = new();
+    public string myName = "";
     private void Awake()
     {
         if (Instance != null)

@@ -29,6 +29,8 @@ namespace Platformer
 
         public ComboController comboController;
 
+        int initIndex = 0;
+
 
         public override void NetworkStart()
         {
@@ -100,8 +102,15 @@ namespace Platformer
         public void AddPlayerToCameraRpc(int newPlayerId)
         {
             CinemachineTargetGroup targetGroup = FindFirstObjectByType<CinemachineTargetGroup>();
-            NetworkedPlayerController[] foundPlayers = FindObjectsByType<NetworkedPlayerController>(FindObjectsSortMode.InstanceID);
-            
+            NetworkedPlayerController[] allFoundPlayers = FindObjectsByType<NetworkedPlayerController>(FindObjectsSortMode.InstanceID);
+            List<NetworkedPlayerController> foundPlayers = new();
+            foreach (NetworkedPlayerController player in allFoundPlayers)
+            {
+                if (player.gameObject.active)
+                {
+                    foundPlayers.Add(player);
+                }
+            }
             if (targetGroup.IsEmpty) 
             {
                 int i = 0;
@@ -125,6 +134,7 @@ namespace Platformer
                 {
                     if (player.GetComponent<NetworkObject>().Id == newPlayerId)
                     {
+                        player.Init(NetworkingController.Instance.playerData[1]);
                         comboController.allPlayers.Add(player);
                         FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
                         //Instantiate(_healthBarPrefab, player.transform.position, Quaternion.identity).transform.SetParent(healthBar.transform);

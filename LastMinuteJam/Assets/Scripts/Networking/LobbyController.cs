@@ -138,6 +138,10 @@ public class LobbyController : MonoBehaviour
     private void StartClientGame()
     {
         SceneManager.LoadScene("MultiGame");
+        foreach (Player player in joinedLobby.Players)
+        {
+            NetworkingController.Instance.playerData.Add(LobbyDataToPlayerData(player));
+        }
         relayController.JoinRelay(joinedLobby.Data[KEY_RELAY_CODE].Value);
         gameRunning = true;
         UpdatePlayerState(KEY_ALIVE);
@@ -158,6 +162,7 @@ public class LobbyController : MonoBehaviour
                     if (data.name.Equals(player.Data[KEY_PLAYER_NAME].Value))
                     {
                         SetPlayerUIData(player, data);
+                        foundPlayer = true;
                     }
                 }
                 if (!foundPlayer)
