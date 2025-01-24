@@ -216,6 +216,7 @@ MonoBehaviour:
   IsGrounded: 0
   SimpleMovement: 0
   networkTransform: {fileID: 5474266722723004511}
+  playerController: {fileID: 0}
   playerAttack:
     id: 0
     hitboxScale: {x: 0, y: 0}
@@ -283,5 +284,5 @@ MonoBehaviour:
   PrefabRoot: {fileID: 0}
   Children: []
   PrefabIndex: -1
-  _PrefabId: 1
+  _PrefabId: 3
   SceneId: -1

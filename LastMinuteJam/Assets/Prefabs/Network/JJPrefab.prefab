@@ -132,7 +132,7 @@ Animator:
   m_GameObject: {fileID: 2335425601369042302}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1e5821f22c5a2d94ab77fc80db79ada9, type: 2}
+  m_Controller: {fileID: 9100000, guid: 89e14291bc729cd4b8d7856d74391f25, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 2
   m_ApplyRootMotion: 0
@@ -255,7 +255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Settings: 0
   _interpolationSource: 0
-  IndexToHash: 2b1a167c794069552638cb43a21b1dacf3b09ce077934a0f89f787200dd451cf35675cb7f7159d15cd35eee8d03229af4aa44fcba167c7369b73537aa8c0764d5aa504396916210eee8841addd3b649a939301a2f1046f6034f9b24c566edc8e9ff1350a333c953374dadf3e9e12f0beb50c887d5fc4a7fd9b91193550403704
+  IndexToHash: 2b1a167c794069552638cb43a21b1dacf3b09ce077934a0f89f787200dd451cf939301a2f1046f6034f9b24c566edc8e9ff1350a333c953374dadf3e9e12f0beb50c887d5fc4a7fd9b91193550403704
 --- !u!1 &6618287190789745965
 GameObject:
   m_ObjectHideFlags: 0
@@ -304,7 +304,7 @@ GameObject:
   - component: {fileID: 5795076534449500483}
   - component: {fileID: -2464111510340329638}
   m_Layer: 0
-  m_Name: NetworkedPlayerPrefab
+  m_Name: JJPrefab
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -536,6 +536,9 @@ MonoBehaviour:
   hitboxPrefab: {fileID: 3901431683383411334, guid: 1e79d69d8f8da584abc3e3e8d83c31b4,
     type: 3}
   attacks: []
+  animatorControllers:
+  - {fileID: 9100000, guid: 89e14291bc729cd4b8d7856d74391f25, type: 2}
+  - {fileID: 9100000, guid: 5890e5277bc8ffd4f8aa2f103781bdbf, type: 2}
   character: 0
   JJAttackAnimations:
   - {fileID: 7400000, guid: 082eaac43bd04a241be047c0424828b3, type: 2}
@@ -569,6 +572,10 @@ MonoBehaviour:
   - {fileID: 7400000, guid: d283a46b28c14354da1dc0a68d87c0d9, type: 2}
   - {fileID: 7400000, guid: b6f668dca9f6fda40957b919f5b81cc8, type: 2}
   - {fileID: 7400000, guid: 738434049f79e7041878f741da55d2d6, type: 2}
+  JJ_BaseSprite: {fileID: -195691930300126243, guid: c1d27d1714cf3204ca18b1b9f2473be6,
+    type: 3}
+  Elvira_BaseSprite: {fileID: -3265970674330752587, guid: f0c4d7960bf091f4d8b9d999840cd0f9,
+    type: 3}
   isPlayer1: 0
   spawnPosition: {x: 0, y: 0, z: 0}
   playerName: 

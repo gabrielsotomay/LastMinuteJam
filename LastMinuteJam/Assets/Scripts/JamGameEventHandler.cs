@@ -17,7 +17,8 @@ namespace Platformer
         public List<NetworkedPlayerController> Players = new(4);
         public List<NetworkedPlayerController> AlivePlayers = new(4);
 
-        private GameObject _playerPrefab;
+        private GameObject JJPrefab;
+        private GameObject ElviraPrefab;
         private GameObject _collectableItem;
         //private GameObject _healthBarPrefab;
 
@@ -41,13 +42,15 @@ namespace Platformer
             moveAction.performed += OnMove;
             */
 
-            _playerPrefab = Sandbox.GetPrefab("NetworkedPlayerPrefab");
+            JJPrefab = Sandbox.GetPrefab("JJPrefab");
+            ElviraPrefab = Sandbox.GetPrefab("ElviraPrefab");
             Sandbox.Events.OnConnectRequest += OnConnectRequest;
             Sandbox.Events.OnPlayerConnected += OnPlayerConnected;
             Sandbox.Events.OnPlayerDisconnected += OnPlayerDisconnected;
 
             // TODO: Make this for the powerups or something Sandbox.InitializePool(Sandbox.GetPrefab("Bomb"), 5);
-            Sandbox.InitializePool(_playerPrefab, 4);
+            Sandbox.InitializePool(JJPrefab, 2);
+            Sandbox.InitializePool(ElviraPrefab, 2);
             //Sandbox.InitializePool(_collectableItem, 1);
             comboController.Init(model);
             for (int i = 0; i < 4; i++)
@@ -67,7 +70,45 @@ namespace Platformer
         // This is called on the server when a playerObj has connected.
         public void OnPlayerConnected(NetworkSandbox sandbox, NetworkPlayer player)
         {
-            var playerObj = sandbox.NetworkInstantiate(_playerPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
+            NetworkedPlayerController playerObj = new NetworkedPlayerController( );
+            
+            if (player.PlayerId == Sandbox.LocalPlayer.PlayerId)
+            {
+                foreach (PlayerData data in NetworkingController.Instance.playerData)
+                {
+                    if (data.name.Equals(NetworkingController.Instance.myName))
+                    {
+                        if (data.character == PlayerData.Character.Elvira)
+                        {
+                            playerObj = sandbox.NetworkInstantiate(ElviraPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
+                        }
+                        else
+                        {
+                            playerObj = sandbox.NetworkInstantiate(JJPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
+                        }
+                    }
+                }
+            }            
+            else
+            {
+                foreach (PlayerData data in NetworkingController.Instance.playerData)
+                {
+                    if (!data.name.Equals(NetworkingController.Instance.myName))
+                    {
+                        if (data.character == PlayerData.Character.Elvira)
+                        {
+                            playerObj = sandbox.NetworkInstantiate(ElviraPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
+                        }
+                        else
+                        {
+                            playerObj = sandbox.NetworkInstantiate(JJPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
+                        }
+                    }
+                }
+            }
+
+
+
             /*sandbox.NetworkInstantiate(_collectableItem, new Vector3(0, -0.5f, 0),
                 Quaternion.identity, null);
             */
@@ -102,7 +143,8 @@ namespace Platformer
         public void AddPlayerToCameraRpc(int newPlayerId)
         {
             CinemachineTargetGroup targetGroup = FindFirstObjectByType<CinemachineTargetGroup>();
-            NetworkedPlayerController[] allFoundPlayers = FindObjectsByType<NetworkedPlayerController>(FindObjectsSortMode.InstanceID);
+            NetworkedPlayerController[] foundPlayers = FindObjectsByType<NetworkedPlayerController>(FindObjectsSortMode.InstanceID);
+            /*
             List<NetworkedPlayerController> foundPlayers = new();
             foreach (NetworkedPlayerController player in allFoundPlayers)
             {
@@ -111,20 +153,42 @@ namespace Platformer
                     foundPlayers.Add(player);
                 }
             }
+            */
             if (targetGroup.IsEmpty) 
             {
                 int i = 0;
-                // received by new player, add all players to the camera
+                // received by new player, add self, then other playerall players to the camera
                 foreach (NetworkedPlayerController player in foundPlayers)
                 {
-                    player.Init(NetworkingController.Instance.playerData[i++]);
-                    model.healthBarController.AddNew(player);
-                    FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
-                    comboController.allPlayers.Add(player);
                     if (player.GetComponent<NetworkObject>().Id == newPlayerId)
                     {
-                        comboController.myPlayer = player;
+                        foreach (PlayerData data in NetworkingController.Instance.playerData)
+                        {
+                            if (data.name.Equals(NetworkingController.Instance.myName))
+                            {
+                                player.Init(data);
+                                model.healthBarController.AddNew(player);
+                                comboController.myPlayer = player;
+                            }
+                        }
+                    }                    
+                }
+                foreach (NetworkedPlayerController player in foundPlayers)
+                {
+                    // If own player
+                    if (player.GetComponent<NetworkObject>().Id != newPlayerId)
+                    {
+                        foreach (PlayerData data in NetworkingController.Instance.playerData)
+                        {
+                            if (!data.name.Equals(NetworkingController.Instance.myName))
+                            {
+                                player.Init(data);
+                                model.healthBarController.AddNew(player);
+                            }
+                        }
                     }
+                    FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
+                    comboController.allPlayers.Add(player);
                 }
             }
             else
@@ -134,12 +198,19 @@ namespace Platformer
                 {
                     if (player.GetComponent<NetworkObject>().Id == newPlayerId)
                     {
-                        player.Init(NetworkingController.Instance.playerData[1]);
-                        model.healthBarController.AddNew(player);
-                        comboController.allPlayers.Add(player);
-                        FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
-                        //Instantiate(_healthBarPrefab, player.transform.position, Quaternion.identity).transform.SetParent(healthBar.transform);
-                        Debug.Log("THIS ISRUNINGIGGGGGGGG");
+                        foreach (PlayerData data in NetworkingController.Instance.playerData)
+                        {
+                            if (!data.name.Equals(NetworkingController.Instance.myName))
+                            {
+                                player.Init(data);
+                                model.healthBarController.AddNew(player); 
+                                comboController.allPlayers.Add(player);
+                                FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
+                                //Instantiate(_healthBarPrefab, player.transform.position, Quaternion.identity).transform.SetParent(healthBar.transform);
+                                Debug.Log("THIS ISRUNINGIGGGGGGGG");
+                            }
+                        }
+                        
                     }
                 }
             }

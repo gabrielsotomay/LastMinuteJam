@@ -92,7 +92,7 @@ public class MenuUIController : MonoBehaviour
          startGameAudio.Play();
     }
 
-    public void SwapCharacter()
+    public async void SwapCharacter()
     {
         characterActive = (characterActive + 1) % 2;
         lobbyController.ChangeCharacter(characterActive);
@@ -107,6 +107,10 @@ public class MenuUIController : MonoBehaviour
     }
     public async void JoinGame()
     {
+        if (lobbyName.text == "" || lobbyName.text == null)
+        {
+            return;
+        }
         if (await lobbyController.JoinLobbyByCode(playerName.text, lobbyName.text))
         {
             OnLobbyEnter();
@@ -131,6 +135,7 @@ public class MenuUIController : MonoBehaviour
 
     private void OnLobbyEnter()
     {
+        NetworkingController.Instance.myName = playerName.text;
         landingPage.sprite = LandingPageNoTitleSprite;
         lobbyPanel.SetActive(true);
         createGameButton.gameObject.SetActive(false);

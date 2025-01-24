@@ -24,8 +24,9 @@ public class HealthBarControllerUI : MonoBehaviour
         {
             HorizontalLayoutGroup.reverseArrangement = true;
             isLeft = isLeft_;
-            damageHealthBar.fillOrigin = 1;
+            damageHealthBar.fillOrigin = 0;
             fullHealthBar.fillOrigin = 1;
+            damageHealthBar.transform.localScale = new Vector3(-damageHealthBar.transform.localScale.x, damageHealthBar.transform.localScale.y, damageHealthBar.transform.localScale.z);
             RectTransform rectTransform = GetComponent<RectTransform>();
             rectTransform.pivot = Vector3.one;
             rectTransform.anchorMin = Vector2.one;
