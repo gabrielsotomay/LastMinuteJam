@@ -162,6 +162,7 @@ public class MenuUIController : MonoBehaviour
         {
             if (player.name.Equals(playerPanels[0].name.text))
             {
+                characterActive = player.character;
                 if (player.character == characterActive)
                 {
                     ToggleCharButtonsEnable(true);
