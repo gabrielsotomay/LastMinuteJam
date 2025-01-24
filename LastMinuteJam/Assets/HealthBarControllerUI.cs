@@ -12,16 +12,20 @@ public class HealthBarControllerUI : MonoBehaviour
     public Image emptyHealthBar;
     public Image damageHealthBar;
     public Image playerIcon;
+    public Sprite hurtPlayerIcon;
+    public Sprite damagedPlayerIcon;
     public HorizontalLayoutGroup HorizontalLayoutGroup;
     public TMP_Text playerName;
     bool isLeft;
     float _oldHealth = 0f;
 
     Tween damageTween;
-    public void Init(bool isLeft_, Sprite playerIcon_, Sprite emptyHealthBar_, Sprite fullHealthBar_, Sprite damageHealthBar_)
+    public void Init(bool isLeft_, Sprite playerIcon_, Sprite damagedPlayerIcon_, Sprite hurtPlayerIcon_, Sprite emptyHealthBar_, Sprite fullHealthBar_, Sprite damageHealthBar_)
     {
         if (!isLeft_)
         {
+            damagedPlayerIcon = damagedPlayerIcon_;
+            hurtPlayerIcon = hurtPlayerIcon_;
             HorizontalLayoutGroup.reverseArrangement = true;
             isLeft = isLeft_;
             damageHealthBar.fillOrigin = 0;
@@ -64,5 +68,18 @@ public class HealthBarControllerUI : MonoBehaviour
         damageTween.SetEase(Ease.OutCubic);
         //damageHealthBar.fillAmount = health;
         fullHealthBar.fillAmount = e.newHealth;
+        UpdateIcon(e.newHealth);
+    }
+
+    public void UpdateIcon(float health)
+    {
+        if (health < 0.6)
+        {
+            playerIcon.sprite = hurtPlayerIcon;
+        }
+        else if (health < 0.2)
+        {
+            playerIcon.sprite = damagedPlayerIcon;
+        }
     }
 }

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1757281048545614007}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RayCast
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 5956421473153333409}
   - component: {fileID: 1513500698877243372}
   - component: {fileID: 5411006460805482902}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RenderPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63,7 +63,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8505662837221065080}
   m_Father: {fileID: 7388506595149493318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7479734947705083220
@@ -265,7 +266,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2046672100160624125}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Attacks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -287,6 +288,116 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7388506595149493318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6917828022470848778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8505662837221065080}
+  - component: {fileID: 9213109305481687689}
+  - component: {fileID: 127210632645604964}
+  m_Layer: 7
+  m_Name: Effect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8505662837221065080
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6917828022470848778}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7476294209994312490}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &9213109305481687689
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6917828022470848778}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: -1233540726, guid: a4f62acb82d7c124e816d10b669cfa95, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1.28, y: 1.28}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!95 &127210632645604964
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6917828022470848778}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a0c5cc5fde8d3124681b311932188d09, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7142347752014638052
 GameObject:
   m_ObjectHideFlags: 0
@@ -303,7 +414,7 @@ GameObject:
   - component: {fileID: 5437070535002535846}
   - component: {fileID: 5795076534449500483}
   - component: {fileID: -2464111510340329638}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: JJPrefab
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -512,8 +623,6 @@ MonoBehaviour:
   jumpAudio: {fileID: 0}
   respawnAudio: {fileID: 0}
   ouchAudio: {fileID: 0}
-  hitAudio: {fileID: 2333797652728666474, guid: 4a2d8419e3c640d4da0c334439047839,
-    type: 3}
   audioSource: {fileID: 1513500698877243372}
   spriteRenderer: {fileID: 7479734947705083220}
   animator: {fileID: 5956421473153333409}
@@ -556,10 +665,10 @@ MonoBehaviour:
   - {fileID: 7400000, guid: 18582e1bb538df14d91cb88315147de1, type: 2}
   JJHitboxSprites:
   - {fileID: 9082429109045791810, guid: 0281c4f3604af2f45ab9524e33353797, type: 3}
-  - {fileID: 21300000, guid: 93f2f4bd0df3ab142be6510157a061f7, type: 2}
+  - {fileID: -6173936450139588112, guid: 3ab59bf205055924398dae2eab9a7e81, type: 3}
   ElviraHitboxSprites:
-  - {fileID: 21300000, guid: 93f2f4bd0df3ab142be6510157a061f7, type: 2}
-  - {fileID: 21300000, guid: 93f2f4bd0df3ab142be6510157a061f7, type: 2}
+  - {fileID: -1402287890, guid: 3adc6c74861403b43934ac42556c5439, type: 3}
+  - {fileID: -6173936450139588112, guid: 3ab59bf205055924398dae2eab9a7e81, type: 3}
   JJStats: {fileID: 11400000, guid: f3297a0b01243884cb1fac6bdb2779f1, type: 2}
   ElviraStats: {fileID: 11400000, guid: 26d53fd9f06db124997eb509897b561f, type: 2}
   JJAttackTypes: {fileID: 11400000, guid: 6b8a6b1696c38ba4b9b49ea2f54b52e9, type: 2}
@@ -576,6 +685,7 @@ MonoBehaviour:
     type: 3}
   Elvira_BaseSprite: {fileID: -3265970674330752587, guid: f0c4d7960bf091f4d8b9d999840cd0f9,
     type: 3}
+  effectAnimator: {fileID: 127210632645604964}
   isPlayer1: 0
   spawnPosition: {x: 0, y: 0, z: 0}
   playerName: 

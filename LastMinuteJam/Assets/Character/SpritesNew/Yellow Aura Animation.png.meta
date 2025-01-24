@@ -1,0 +1,456 @@
+fileFormatVersion: 2
+guid: 3adc6c74861403b43934ac42556c5439
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1837836600160467822
+    second: Yellow Aura Animation_0
+  - first:
+      213: 8385522651273998635
+    second: Yellow Aura Animation_1
+  - first:
+      213: 2785081079111907747
+    second: Yellow Aura Animation_2
+  - first:
+      213: -5914075411164106278
+    second: Yellow Aura Animation_3
+  - first:
+      213: -696294292591222483
+    second: Yellow Aura Animation_4
+  - first:
+      213: -1627887382594806017
+    second: Yellow Aura Animation_5
+  - first:
+      213: 1162721702141568201
+    second: Yellow Aura Animation_6
+  - first:
+      213: -471723185118519784
+    second: Yellow Aura Animation_7
+  - first:
+      213: -3378533970140860492
+    second: Yellow Aura Animation_8
+  - first:
+      213: 8902702920281363698
+    second: Yellow Aura Animation_9
+  - first:
+      213: -359464449707507131
+    second: Yellow Aura Animation_10
+  - first:
+      213: 7854758368392755317
+    second: Yellow Aura Animation_11
+  - first:
+      213: -3425757902178888841
+    second: Yellow Aura Animation_12
+  - first:
+      213: 1487588597531982898
+    second: Yellow Aura Animation_13
+  - first:
+      213: 5619735314116657250
+    second: Yellow Aura Animation_14
+  - first:
+      213: -2844171612830404742
+    second: Yellow Aura Animation_15
+  - first:
+      213: 7713397654377662098
+    second: Yellow Aura Animation_16
+  - first:
+      213: 2523683444516140888
+    second: Yellow Aura Animation_17
+  - first:
+      213: 460420272043301382
+    second: Yellow Aura Animation_18
+  - first:
+      213: 4528260761709101313
+    second: Yellow Aura Animation_19
+  - first:
+      213: 1096016854037348240
+    second: Yellow Aura Animation_20
+  - first:
+      213: 7274099630785485826
+    second: Yellow Aura Animation_21
+  - first:
+      213: 7513349624154491593
+    second: Yellow Aura Animation_22
+  - first:
+      213: 3986883106985075600
+    second: Yellow Aura Animation_23
+  - first:
+      213: 1495416602643224724
+    second: Yellow Aura Animation_24
+  - first:
+      213: 4585546938887236218
+    second: Yellow Aura Animation_25
+  - first:
+      213: 4022637477107825812
+    second: Yellow Aura Animation_26
+  - first:
+      213: 8189988619433242474
+    second: Yellow Aura Animation_27
+  - first:
+      213: 8639079369086967443
+    second: Yellow Aura Animation_28
+  - first:
+      213: -8637478680573519057
+    second: Yellow Aura Animation_29
+  - first:
+      213: 5293179794507395746
+    second: Yellow Aura Animation_30
+  - first:
+      213: 2576957046547531868
+    second: Yellow Aura Animation_31
+  - first:
+      213: 6526836817431100247
+    second: Yellow Aura Animation_32
+  - first:
+      213: 334033920571919948
+    second: Yellow Aura Animation_33
+  - first:
+      213: -6259629526851720049
+    second: Yellow Aura Animation_34
+  - first:
+      213: -7030484206595827952
+    second: Yellow Aura Animation_35
+  - first:
+      213: 4022617645491109082
+    second: Yellow Aura Animation_36
+  - first:
+      213: -3025136914392131187
+    second: Yellow Aura Animation_37
+  - first:
+      213: 6461093132375248451
+    second: Yellow Aura Animation_38
+  - first:
+      213: 8194312283499611476
+    second: Yellow Aura Animation_39
+  - first:
+      213: 4979051342187907414
+    second: Yellow Aura Animation_40
+  - first:
+      213: -5430256706356139234
+    second: Yellow Aura Animation_41
+  - first:
+      213: -2897276775937950524
+    second: Yellow Aura Animation_42
+  - first:
+      213: 5576618336872674383
+    second: Yellow Aura Animation_43
+  - first:
+      213: -4471167936169981639
+    second: Yellow Aura Animation_44
+  - first:
+      213: 5775492016423481586
+    second: Yellow Aura Animation_45
+  - first:
+      213: 6208555302659550677
+    second: Yellow Aura Animation_46
+  - first:
+      213: -1076375396626898363
+    second: Yellow Aura Animation_47
+  - first:
+      213: 8082812508772846670
+    second: Yellow Aura Animation_48
+  - first:
+      213: 5165396297126672764
+    second: Yellow Aura Animation_49
+  - first:
+      213: 3896128067404201388
+    second: Yellow Aura Animation_50
+  - first:
+      213: -4228276943488472817
+    second: Yellow Aura Animation_51
+  - first:
+      213: -1281243946559767136
+    second: Yellow Aura Animation_52
+  - first:
+      213: 8274616028788965059
+    second: Yellow Aura Animation_53
+  - first:
+      213: 1021043595288904326
+    second: Yellow Aura Animation_54
+  - first:
+      213: 1501451645909732513
+    second: Yellow Aura Animation_55
+  - first:
+      213: -7001739823710000741
+    second: Yellow Aura Animation_56
+  - first:
+      213: -2499271297282594518
+    second: Yellow Aura Animation_57
+  - first:
+      213: 3883921307728866192
+    second: Yellow Aura Animation_58
+  - first:
+      213: -4721190445068926672
+    second: Yellow Aura Animation_59
+  - first:
+      213: 865581335544916032
+    second: Yellow Aura Animation_60
+  - first:
+      213: 658635717239249673
+    second: Yellow Aura Animation_61
+  - first:
+      213: -753887881746518056
+    second: Yellow Aura Animation_62
+  - first:
+      213: 3632123426551810019
+    second: Yellow Aura Animation_63
+  - first:
+      213: -5722117142412858319
+    second: Yellow Aura Animation_64
+  - first:
+      213: 2399792494565848477
+    second: Yellow Aura Animation_65
+  - first:
+      213: 6807346550007549661
+    second: Yellow Aura Animation_66
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Yellow Aura Animation_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bb0e9401636e6714086228d614e95b31
+      internalID: 2029750384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Yellow Aura Animation_1
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3729146613295954ca0abce36ef7a197
+      internalID: 354996860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Yellow Aura Animation_2
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3efd5e7046540f842a58fe60f8be24bf
+      internalID: -1402287890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Yellow Aura Animation_3
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57b63cd951f2b264bb27f9f3aec14f46
+      internalID: 1148885897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Yellow Aura Animation_4
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7aad98ed2458e6b42b2bc5c88a805fad
+      internalID: -115494077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Yellow Aura Animation_5
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e98a2dc982f99e40a67a77de9bd82b6
+      internalID: -2014096485
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: cd9d6be74fe69f643a9d45a9f15ce2af
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Yellow Aura Animation_0: 2029750384
+      Yellow Aura Animation_1: 354996860
+      Yellow Aura Animation_2: -1402287890
+      Yellow Aura Animation_3: 1148885897
+      Yellow Aura Animation_4: -115494077
+      Yellow Aura Animation_5: -2014096485
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -100,6 +100,17 @@
                 },
                 {
                     "name": "",
+                    "id": "a71b3cd9-5416-455a-a90d-f9fc179e1b0e",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KeyboardPlayer1;KeyboardPlayer2",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "351361c4-8ddb-4fcc-b83b-20f095057fe8",
                     "path": "<Keyboard>/v",
                     "interactions": "",

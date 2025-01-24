@@ -1,0 +1,397 @@
+fileFormatVersion: 2
+guid: 29c5eda4238bfee48b41063fbe5b5506
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 469063090277440419
+    second: Red Aura Animation_0
+  - first:
+      213: -746283786282022798
+    second: Red Aura Animation_1
+  - first:
+      213: 4377239622184798427
+    second: Red Aura Animation_2
+  - first:
+      213: 5994206241279867459
+    second: Red Aura Animation_3
+  - first:
+      213: -787242007111720391
+    second: Red Aura Animation_4
+  - first:
+      213: -6356910186457828615
+    second: Red Aura Animation_5
+  - first:
+      213: 3884177686625690271
+    second: Red Aura Animation_6
+  - first:
+      213: 5348444842970195968
+    second: Red Aura Animation_7
+  - first:
+      213: 5120253835967236608
+    second: Red Aura Animation_8
+  - first:
+      213: 8969727325001172262
+    second: Red Aura Animation_9
+  - first:
+      213: 7684523640551150767
+    second: Red Aura Animation_10
+  - first:
+      213: -549908498622569574
+    second: Red Aura Animation_11
+  - first:
+      213: 5047319255008483481
+    second: Red Aura Animation_12
+  - first:
+      213: -3361786551758970361
+    second: Red Aura Animation_13
+  - first:
+      213: 6387488306664438288
+    second: Red Aura Animation_14
+  - first:
+      213: 3290356583691813909
+    second: Red Aura Animation_15
+  - first:
+      213: 2395278972568023576
+    second: Red Aura Animation_16
+  - first:
+      213: 4934907285924538921
+    second: Red Aura Animation_17
+  - first:
+      213: -2779448880805088152
+    second: Red Aura Animation_18
+  - first:
+      213: -3481548181883217864
+    second: Red Aura Animation_19
+  - first:
+      213: 4728332732320707802
+    second: Red Aura Animation_20
+  - first:
+      213: -3355351995020126049
+    second: Red Aura Animation_21
+  - first:
+      213: 9167866448757729455
+    second: Red Aura Animation_22
+  - first:
+      213: 7702694907900605269
+    second: Red Aura Animation_23
+  - first:
+      213: -6896205128025043258
+    second: Red Aura Animation_24
+  - first:
+      213: -5235899427576995143
+    second: Red Aura Animation_25
+  - first:
+      213: -3347101446015589625
+    second: Red Aura Animation_26
+  - first:
+      213: -6004561656052686183
+    second: Red Aura Animation_27
+  - first:
+      213: -8284930456456751953
+    second: Red Aura Animation_28
+  - first:
+      213: 6005379034046079389
+    second: Red Aura Animation_29
+  - first:
+      213: -3805393174442749685
+    second: Red Aura Animation_30
+  - first:
+      213: 1405190122725958165
+    second: Red Aura Animation_31
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Red Aura Animation_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4281fed7d73d8ed42a3078be16d60d1b
+      internalID: -434596438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Red Aura Animation_1
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a4e37dc61fa203042943e0a6f8cb93a0
+      internalID: 1742433230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Red Aura Animation_2
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e813c002b97f737499a6240c95012eb9
+      internalID: -2098152759
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Red Aura Animation_3
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2327d94ed2e1c2347b502b3baa155209
+      internalID: -240587146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Red Aura Animation_4
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6c1d6fe7803057458587faaaf39828c
+      internalID: 205479854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Red Aura Animation_5
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b96ac1fd71b11d4692581d9d2d3e03c
+      internalID: -1029794193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Red Aura Animation_6
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 56b0ae8cc27424b4d814765cf8c63357
+      internalID: 1714753115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Red Aura Animation_7
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 675d92ef3ea24194a888625064bb7d8d
+      internalID: 1314009105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 9a85a07e6afdb014ab95b6becc2b6b49
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Red Aura Animation_0: -434596438
+      Red Aura Animation_1: 1742433230
+      Red Aura Animation_2: -2098152759
+      Red Aura Animation_3: -240587146
+      Red Aura Animation_4: 205479854
+      Red Aura Animation_5: -1029794193
+      Red Aura Animation_6: 1714753115
+      Red Aura Animation_7: 1314009105
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

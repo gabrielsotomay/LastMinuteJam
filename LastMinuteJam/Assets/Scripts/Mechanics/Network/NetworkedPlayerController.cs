@@ -122,6 +122,8 @@ namespace Platformer.Mechanics
         Sprite Elvira_BaseSprite;
 
 
+        [SerializeField] Animator effectAnimator;
+
 
         // TODO: input queue
         // private Queue<InputAction> actionQueue = new Queue<InputAction>();
@@ -192,9 +194,8 @@ namespace Platformer.Mechanics
             collider2d = GetComponent<CapsuleCollider2D>();
             playerStats = JJStats;
             playerAttackTypes = JJAttackTypes;
-
+            effectAnimator.GetComponent<SpriteRenderer>().enabled = false;
         }
-        
         public void Init(PlayerData playerData)
         {
             character = playerData.character;
@@ -263,7 +264,7 @@ namespace Platformer.Mechanics
             }
             spawnPosition = transform.position;
             bounds = collider2d.bounds;
-
+            health.OnDeath += Respawn;
             direction = Direction.Right;
             // we store the spawn pos so that we use it later during respawn.
             spawnPosition = transform.position;
@@ -384,22 +385,37 @@ namespace Platformer.Mechanics
         }
         public void ApplyComboEffect(ComboEffect effect)
         {
+            effectAnimator.GetComponent<SpriteRenderer>().enabled = true;
             switch (effect.type)
             {
                 case ComboEffect.Type.Speed:
                     speedModifier = effect.value;
+                    effectAnimator.SetBool("green", true);
+                    effectAnimator.SetBool("red", false);
+                    effectAnimator.SetBool("blue", false);
+                    effectAnimator.SetBool("yellow", false);
                     break;
                 case ComboEffect.Type.Damage:
                     damageModifier = effect.value;
+                    effectAnimator.SetBool("green", false);
+                    effectAnimator.SetBool("red", true);
+                    effectAnimator.SetBool("blue", false);
+                    effectAnimator.SetBool("yellow", false);
                     break;
-
-
                 case ComboEffect.Type.AttackSpeed:
                     attackSpeedModifier = effect.value;
+                    effectAnimator.SetBool("green", false);
+                    effectAnimator.SetBool("red", false);
+                    effectAnimator.SetBool("yellow", false);
+                    effectAnimator.SetBool("blue", true);
                     break;
 
                 case ComboEffect.Type.AttackSize:
                     attackSizeModifier = effect.value;
+                    effectAnimator.SetBool("green", false);
+                    effectAnimator.SetBool("red", false);
+                    effectAnimator.SetBool("blue", false);
+                    effectAnimator.SetBool("yellow", true);
                     break;
 
                 default:
@@ -415,6 +431,7 @@ namespace Platformer.Mechanics
             damageModifier = 1f;
             attackSpeedModifier = 1f;
             attackSizeModifier = 1f;
+            effectAnimator.GetComponent<SpriteRenderer>().enabled = false;
         }
 
 
@@ -439,10 +456,12 @@ namespace Platformer.Mechanics
 
         public void Respawn()
         {
-            
+            if(IsServer)
+            {
+                networkTransform.Teleport(spawnPosition);
+            }
             Sandbox.GetComponent<JamGameEventHandler>().RespawnPlayer(this);
 
-            transform.position = spawnPosition;
             
         }
         void Setup()

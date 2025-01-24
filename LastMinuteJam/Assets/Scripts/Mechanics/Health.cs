@@ -20,6 +20,7 @@ namespace Platformer.Mechanics
         public delegate void OnPlayerDamagedEvent(object source, PlayerDamagedEventArgs e);
         public event OnPlayerDamagedEvent OnPlayerDamaged;
 
+        public event Action OnDeath;
 
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace Platformer.Mechanics
         public void Hurt(float damage)
         {
             cumulativeDamage += damage;
-            float newHp = Mathf.Clamp(currentHP - damage, 0, maxHP);
+            float newHp = Mathf.Clamp(currentHP - cumulativeDamage, 0, maxHP);
             OnPlayerHurt?.Invoke(this, new PlayerHurtEventArgs { oldHealth = currentHP / maxHP, newHealth = newHp / maxHP });
         }
 
@@ -69,13 +70,26 @@ namespace Platformer.Mechanics
             OnPlayerDamaged?.Invoke(this, new PlayerDamagedEventArgs { newHealth = newHp / maxHP });
             currentHP = newHp;
             cumulativeDamage = 0;
+            if (currentHP <= 0)
+            {
+                OnDeath?.Invoke();
+                currentHP = maxHP;
+                OnPlayerDamaged?.Invoke(this, new PlayerDamagedEventArgs { newHealth = 1 });
+
+                //var ev = Schedule<HealthIsZero>();
+                //ev.health = this;
+            }
         }
         public void Decrement()
         {
             float newHp = Mathf.Clamp(currentHP - 1, 0, maxHP);
             currentHP = newHp;
-            if (currentHP == 0)
+            if (currentHP <= 0)
             {
+                OnDeath?.Invoke();
+                currentHP = maxHP;
+                OnPlayerDamaged?.Invoke(this, new PlayerDamagedEventArgs { newHealth = 1 });
+
                 //var ev = Schedule<HealthIsZero>();
                 //ev.health = this;
             }

@@ -89,6 +89,7 @@ namespace LastMinuteJam
             transform.SetParent(playerController.transform, true);
             delayDestroy = StartCoroutine(DisableDelayed(playerAttack.lifeTime));
             spriteRenderer.sprite = attackSprite;
+            //spriteRenderer.color = Color.clear;
             transform.localScale = new Vector3(playerAttack.imageScale.x, playerAttack.imageScale.y, transform.localScale.z);
             GetComponent<BoxCollider2D>().size = new Vector2(Mathf.Abs(playerAttack.hitboxScale.x), Mathf.Abs(playerAttack.hitboxScale.y));
         }
