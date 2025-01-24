@@ -512,6 +512,8 @@ MonoBehaviour:
   jumpAudio: {fileID: 0}
   respawnAudio: {fileID: 0}
   ouchAudio: {fileID: 0}
+  hitAudio: {fileID: 2333797652728666474, guid: 4a2d8419e3c640d4da0c334439047839,
+    type: 3}
   audioSource: {fileID: 1513500698877243372}
   spriteRenderer: {fileID: 7479734947705083220}
   animator: {fileID: 5956421473153333409}

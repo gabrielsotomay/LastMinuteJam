@@ -159,7 +159,9 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      JJ Block Animation_0: -5630051513465003871
+      JJ Block Animation_1: -4972874123853242609
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

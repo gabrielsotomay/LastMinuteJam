@@ -259,7 +259,13 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      JJ Light Attack Up Animation_0: -8250600816189762593
+      JJ Light Attack Up Animation_1: 253517226834187506
+      JJ Light Attack Up Animation_2: -4019329130811133017
+      JJ Light Attack Up Animation_3: -6642325860821476683
+      JJ Light Attack Up Animation_4: 2825117744059904993
+      JJ Light Attack Up Animation_5: 3124338856053614945
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
