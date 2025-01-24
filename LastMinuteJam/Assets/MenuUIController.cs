@@ -25,12 +25,12 @@ public class MenuUIController : MonoBehaviour
 
     public GameObject playerContainer;
     public GameObject startContainer;
-
-    public GameObject charactersContainer;
-    public GameObject playerOneElvira;
+    
+    public List<GameObject> characterContainers;
+    /*public GameObject playerOneElvira;
     public GameObject playerOneJj;
     public GameObject playerTwoElvira;
-    public GameObject playerTwoJj;
+    public GameObject playerTwoJj;*/
     
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -41,8 +41,12 @@ public class MenuUIController : MonoBehaviour
         startGameButton.onClick.AddListener(() => StartGame());
         quickJoinButton.onClick.AddListener(() => QuickJoin());
         lobbyPanel.SetActive(false);
-        charactersContainer.SetActive(false);
+        foreach (GameObject character in characterContainers)
+        {
+            character.SetActive(false);
+        }
         lobbyController.OnLobbyUpdate += QueryLobby;
+        
     }
     private void OnDestroy()
     {
@@ -59,11 +63,15 @@ public class MenuUIController : MonoBehaviour
             lobbyName.gameObject.SetActive(false);
             startGameButton.gameObject.SetActive(true);
             startContainer.SetActive(false);
-            charactersContainer.SetActive(true);
-            playerOneJj.SetActive(true);
+            foreach (GameObject character in characterContainers)
+            {
+                character.SetActive(true);
+            }
+            
+            /*playerOneJj.SetActive(true);
             playerTwoJj.SetActive(true);
             playerTwoElvira.SetActive(false);
-            playerOneElvira.SetActive(false);
+            playerOneElvira.SetActive(false);*/
             
             
         }
@@ -116,10 +124,15 @@ public class MenuUIController : MonoBehaviour
             }
             if (!foundPanel)
             {
-                lobbyPlayers.Add(Instantiate(playerPanelPrefab, playerContainer.transform).GetComponent<LobbyPlayerPanelController>());
+                foreach (GameObject character in characterContainers)
+                {
+                    lobbyPlayers.Add(Instantiate(playerPanelPrefab, character.transform).GetComponent<LobbyPlayerPanelController>());
+                    
+                }
+                //lobbyPlayers.Add(Instantiate(playerPanelPrefab, playerContainer.transform).GetComponent<LobbyPlayerPanelController>());
                 lobbyPlayers[^1].Init(lobbyController);
                 lobbyPlayers[^1].UpdateInfo(player);
-            }
+            }   
         }
 
 
