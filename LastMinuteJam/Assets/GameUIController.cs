@@ -22,4 +22,11 @@ public class GameUIController : MonoBehaviour
     {
         loadingPanel.SetActive(false);
     }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+
 }
