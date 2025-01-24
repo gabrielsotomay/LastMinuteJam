@@ -163,10 +163,7 @@ public class MenuUIController : MonoBehaviour
             if (player.name.Equals(playerPanels[0].name.text))
             {
                 characterActive = player.character;
-                if (player.character == characterActive)
-                {
-                    ToggleCharButtonsEnable(true);
-                }
+                ToggleCharButtonsEnable(true);
             }
             bool foundPanel = false;
             foreach (LobbyPlayerPanelController panel in playerPanels)
