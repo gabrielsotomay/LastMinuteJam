@@ -474,6 +474,12 @@ public class LobbyController : MonoBehaviour
         try
         {
             SceneManager.LoadScene("MultiGame");
+            foreach(Player player in joinedLobby.Players)
+            {
+                NetworkingController.Instance.playerData.Add(LobbyDataToPlayerData(player));
+
+            }
+
 
             string relayCode = await relayController.CreateRelay();
 
@@ -496,7 +502,23 @@ public class LobbyController : MonoBehaviour
             Debug.Log(e);
         }
     }
-
+    private PlayerData LobbyDataToPlayerData(Player player)
+    {
+        PlayerData playerData = new PlayerData();
+        switch(player.Data[KEY_PLAYER_CHARACTER].Value)
+        {
+            case KEY_JJ:
+                playerData.character = PlayerData.Character.JJ;
+                break;
+            case KEY_ELVIRA:
+                playerData.character = PlayerData.Character.Elvira;
+                break;
+            default:
+                break;
+        }
+        playerData.name = player.Data[KEY_PLAYER_NAME].Value;
+        return playerData; ;
+    }
     public bool CheckLobbyReady()
     {
         if (joinedLobby.Players.Count < 1)

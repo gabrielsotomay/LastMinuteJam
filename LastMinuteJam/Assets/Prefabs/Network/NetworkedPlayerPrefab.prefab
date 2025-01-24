@@ -464,7 +464,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffad43bb006db4856a9c527b89b48db9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 1
+  maxHP: 100
+  currentHP: 0
 --- !u!114 &7349908277165936739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -530,23 +531,45 @@ MonoBehaviour:
   attackSizeModifier: 1
   attackPrefab: {fileID: 3901431683383411334, guid: 1e79d69d8f8da584abc3e3e8d83c31b4,
     type: 3}
-  playerStats: {fileID: 11400000, guid: f3297a0b01243884cb1fac6bdb2779f1, type: 2}
   hitboxPrefab: {fileID: 3901431683383411334, guid: 1e79d69d8f8da584abc3e3e8d83c31b4,
     type: 3}
   attacks: []
-  playerAttackTypes: {fileID: 11400000, guid: 6b8a6b1696c38ba4b9b49ea2f54b52e9, type: 2}
-  attackAnimations:
+  character: 0
+  JJAttackAnimations:
   - {fileID: 7400000, guid: 082eaac43bd04a241be047c0424828b3, type: 2}
   - {fileID: 7400000, guid: 8d346a257f9963047928988987f303f8, type: 2}
   - {fileID: 7400000, guid: 384130db6e8ab3847b6880a46fe68c89, type: 2}
   - {fileID: 7400000, guid: 843ed62fa13f60940a1d587670d0cd37, type: 2}
   - {fileID: 7400000, guid: eb66f340fd8b1df4385cb1e45c6a3a88, type: 2}
   - {fileID: 7400000, guid: 8ab2fae1681299c48b54834997ab25de, type: 2}
-  hitboxSprites:
+  ElviraAttackAnimations:
+  - {fileID: 7400000, guid: 3a3bf2d93cf3b83448e4f91196597d63, type: 2}
+  - {fileID: 7400000, guid: 7f71323bf22163e4a901a931c39eeaaf, type: 2}
+  - {fileID: 7400000, guid: f7070093a800dba4882f83022439983a, type: 2}
+  - {fileID: 7400000, guid: 216bc25ee9585f044bdd72948facdcf5, type: 2}
+  - {fileID: 7400000, guid: fb8bc12f4cd5cec43a39e008f9f94a1a, type: 2}
+  - {fileID: 7400000, guid: 18582e1bb538df14d91cb88315147de1, type: 2}
+  JJHitboxSprites:
   - {fileID: 9082429109045791810, guid: 0281c4f3604af2f45ab9524e33353797, type: 3}
-  - {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
+  - {fileID: 21300000, guid: 93f2f4bd0df3ab142be6510157a061f7, type: 2}
+  ElviraHitboxSprites:
+  - {fileID: 21300000, guid: 93f2f4bd0df3ab142be6510157a061f7, type: 2}
+  - {fileID: 21300000, guid: 93f2f4bd0df3ab142be6510157a061f7, type: 2}
+  JJStats: {fileID: 11400000, guid: f3297a0b01243884cb1fac6bdb2779f1, type: 2}
+  ElviraStats: {fileID: 11400000, guid: 26d53fd9f06db124997eb509897b561f, type: 2}
+  JJAttackTypes: {fileID: 11400000, guid: 6b8a6b1696c38ba4b9b49ea2f54b52e9, type: 2}
+  ElviraAttackTypes: {fileID: 11400000, guid: 25452aedbdb45af498c0b407223b2403, type: 2}
+  JJMoveAnimations:
+  - {fileID: 7400000, guid: ee97cc7f426df19479dc434a1e59249e, type: 2}
+  - {fileID: 7400000, guid: 137a1ab1c1eeb0a42ab41f5b854b36b5, type: 2}
+  - {fileID: 7400000, guid: aac266a894af53040873a8fbb445fc72, type: 2}
+  ElviraMoveAnimations:
+  - {fileID: 7400000, guid: d283a46b28c14354da1dc0a68d87c0d9, type: 2}
+  - {fileID: 7400000, guid: b6f668dca9f6fda40957b919f5b81cc8, type: 2}
+  - {fileID: 7400000, guid: 738434049f79e7041878f741da55d2d6, type: 2}
   isPlayer1: 0
   spawnPosition: {x: 0, y: 0, z: 0}
+  playerName: 
   inputAvailabile:
     RawValue: 0
 --- !u!114 &5795076534449500483

@@ -70,7 +70,6 @@ namespace Platformer.Mechanics
         [SerializeField]
         GameObject attackPrefab;
         // Data
-        [SerializeField] PlayerStats playerStats;
 
         // Prefabs
         [SerializeField] GameObject hitboxPrefab;
@@ -78,7 +77,6 @@ namespace Platformer.Mechanics
         List<int> activeAttacks = new List<int>(); // list of attacks in "attacks" array that are active
 
         // Attacks
-        [SerializeField] PlayerAttackTypes playerAttackTypes; // TODO: Give this to character on setup
         List<PlayerAttack> playerAttacks;
         PlayerAttack currentAttack;
         GameObject attackHitbox;
@@ -91,10 +89,35 @@ namespace Platformer.Mechanics
 
         // Networked things?!
         public FighterInput latestInput = new FighterInput();
+        public PlayerData.Character character;
 
         // Attack animations
-        [SerializeField] List<AnimationClip> attackAnimations = new List<AnimationClip>();
-        [SerializeField] List<Sprite> hitboxSprites = new List<Sprite>();
+        List<AnimationClip> attackAnimations = new List<AnimationClip>();
+        List<AnimationClip> moveAnimations = new List<AnimationClip>();
+        List<Sprite> hitboxSprites = new List<Sprite>();
+        PlayerStats playerStats;
+        PlayerAttackTypes playerAttackTypes; // TODO: Give this to character on setup
+
+        [SerializeField]
+        List<AnimationClip> JJAttackAnimations = new List<AnimationClip>();
+        [SerializeField]
+        List<AnimationClip> ElviraAttackAnimations = new List<AnimationClip>();
+        [SerializeField]
+        List<Sprite> JJHitboxSprites = new List<Sprite>();
+        [SerializeField]
+        List<Sprite> ElviraHitboxSprites = new List<Sprite>();
+        [SerializeField]
+        PlayerStats JJStats = new PlayerStats();
+        [SerializeField]
+        PlayerStats ElviraStats = new PlayerStats();
+        [SerializeField]
+        PlayerAttackTypes JJAttackTypes = new PlayerAttackTypes();
+        [SerializeField]
+        PlayerAttackTypes ElviraAttackTypes = new PlayerAttackTypes();
+        [SerializeField]
+        List<AnimationClip> JJMoveAnimations = new List<AnimationClip>();
+        [SerializeField]
+        List<AnimationClip> ElviraMoveAnimations = new List<AnimationClip>();
 
         // TODO: input queue
         // private Queue<InputAction> actionQueue = new Queue<InputAction>();
@@ -105,6 +128,11 @@ namespace Platformer.Mechanics
 
         public Vector3 spawnPosition;
 
+        public string playerName = "";
+
+
+
+
         [Networked]
         public FighterInput MyInput
         {
@@ -112,7 +140,6 @@ namespace Platformer.Mechanics
         }
 
         public NetworkBool inputAvailabile = false;
-
         public enum JumpState
         {
             Grounded,
@@ -162,6 +189,46 @@ namespace Platformer.Mechanics
             
         }
         
+        public void Init(PlayerData playerData)
+        {
+            character = playerData.character;
+            playerName = playerData.name;
+            switch (character)
+            {
+                case PlayerData.Character.JJ:
+                    playerStats = JJStats;
+                    playerAttackTypes = JJAttackTypes;
+                    hitboxSprites = JJHitboxSprites;
+                    attackAnimations = JJAttackAnimations;
+                    moveAnimations = JJMoveAnimations;
+                    break;
+                case PlayerData.Character.Elvira:
+                    playerStats = ElviraStats;
+                    playerAttackTypes = ElviraAttackTypes;
+                    hitboxSprites = ElviraHitboxSprites;
+                    attackAnimations = ElviraAttackAnimations;
+                    moveAnimations = ElviraMoveAnimations;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void InitAnimations()
+        {
+            AnimatorOverrideController animatorOverrideController = new AnimatorOverrideController(animator.runtimeAnimatorController);
+            animatorOverrideController[JJAttackAnimations[0]] = attackAnimations[0];
+            animatorOverrideController[JJAttackAnimations[1]] = attackAnimations[1];
+            animatorOverrideController[JJAttackAnimations[2]] = attackAnimations[2];
+            animatorOverrideController[JJAttackAnimations[3]] = attackAnimations[3];
+            animatorOverrideController[JJAttackAnimations[4]] = attackAnimations[4];
+            animatorOverrideController[JJAttackAnimations[5]] = attackAnimations[5];
+            animatorOverrideController[JJMoveAnimations[0]] = moveAnimations[0];
+            animatorOverrideController[JJMoveAnimations[1]] = moveAnimations[1];
+            animatorOverrideController[JJMoveAnimations[2]] = moveAnimations[2];
+            animator.runtimeAnimatorController = animatorOverrideController;
+        }
+
         public override void NetworkStart()
         {
             id = (ulong)UnityEngine.Random.Range(0, 10000);
@@ -287,9 +354,6 @@ namespace Platformer.Mechanics
                     ray.collider.GetComponent<CollectableItem>()?.CollectItem(InputSource);
                 }
             }
-            
-            
-            
             UpdateJumpState();
             CheckTickActions();
             base.NetworkFixedUpdate();
@@ -322,9 +386,6 @@ namespace Platformer.Mechanics
 
 
         }
-
-
-
         public void ComboEffectFinished()
         {
             speedModifier = 1f;
@@ -473,9 +534,6 @@ namespace Platformer.Mechanics
                 Schedule<WindupFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.windupTime * attackSpeedModifier / Sandbox.FixedDeltaTime)).player = this;
             }
         }
-
-
-
 
         private void UpdateAttackAnimations(int id)
         {
@@ -794,7 +852,7 @@ gg                Debug.Log("Analysing");
             NetworkAttackController attackController = cldr.GetComponent<NetworkAttackController>();
 
             // Check parry
-            if (attackController == null || !IsServer || attackController.playerId == 0)
+            if (attackController == null || !IsServer || attackController.playerId == 0 || (healthState != HealthState.Normal && healthState != HealthState.Impacted))
             {
                 //Debug.Log("Player" + id + " entered non-atack trigger");
                 return;
@@ -869,7 +927,7 @@ gg                Debug.Log("Analysing");
         {
             impactList.Add(attackController.GetInstanceID());
             SetHealthState(HealthState.Impacted);
-            health.Decrement();
+            health.Hurt(attackController.playerAttack.baseAttack);
             Schedule<PlayerImpactedN>(Sandbox.Tick.TickValue).player = this;
             ImpactFinishedN impactFinishedEvent = Schedule<ImpactFinishedN>(Sandbox.Tick.TickValue, (int)(attackController.playerAttack.impactTime/Sandbox.FixedDeltaTime));
             impactFinishedEvent.player = this;
@@ -892,6 +950,7 @@ gg                Debug.Log("Analysing");
             }
             velocity.y = lastAttackTaken.knockback * impactVector.y * playerStats.knockbackModifier;
             velocity.x = lastAttackTaken.knockback * impactVector.x * playerStats.knockbackModifier;
+            health.TakeDamage();
             SetHealthState(HealthState.Disabled);
             Schedule<PlayerDisableN>(Sandbox.Tick.TickValue).player = this;
             Schedule<DisableFinishedN>(Sandbox.Tick.TickValue, (int)(lastAttackTaken.disableTime/Sandbox.FixedDeltaTime)).player = this;

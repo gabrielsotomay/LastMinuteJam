@@ -19,6 +19,7 @@ namespace Platformer.Model
 
         public GameUIController UIcontroller;
         public ComboUIController comboUIcontroller;
+        public HealthBarController healthBarController; 
 
         /// <summary>
         /// The main component which controls the player sprite, controlled 

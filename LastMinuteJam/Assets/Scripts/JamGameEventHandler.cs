@@ -104,9 +104,12 @@ namespace Platformer
             
             if (targetGroup.IsEmpty) 
             {
+                int i = 0;
                 // received by new player, add all players to the camera
                 foreach (NetworkedPlayerController player in foundPlayers)
                 {
+                    model.healthBarController.AddNew(player);
+                    player.Init(NetworkingController.Instance.playerData[i++]);
                     FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
                     comboController.allPlayers.Add(player);
                     if (player.GetComponent<NetworkObject>().Id == newPlayerId)

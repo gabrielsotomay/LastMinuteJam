@@ -1,6 +1,8 @@
 using Netick.Unity;
+using NUnit.Framework;
 using StinkySteak.NShooter.Netick.Transport;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class NetworkingController : NetworkEventsListener
 {
@@ -8,7 +10,7 @@ public class NetworkingController : NetworkEventsListener
     public GameObject SandboxPrefab;
     public NetworkTransportProvider Transport;
     public StartMode Mode = StartMode.MultiplePeers;
-    [Range(1, 5)]
+    [UnityEngine.Range(1, 5)]
     public int Clients = 4;
     public bool StartServerInMultiplePeersMode = true;
 
@@ -16,7 +18,7 @@ public class NetworkingController : NetworkEventsListener
     public bool AutoConnect;
 
     [Header("Network")]
-    [Range(0, 65535)]
+    [UnityEngine.Range(0, 65535)]
     public int Port;
     public string ServerIPAddress = "127.0.0.1";
 
@@ -28,7 +30,7 @@ public class NetworkingController : NetworkEventsListener
     public bool ShowDisconnectButton = true;
     public bool ShowConnectButton = true;
     public Vector2 Offset = new Vector2(36, 0);
-
+    public List<PlayerData> playerData;
 
     private void Awake()
     {
