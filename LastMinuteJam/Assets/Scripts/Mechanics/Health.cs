@@ -67,10 +67,8 @@ namespace Platformer.Mechanics
         public void TakeDamage()
         {
             float newHp = Mathf.Clamp(currentHP - cumulativeDamage, 0, maxHP);
-            OnPlayerDamaged?.Invoke(this, new PlayerDamagedEventArgs { newHealth = newHp / maxHP });
-            currentHP = newHp;
-            cumulativeDamage = 0;
-            if (currentHP <= 0)
+            
+            if (newHp <= 0)
             {
                 OnDeath?.Invoke();
                 currentHP = maxHP;
@@ -79,6 +77,12 @@ namespace Platformer.Mechanics
                 //var ev = Schedule<HealthIsZero>();
                 //ev.health = this;
             }
+            else
+            {
+                OnPlayerDamaged?.Invoke(this, new PlayerDamagedEventArgs { newHealth = newHp / maxHP });
+                currentHP = newHp;
+            }
+            cumulativeDamage = 0;
         }
         public void Decrement()
         {
