@@ -407,7 +407,6 @@ public class LobbyController : MonoBehaviour
 
     public async void LeaveLobby()
     {
-        SceneManager.LoadScene("MainMenu");
         if (joinedLobby == null)
         {
             return;

@@ -15,6 +15,7 @@ public class MenuUIController : MonoBehaviour
     public Button joinGameButton;
     public Button quickJoinButton;
     public Button startGameButton;
+    public Button leaveLobbyButton;
     public TMP_InputField lobbyName;
     public TMP_InputField playerName;
     public LobbyController lobbyController;
@@ -50,6 +51,7 @@ public class MenuUIController : MonoBehaviour
         joinGameButton.onClick.AddListener(() => JoinGame());
         startGameButton.onClick.AddListener(() => StartGame());
         quickJoinButton.onClick.AddListener(() => QuickJoin());
+        leaveLobbyButton.onClick.AddListener(() => LeaveLobby());
         landingPage.sprite = LandingPageSprite;
         lobbyPanel.SetActive(false);
         foreach (GameObject character in characterContainers)
@@ -87,6 +89,10 @@ public class MenuUIController : MonoBehaviour
          lobbyController.UpdatePlayerState(LobbyController.KEY_READY);
     }
 
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
     public async void SwapCharacter()
     {
         characterActive = (characterActive + 1) % 2;
@@ -125,6 +131,22 @@ public class MenuUIController : MonoBehaviour
         }
     }
 
+
+    public async void LeaveLobby()
+    {
+        lobbyController.LeaveLobby();
+        landingPage.sprite = LandingPageSprite;
+        lobbyPanel.SetActive(false);
+        createGameButton.gameObject.SetActive(true);
+        joinGameButton.gameObject.SetActive(true);
+        lobbyName.gameObject.SetActive(true);
+        startContainer.SetActive(true);
+        characterContainers[0].SetActive(false);
+        characterButtons[0].onClick.RemoveListener(SwapCharacter);
+        characterButtons[1].onClick.RemoveListener(SwapCharacter);
+        readyButton.onClick.RemoveListener(SetReady);
+        playersActive = 0;
+    }
     private void OnLobbyEnter()
     {
         NetworkingController.Instance.myName = playerName.text;
