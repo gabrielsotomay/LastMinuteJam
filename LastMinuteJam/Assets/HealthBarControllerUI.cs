@@ -21,13 +21,11 @@ public class HealthBarControllerUI : MonoBehaviour
     float _oldHealth = 0f;
 
     Tween damageTween;
-    public void Init(bool isLeft_, Sprite playerIcon_, Sprite damagedPlayerIcon_, Sprite hurtPlayerIcon_, Sprite emptyHealthBar_, Sprite fullHealthBar_, Sprite damageHealthBar_)
+    public void Init(bool isLeft_, Sprite playerIcon_, Sprite hurtPlayerIcon_, Sprite damagedPlayerIcon_,  Sprite emptyHealthBar_, Sprite fullHealthBar_, Sprite damageHealthBar_)
     {
         if (!isLeft_)
         {
-            healthyPlayerIcon = playerIcon_;
-            damagedPlayerIcon = damagedPlayerIcon_;
-            hurtPlayerIcon = hurtPlayerIcon_;
+            
             HorizontalLayoutGroup.reverseArrangement = true;
             isLeft = isLeft_;
             damageHealthBar.fillOrigin = 0;
@@ -46,6 +44,9 @@ public class HealthBarControllerUI : MonoBehaviour
             damageHealthBar.fillOrigin = 0;
             fullHealthBar.fillOrigin = 0;
         }
+        healthyPlayerIcon = playerIcon_;
+        hurtPlayerIcon = hurtPlayerIcon_;
+        damagedPlayerIcon = damagedPlayerIcon_;
         playerIcon.sprite = playerIcon_;
         fullHealthBar.sprite = fullHealthBar_;
         emptyHealthBar.sprite = emptyHealthBar_;
@@ -59,7 +60,7 @@ public class HealthBarControllerUI : MonoBehaviour
         _oldHealth = e.oldHealth;
 
         damageHealthBar.fillAmount = e.oldHealth;
-        damageTween = DOTween.To(() => e.oldHealth, x => fullHealthBar.fillAmount = x, e.newHealth, 0.5f);
+        damageTween = DOTween.To(() => fullHealthBar.fillAmount, x => fullHealthBar.fillAmount = x, e.newHealth, 0.5f);
         damageTween.SetEase(Ease.OutCubic);
     }
 
@@ -76,17 +77,17 @@ public class HealthBarControllerUI : MonoBehaviour
 
     public void UpdateIcon(float health)
     {
-        if (health < 0.6)
+        if (health > 0.6)
+        {
+            playerIcon.sprite = healthyPlayerIcon;
+        }
+        else if (health > 0.2)
         {
             playerIcon.sprite = hurtPlayerIcon;
         }
-        else if (health < 0.2)
-        {
-            playerIcon.sprite = damagedPlayerIcon;
-        }
         else
         {
-            playerIcon.sprite = healthyPlayerIcon;
+            playerIcon.sprite = damagedPlayerIcon;
         }
     }
 }

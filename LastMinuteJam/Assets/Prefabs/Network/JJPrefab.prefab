@@ -619,7 +619,7 @@ MonoBehaviour:
   velocity: {x: 0, y: 0}
   IsGrounded: 0
   SimpleMovement: 0
-  networkTransform: {fileID: 0}
+  networkTransform: {fileID: 5795076534449500483}
   jumpAudio: {fileID: 0}
   respawnAudio: {fileID: 0}
   ouchAudio: {fileID: 0}

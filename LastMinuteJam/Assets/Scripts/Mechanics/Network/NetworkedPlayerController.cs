@@ -458,9 +458,9 @@ namespace Platformer.Mechanics
         {
             if(IsServer)
             {
-                networkTransform.Teleport(spawnPosition);
+                Teleport(spawnPosition);
             }
-            Sandbox.GetComponent<JamGameEventHandler>().RespawnPlayer(this);
+            //Sandbox.GetComponent<JamGameEventHandler>().RespawnPlayer(this);
 
             
         }
