@@ -5,9 +5,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class LobbyController : MonoBehaviour

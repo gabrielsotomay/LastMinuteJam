@@ -67,6 +67,17 @@
                 },
                 {
                     "name": "",
+                    "id": "c6fc5b0e-461e-4205-963b-7700f5f46e8a",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KeyboardPlayer1;KeyboardPlayer2",
+                    "action": "BasicAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "0feac029-474a-47fd-b36b-09611c72e93e",
                     "path": "<Keyboard>/b",
                     "interactions": "",
@@ -105,6 +116,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KeyboardPlayer2",
+                    "action": "HeavyAttack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cc32bd75-6696-49d6-867d-f6b7f0068120",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KeyboardPlayer1;KeyboardPlayer2",
                     "action": "HeavyAttack",
                     "isComposite": false,
                     "isPartOfComposite": false

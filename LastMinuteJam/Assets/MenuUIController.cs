@@ -1,14 +1,8 @@
-using Netick.Unity;
-using NUnit.Framework;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
-using UnityEditor.U2D.Animation;
-using System.Linq;
-
 public class MenuUIController : MonoBehaviour
 {
     public Button createGameButton;
@@ -166,8 +160,8 @@ public class MenuUIController : MonoBehaviour
         startContainer.SetActive(false);
         characterContainers[0].SetActive(true);
         playerPanels[0].Init(new LobbyUIData { name = playerName.text, state = "not ready", character = 0 });
-        characterButtons[0].onClick.AddListener(SwapCharacter);
-        characterButtons[1].onClick.AddListener(SwapCharacter);
+        //characterButtons[0].onClick.AddListener(SwapCharacter);
+        //characterButtons[1].onClick.AddListener(SwapCharacter);
         readyButton.onClick.AddListener(SetReady);
         playersActive = 1;
     }

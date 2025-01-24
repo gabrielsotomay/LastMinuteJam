@@ -3,15 +3,12 @@ using UnityEngine;
 using Platformer.Gameplay;
 using static Platformer.Core.SimulationNetick;
 using Platformer.Model;
-using Platformer.Core;
 using UnityEngine.InputSystem;
 using LastMinuteJam;
 using Netick;
 using Unity.VisualScripting;
 using System;
-using UnityEngine.Windows;
 using Netick.Unity;
-using System.Collections;
 
 namespace Platformer.Mechanics
 {

@@ -2,13 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using Netick.Unity;
 using Platformer.Model;
-using static Platformer.Core.SimulationNetick;
 using Netick;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
-using System;
 using Platformer.Mechanics;
 using System.Collections;
-using static Unity.Cinemachine.AxisState;
 
 
 public class ComboController : NetworkBehaviour

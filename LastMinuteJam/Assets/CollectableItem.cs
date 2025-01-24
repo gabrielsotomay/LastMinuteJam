@@ -1,10 +1,6 @@
-using System;
 using Netick;
 using Netick.Unity;
-using UnityEditor.UI;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
-using UnityEngine.SceneManagement;
 
 
 public class CollectableItem : NetworkBehaviour
