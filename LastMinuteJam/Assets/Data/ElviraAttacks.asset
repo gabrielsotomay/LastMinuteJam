@@ -19,9 +19,9 @@ MonoBehaviour:
     rotation: 0
     windupTime: 0.1
     activeTime: 0.2
-    recoverTime: 0.1
+    recoverTime: 0.2
     lifeTime: 0
-    baseAttack: 8
+    baseAttack: 5
     knockback: 0.5
     impactTime: 0.4
     disableTime: 0.5
@@ -37,11 +37,11 @@ MonoBehaviour:
     windupTime: 0.2
     activeTime: 0.4
     recoverTime: 0.3
-    lifeTime: 0.5
+    lifeTime: 0.4
     baseAttack: 12
     knockback: 4
     impactTime: 0.6
-    disableTime: 0.5
+    disableTime: 1
     type: 2
     recoil: {x: 0.5, y: 0}
     velocity: {x: 0, y: 0}

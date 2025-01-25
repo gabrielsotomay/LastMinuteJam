@@ -32,6 +32,7 @@ public class NetworkingController : NetworkEventsListener
     public Vector2 Offset = new Vector2(36, 0);
     public List<PlayerData> playerData = new();
     public string myName = "";
+    public string mapName = "";
     private void Awake()
     {
         if (Instance != null)

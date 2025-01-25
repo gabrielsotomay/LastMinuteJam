@@ -30,6 +30,8 @@ public class LobbyController : MonoBehaviour
     public const string KEY_RELAY_CODE = "RelayCode";
     public const string KEY_PLAYER_NAME = "PlayerName";
     public const string KEY_MAP_NAME = "MapName";
+    public const string KEY_MAP_CLASSIC = "Classic";
+    public const string KEY_MAP_OLDMAP = "Dancing Islands";
     public const string KEY_LOBBY = "Lobby";
     public const string KEY_NULL = "Null";
     private string playerId; // TODO: CHANGE ALL THESE TO AuthenticationService.Instance.PlayerId
@@ -50,6 +52,7 @@ public class LobbyController : MonoBehaviour
     string oldMapSent = "";
     public bool gameRunning;
 
+    public List<string> mapNames = new();
     public List<LobbyUIData> playerData = new();
 
     private void Awake()
@@ -69,6 +72,9 @@ public class LobbyController : MonoBehaviour
             await UnityServices.InitializeAsync();
             PlayerSetupAsync();
             gameRunning = false;
+            mapNames = new();
+            mapNames.Add(KEY_MAP_CLASSIC);
+            mapNames.Add(KEY_MAP_OLDMAP);
         }
         catch (Exception e)
         {
@@ -152,9 +158,10 @@ public class LobbyController : MonoBehaviour
             lobbyUpdateTimer = lobbyUpdateTimerMax;
 
             joinedLobby = await Lobbies.Instance.GetLobbyAsync(joinedLobby.Id);
-            foreach(Player player in joinedLobby.Players)
+            NetworkingController.Instance.mapName = joinedLobby.Data[KEY_MAP_NAME].Value;
+            foreach (Player player in joinedLobby.Players)
             {
-                bool foundPlayer = false; ;
+                bool foundPlayer = false;
                 foreach (LobbyUIData data in playerData)
                 {
                     if (data.name.Equals(player.Data[KEY_PLAYER_NAME].Value))
@@ -265,7 +272,7 @@ public class LobbyController : MonoBehaviour
             playerName = playerName_;
             string lobbyName = playerName + "'s Lobby";
             int maxPlayers = 4;
-            oldMapSent = "map0";
+            oldMapSent = KEY_MAP_CLASSIC;
             CreateLobbyOptions createLobbyOptions = new()
             {
                 IsPrivate = false,
@@ -278,6 +285,7 @@ public class LobbyController : MonoBehaviour
                 }
             };
             Lobby lobby = await Lobbies.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
+            NetworkingController.Instance.mapName = lobby.Data[KEY_MAP_NAME].Value;
             hostLobby = lobby;
             joinedLobby = hostLobby;
             Debug.Log("Created Lobby! " + lobby.Name + " " + lobby.MaxPlayers + " " + lobby.Id + " " + lobby.LobbyCode);
@@ -338,6 +346,7 @@ public class LobbyController : MonoBehaviour
     private void JoinLobby(Lobby lobby)
     {
         joinedLobby = lobby;
+        NetworkingController.Instance.mapName = lobby.Data[KEY_MAP_NAME].Value;
         Debug.Log("Joined Lobby with code " + lobby.Id);
         PrintPlayers(joinedLobby);
     }
@@ -360,7 +369,7 @@ public class LobbyController : MonoBehaviour
     {
         try
         {
-            string newMapName = "map0";
+            string newMapName = mapName;
             hostLobby = await LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions
             {
                 Data = new Dictionary<string, DataObject>
@@ -369,6 +378,7 @@ public class LobbyController : MonoBehaviour
             }
             });
             joinedLobby = hostLobby;
+            NetworkingController.Instance.mapName = joinedLobby.Data[KEY_MAP_NAME].Value;
 
             oldMapSent = newMapName;
 

@@ -22,7 +22,7 @@ namespace Platformer
         private GameObject _collectableItem;
         //private GameObject _healthBarPrefab;
 
-        private Vector3[] _spawnPositions = new Vector3[4] { new Vector3(11, 9, 0), new Vector3(11, 1, 0), new Vector3(1, 9, 0), new Vector3(1, 1, 0) };
+        private List<Transform> _spawnPositions = new();
         private Queue<Vector3> _freePositions = new(4);
 
 
@@ -41,6 +41,7 @@ namespace Platformer
             jumpAction.performed += OnJump;
             moveAction.performed += OnMove;
             */
+            SetMap(SelectMap(NetworkingController.Instance.mapName));
 
             JJPrefab = Sandbox.GetPrefab("JJPrefab");
             ElviraPrefab = Sandbox.GetPrefab("ElviraPrefab");
@@ -53,15 +54,53 @@ namespace Platformer
             Sandbox.InitializePool(ElviraPrefab, 2);
             //Sandbox.InitializePool(_collectableItem, 1);
             comboController.Init(model);
+            /*
             for (int i = 0; i < 4; i++)
             {
-                _freePositions.Enqueue(_spawnPositions[i]);
+                _freePositions.Enqueue(_spawnPositions[i].position);
             }
+            */
             base.NetworkStart();
             if (IsServer)
                 RestartGame();
         }
+        static int SelectMap(string mapName)
+        {
+            Debug.Log("Selected " + mapName);
+            switch (mapName)
+            {
+                case LobbyController.KEY_MAP_CLASSIC:
+                    return 0;
+                case LobbyController.KEY_MAP_OLDMAP:
+                    return 1;
+            }
+            return -1;
+        }
 
+        public void SetMap(int mapSelected)
+        {
+            Transform spawnPointContainer = model.spawnPointsContainers[0];
+            _spawnPositions = new();
+            for (int i = 0; i < model.maps.Count; i++)
+            {
+                if (mapSelected == i)
+                {
+                    model.maps[mapSelected].SetActive(true);
+                    spawnPointContainer = model.spawnPointsContainers[mapSelected];
+                    model.topLeft = model.mapMarkers[mapSelected].GetChild(0);
+                    model.topRight = model.mapMarkers[mapSelected].GetChild(1);
+                }
+                else
+                {
+                    model.maps[i].SetActive(false);
+                }
+            }
+            for (int i = 0; i < spawnPointContainer.childCount; i++)
+            {
+                _spawnPositions.Add(spawnPointContainer.GetChild(i));
+                Debug.Log("Added spawn position" + i);
+            }
+        }
         public void OnConnectRequest(NetworkSandbox sandbox, NetworkConnectionRequest request)
         {
             if (Sandbox.ConnectedPlayers.Count >= 4)
@@ -80,11 +119,11 @@ namespace Platformer
                     {
                         if (data.character == PlayerData.Character.Elvira)
                         {
-                            playerObj = sandbox.NetworkInstantiate(ElviraPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
+                            playerObj = sandbox.NetworkInstantiate(ElviraPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count-1].position, Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
                         }
                         else
                         {
-                            playerObj = sandbox.NetworkInstantiate(JJPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
+                            playerObj = sandbox.NetworkInstantiate(JJPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count - 1].position, Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
                         }
                     }
                 }
@@ -97,11 +136,11 @@ namespace Platformer
                     {
                         if (data.character == PlayerData.Character.Elvira)
                         {
-                            playerObj = sandbox.NetworkInstantiate(ElviraPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
+                            playerObj = sandbox.NetworkInstantiate(ElviraPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count - 1].position, Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
                         }
                         else
                         {
-                            playerObj = sandbox.NetworkInstantiate(JJPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count], Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
+                            playerObj = sandbox.NetworkInstantiate(JJPrefab, _spawnPositions[Sandbox.ConnectedPlayers.Count - 1].position, Quaternion.identity, player).GetComponent<NetworkedPlayerController>();
                         }
                     }
                 }
@@ -120,7 +159,6 @@ namespace Platformer
                 playerObj.isPlayer1 = true;
             }
             //SetPlayerInputsRpc();
-            Debug.Log("Ran a thing and count is " + Sandbox.ConnectedPlayers.Count);
             foreach (NetworkPlayer networkPlayer in Sandbox.ConnectedPlayers)
             {
                 ((GameObject)networkPlayer.PlayerObject).GetComponent<NetworkedPlayerController>().InputSource = networkPlayer;                
@@ -206,8 +244,6 @@ namespace Platformer
                                 model.healthBarController.AddNew(player); 
                                 comboController.allPlayers.Add(player);
                                 FindFirstObjectByType<CinemachineTargetGroup>().AddMember(player.transform, 1, 4);
-                                //Instantiate(_healthBarPrefab, player.transform.position, Quaternion.identity).transform.SetParent(healthBar.transform);
-                                Debug.Log("THIS ISRUNINGIGGGGGGGG");
                             }
                         }
                         
@@ -233,7 +269,7 @@ namespace Platformer
         // This is called on the server when a client has disconnected.
         public void OnPlayerDisconnected(NetworkSandbox sandbox, Netick.NetworkPlayer player, TransportDisconnectReason reason)
         {
-            _freePositions.Enqueue(((GameObject)player.PlayerObject).GetComponent<NetworkedPlayerController>().spawnPosition);
+            //_freePositions.Enqueue(((GameObject)player.PlayerObject).GetComponent<NetworkedPlayerController>().spawnPosition);
             Players.Remove(((GameObject)player.PlayerObject).GetComponent<NetworkedPlayerController>());
         }
 

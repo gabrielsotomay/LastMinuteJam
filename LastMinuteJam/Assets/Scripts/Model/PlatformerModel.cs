@@ -19,7 +19,7 @@ namespace Platformer.Model
 
         public GameUIController UIcontroller;
         public ComboUIController comboUIcontroller;
-        public HealthBarController healthBarController; 
+        public HealthBarController healthBarController;
 
         /// <summary>
         /// The main component which controls the player sprite, controlled 
@@ -29,8 +29,10 @@ namespace Platformer.Model
 
         /// <summary>
         /// The spawn point in the scene.
-        /// </summary>
-        public List<Transform> spawnPoints;
+        /// </summary>]
+        public List<Transform> spawnPointsContainers = new();
+        public List<GameObject> maps;
+        public List<Transform> mapMarkers = new();
         public Transform topLeft;
         public Transform topRight;
 

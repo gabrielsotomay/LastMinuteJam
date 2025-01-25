@@ -54,7 +54,7 @@ namespace Platformer.Core
         {
             var ev = New<T>();
             ev.tick = currentTick + Mathf.Max(scheduledTick, 1);
-            Debug.Log("Scheduled" + ev.ToString() +"  at " + currentTick + " for " + scheduledTick);
+            //Debug.Log("Scheduled" + ev.ToString() +"  at " + currentTick + " for " + scheduledTick);
             eventQueue.Push(ev);
             return ev;
         }

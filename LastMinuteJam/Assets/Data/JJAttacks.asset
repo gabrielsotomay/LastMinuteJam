@@ -18,13 +18,13 @@ MonoBehaviour:
     position: {x: 0.38, y: 0.15}
     rotation: 0
     windupTime: 0.1
-    activeTime: 0.3
+    activeTime: 0.2
     recoverTime: 0.2
     lifeTime: 2
-    baseAttack: 5
-    knockback: 0.5
-    impactTime: 0.2
-    disableTime: 1
+    baseAttack: 4
+    knockback: 3
+    impactTime: 0.4
+    disableTime: 0.5
     type: 1
     recoil: {x: -0.2, y: 0}
     velocity: {x: 8, y: 0}
@@ -34,14 +34,14 @@ MonoBehaviour:
     hitboxScale: {x: 1, y: 1}
     position: {x: 0.5, y: 0}
     rotation: 0
-    windupTime: 0.1
+    windupTime: 0.2
     activeTime: 0.3
     recoverTime: 0.3
-    lifeTime: 0.5
-    baseAttack: 10
-    knockback: 4
-    impactTime: 0.1
-    disableTime: 0.5
+    lifeTime: 0.3
+    baseAttack: 15
+    knockback: 6
+    impactTime: 0.8
+    disableTime: 1
     type: 2
     recoil: {x: 0.5, y: 0}
     velocity: {x: 0, y: 0}

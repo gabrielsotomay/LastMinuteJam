@@ -218,7 +218,6 @@ using Vector3 = UnityEngine.Vector3;
                 _comboImages[counter].GetComponent<Image>().sprite = redArrow;
             }
 
-            Debug.Log(_comboImages.Count);
             if (counter == _combo.Count)
             {
                 for (int i = 0; i < counter; i++)
