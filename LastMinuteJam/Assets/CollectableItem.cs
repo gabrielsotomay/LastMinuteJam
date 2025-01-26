@@ -13,7 +13,6 @@ public class CollectableItem : NetworkBehaviour
         {
         // Only happens in server
             comboController.OnComboCollected(this, player);
-            Debug.Log("destroyed");
         }
 
         public void Init(ComboController comboController_, int difficulty_)

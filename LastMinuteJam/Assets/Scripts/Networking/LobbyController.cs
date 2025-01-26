@@ -7,7 +7,6 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 public class LobbyController : MonoBehaviour
 {
 
@@ -83,7 +82,13 @@ public class LobbyController : MonoBehaviour
 
     }
 
-
+    public void OnDestroy()
+    {
+        if (joinedLobby != null)
+        {
+            LeaveLobby();
+        }
+    }
     private async void PlayerSetupAsync()
     {
         playerName = "Goose " + UnityEngine.Random.Range(10, 9999);
@@ -157,20 +162,67 @@ public class LobbyController : MonoBehaviour
         {
             lobbyUpdateTimer = lobbyUpdateTimerMax;
 
-            joinedLobby = await Lobbies.Instance.GetLobbyAsync(joinedLobby.Id);
+            Lobby loadedLobby =  await Lobbies.Instance.GetLobbyAsync(joinedLobby.Id);
+            if (joinedLobby != null && loadedLobby.Players.Count == 1 && !loadedLobby.HostId.Equals(playerId))
+            {
+                joinedLobby = null;
+                playerData.Clear();
+                OnLobbyUpdate?.Invoke(this, EventArgs.Empty);
+                Debug.Log("Kicked from server");
+                return;
+            }
+            else if(joinedLobby != null)
+            {
+                joinedLobby = loadedLobby;
+                oldMapSent = joinedLobby.Data[KEY_MAP_NAME].Value;
+            }
+            else
+            {
+                Debug.Log("Aborted update");
+                return;
+
+            }
+            if (IsLobbyHost())
+            {
+                hostLobby = joinedLobby;
+            }
             NetworkingController.Instance.mapName = joinedLobby.Data[KEY_MAP_NAME].Value;
+            List<LobbyUIData> dataToRemove = new();
+            for (int i = 0; i < playerData.Count; i++)
+            {
+                LobbyUIData data = playerData[i];
+                bool foundData = false;
+                foreach (Player player in joinedLobby.Players)
+                {
+                    if (player.Data != null && data.name.Equals(player.Data[KEY_PLAYER_NAME].Value))
+                    {
+                        foundData = true;
+                    }                    
+                }
+                if (!foundData)
+                {
+                    dataToRemove.Add(data);
+                }
+            }
+            foreach( LobbyUIData data in dataToRemove)
+            {
+                playerData.Remove(data);
+            }
+
+
             foreach (Player player in joinedLobby.Players)
             {
+                
                 bool foundPlayer = false;
                 foreach (LobbyUIData data in playerData)
                 {
-                    if (data.name.Equals(player.Data[KEY_PLAYER_NAME].Value))
+                    if (player.Data != null && data.name.Equals(player.Data[KEY_PLAYER_NAME].Value))
                     {
                         SetPlayerUIData(player, data);
                         foundPlayer = true;
                     }
                 }
-                if (!foundPlayer)
+                if (player.Data != null && !foundPlayer)
                 {                    
                     playerData.Add(GetPlayerUIData(player));
                 }
@@ -183,7 +235,7 @@ public class LobbyController : MonoBehaviour
                 {
                     StartClientGame();
                 }
-                else if (IsHostInLobby() && joinedLobby.Players[0].Data[KEY_PLAYER_STATE].Value.Equals(KEY_PLAY_AGAIN))
+                else if (IsHostInLobby() && joinedLobby.Players[0].Data != null && joinedLobby.Players[0].Data[KEY_PLAYER_STATE].Value.Equals(KEY_PLAY_AGAIN))
                 {
                     //ExitToLobby();
                 }
@@ -370,7 +422,7 @@ public class LobbyController : MonoBehaviour
         try
         {
             string newMapName = mapName;
-            hostLobby = await LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions
+            hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions
             {
                 Data = new Dictionary<string, DataObject>
             {
@@ -395,7 +447,7 @@ public class LobbyController : MonoBehaviour
     {
         try
         {
-            hostLobby = await LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions
+            hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions
             {
                 Data = new Dictionary<string, DataObject>
             {
@@ -421,8 +473,22 @@ public class LobbyController : MonoBehaviour
         }
         try
         {
+            if (joinedLobby.Players.Count == 2)
+            {
+                if (joinedLobby.HostId == playerId)
+                {
+                    await MigrateLobbyHost();
+                }
+                await Lobbies.Instance.RemovePlayerAsync(joinedLobby.Id, playerId);
+                Debug.Log("Left lobby");
 
-            await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, playerId);
+            }
+            else
+            {
+                await DeleteLobby();
+            }
+            
+            
             joinedLobby = null;
             hostLobby = null;
             return;
@@ -438,7 +504,7 @@ public class LobbyController : MonoBehaviour
     {
         try
         {
-            await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, joinedLobby.Players[1].Id);
+            await Lobbies.Instance.RemovePlayerAsync(joinedLobby.Id, joinedLobby.Players[1].Id);
         }
         catch (LobbyServiceException e)
         {
@@ -446,11 +512,11 @@ public class LobbyController : MonoBehaviour
         }
     }
 
-    private async void MigrateLobbyHost()
+    private async Task MigrateLobbyHost()
     {
         try
         {
-            hostLobby = await LobbyService.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions
+            hostLobby = await Lobbies.Instance.UpdateLobbyAsync(hostLobby.Id, new UpdateLobbyOptions
             {
                 HostId = joinedLobby.Players[1].Id
             });
@@ -463,11 +529,11 @@ public class LobbyController : MonoBehaviour
         }
     }
 
-    private async void DeleteLobby()
+    private async Task DeleteLobby()
     {
         try
         {
-            await LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id);
+            await Lobbies.Instance.DeleteLobbyAsync(joinedLobby.Id);
         }
         catch (LobbyServiceException e)
         {
@@ -495,7 +561,7 @@ public class LobbyController : MonoBehaviour
 
             string relayCode = await relayController.CreateRelay();
 
-            Lobby lobby = await LobbyService.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions
+            Lobby lobby = await Lobbies.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions
             {
                 Data = new Dictionary<string, DataObject>
                 {
@@ -575,7 +641,7 @@ public class LobbyController : MonoBehaviour
     }
     public bool IsLobbyHost()
     {
-        return joinedLobby?.Players[0].Id.Equals(playerId) ?? false;
+        return joinedLobby?.HostId.Equals(playerId) ?? false;
     }
 
     public string GetLobbyCode()
@@ -589,7 +655,7 @@ public class LobbyController : MonoBehaviour
     {
         try
         {
-            await LobbyService.Instance.UpdatePlayerAsync(joinedLobby.Id, playerId, new UpdatePlayerOptions
+            await Lobbies.Instance.UpdatePlayerAsync(joinedLobby.Id, playerId, new UpdatePlayerOptions
             {
                 Data = new Dictionary<string, PlayerDataObject>
                 {
@@ -608,7 +674,7 @@ public class LobbyController : MonoBehaviour
     {
         try
         {
-            await LobbyService.Instance.UpdatePlayerAsync(joinedLobby.Id, playerId, new UpdatePlayerOptions
+            await Lobbies.Instance.UpdatePlayerAsync(joinedLobby.Id, playerId, new UpdatePlayerOptions
             {
                 Data = new Dictionary<string, PlayerDataObject>
                 {

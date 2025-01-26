@@ -141,10 +141,8 @@ namespace LastMinuteJam
             NetworkAttackController[] attacks = FindObjectsByType<NetworkAttackController>(FindObjectsInactive.Exclude, FindObjectsSortMode.InstanceID);
             foreach (NetworkAttackController attack in attacks)
             {
-                Debug.Log("Found attack of id " + attack.GetComponent<NetworkObject>().Id + ", looking for " + networkId);
                 if (networkId == attack.GetComponent<NetworkObject>().Id)
                 {
-                    Debug.Log("Found matching attack");
                     return attack;
                 }
             }

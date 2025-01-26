@@ -479,7 +479,7 @@ namespace Platformer.Mechanics
             //Teleport(model.spawnPoint.transform.position);
 
             rayCastBeginPoint = transform.Find("RayCast");
-            Debug.Log(rayCastBeginPoint.transform.position);
+
             
             jumpState = JumpState.Grounded;
             animator.SetBool("dead", false);
@@ -723,7 +723,6 @@ namespace Platformer.Mechanics
             PlayerAttack attack ;
             if (attackType == AttackTypes.Light)
             {
-                Debug.Log("Got basic attack");
                 attack = playerAttackTypes.basicAttack;
             }
             else if (attackType == AttackTypes.Heavy)
@@ -899,7 +898,6 @@ gg                Debug.Log("Analysing");
                 //Debug.Log("Player" + id + " entered non-atack trigger");
                 return;
             }
-            Debug.Log("Player " + id + " + got hit by player " + attackController.playerId + " with attack" + attackController.id);
             if (CheckParry(attackController))
             {
                 // TODO: Don't get hit and do cool effect

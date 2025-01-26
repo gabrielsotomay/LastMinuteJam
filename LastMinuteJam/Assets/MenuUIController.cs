@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
+using Netick.Unity;
 public class MenuUIController : MonoBehaviour
 {
     public Button createGameButton;
@@ -10,6 +11,7 @@ public class MenuUIController : MonoBehaviour
     public Button quickJoinButton;
     public Button startGameButton;
     public Button leaveLobbyButton;
+    public Button kickPlayerButton;
     public TMP_InputField lobbyName;
     public TMP_InputField playerName;
     public LobbyController lobbyController;
@@ -48,6 +50,7 @@ public class MenuUIController : MonoBehaviour
         startGameButton.onClick.AddListener(() => StartGame());
         quickJoinButton.onClick.AddListener(() => QuickJoin());
         leaveLobbyButton.onClick.AddListener(() => LeaveLobby());
+        kickPlayerButton.onClick.AddListener(() => KickPlayer());
         landingPage.sprite = LandingPageSprite;
         lobbyPanel.SetActive(false);
         foreach (GameObject character in characterContainers)
@@ -73,6 +76,7 @@ public class MenuUIController : MonoBehaviour
             OnLobbyEnter();
             startGameAudio.Play();
             startGameButton.gameObject.SetActive(true);
+            kickPlayerButton.gameObject.SetActive(true);
 
             /*playerOneJj.SetActive(true);
             playerTwoJj.SetActive(true);
@@ -115,9 +119,10 @@ public class MenuUIController : MonoBehaviour
         {
             OnLobbyEnter();
             startGameButton.gameObject.SetActive(false);
+            kickPlayerButton.gameObject.SetActive(false);
         }
     }
-    public async void StartGame()
+    public void StartGame()
     {
         lobbyController.StartGame();
         startGameAudio.Play();
@@ -129,12 +134,16 @@ public class MenuUIController : MonoBehaviour
         {
             OnLobbyEnter();
             startGameButton.gameObject.SetActive(false);
+            kickPlayerButton.gameObject.SetActive(false);
             startGameAudio.Play();
         }
     }
 
-
-    public async void LeaveLobby()
+    public void KickPlayer()
+    {
+        lobbyController.KickPlayer();
+    }
+    public void LeaveLobby()
     {
         lobbyController.LeaveLobby();
         landingPage.sprite = LandingPageSprite;
@@ -185,7 +194,12 @@ public class MenuUIController : MonoBehaviour
                 playersActive++;
                 Debug.Log("Added player " + lobbyUIData[0].name);
             }
-            
+        }
+        else if (lobbyUIData.Count == 1 && playersActive == 2)
+        {
+            characterContainers[1].SetActive(false);
+            playersActive = 1;
+            Debug.Log("Removed player " + playerPanels[1].name.text);
         }
         foreach (LobbyUIData player in lobbyUIData)
         {
@@ -208,6 +222,15 @@ public class MenuUIController : MonoBehaviour
     public void QueryLobby(object o, EventArgs args)
     {
         UpdateUI(lobbyController.playerData);
+        if (lobbyController.IsLobbyHost())
+        {
+            startGameButton.gameObject.SetActive(true);
+            kickPlayerButton.gameObject.SetActive(true);
+        }
+        else if (lobbyController.playerData.Count == 0)
+        {
+            LeaveLobby();
+        }
     }
     // Update is called once per frame
     void Update()

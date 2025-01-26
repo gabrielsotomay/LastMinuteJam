@@ -210,7 +210,6 @@ public class ComboController : NetworkBehaviour
         if (newInput == Combo.Input.None || lastInput == newInput)
         {
             lastInput = newInput;
-            Debug.Log("No input!");
             return;
         }
         lastInput = newInput;
