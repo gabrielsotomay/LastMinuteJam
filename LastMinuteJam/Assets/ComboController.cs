@@ -246,8 +246,20 @@ public class ComboController : NetworkBehaviour
         model.comboUIcontroller.OnComboCompleted();
         comboIsActive = false;
         StopAllCoroutines();
-        ApplyComboEffectRpc(myPlayer.GetComponent<NetworkedKinematicObject>().Id, activeCombo.comboEffect);
+        if (IsServer)
+        {
 
+            ApplyComboEffectRpc(myPlayer.GetComponent<NetworkedKinematicObject>().Id, activeCombo.comboEffect);
+        }
+        else
+        {
+            SendComboToServerRpc(myPlayer.GetComponent<NetworkedKinematicObject>().Id, activeCombo.comboEffect);
+        }
+    }
+    [Rpc(source: RpcPeers.Everyone, target: RpcPeers.Owner)]
+    public void SendComboToServerRpc(int playerId, ComboEffect comboEffect)
+    {
+        ApplyComboEffectRpc(playerId, comboEffect);
     }
 
     [Rpc(target: RpcPeers.Everyone, localInvoke: true)]

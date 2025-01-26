@@ -7,8 +7,6 @@ using Platformer.Model;
 using Platformer.Core;
 using UnityEngine.InputSystem;
 using LastMinuteJam;
-using UnityEngine.Splines;
-using System.Net;
 
 namespace Platformer.Mechanics
 {

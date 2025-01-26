@@ -22,6 +22,9 @@ namespace Platformer.Mechanics
         public AudioClip jumpAudio;
         public AudioClip respawnAudio;
         public AudioClip ouchAudio;
+        public AudioClip lightAttackAudio;
+        public AudioClip heavyAttackAudio;
+        public List<AudioClip> footsteps;
 
         // Components
         private CapsuleCollider2D collider2d;
@@ -82,6 +85,7 @@ namespace Platformer.Mechanics
         int impactNumber = -1;
         bool impactFinished = false;
         PlayerAttack lastAttackTaken;
+        AttackTypes lastAttackSent = AttackTypes.None;
         Vector2 impactVector;
         List<int> impactList = new List<int>();
 
@@ -474,7 +478,7 @@ namespace Platformer.Mechanics
             collider2d.enabled = true;
             controlEnabled = false;
             if (audioSource && respawnAudio)
-                audioSource.PlayOneShot(respawnAudio);
+                //audioSource.PlayOneShot(respawnAudio);
             health.Increment();
             //Teleport(model.spawnPoint.transform.position);
 
@@ -565,7 +569,8 @@ namespace Platformer.Mechanics
                 return;
             }
             if (attackState == AttackState.None && attacks.Count <= 8)
-            { 
+            {
+                lastAttackSent = type;
                 SetAttackState(AttackState.WindUp);
                 UpdateAttackAnimations((int)type);
                 currentAttack = GetAttackType(type);
@@ -609,11 +614,36 @@ namespace Platformer.Mechanics
             if (attackState == AttackState.WindUp)
             {
                 SetAttackState(AttackState.Active);
+                PlayAttackAudio();
                 if (IsServer)
                 {
                     Attack(currentAttack);
                 }
                 Schedule<ActiveFinishedN>(Sandbox.Tick.TickValue, (int)(currentAttack.activeTime * attackSpeedModifier / Sandbox.FixedDeltaTime)).player = this;
+            }
+        }
+
+        private void PlayAttackAudio()
+        {
+            switch (lastAttackSent)
+            {
+                case AttackTypes.Light:
+                    if (character == PlayerData.Character.Elvira)
+                    {
+                        audioSource.pitch = 1.5f + UnityEngine.Random.Range(0, 0.1f);
+                        audioSource.PlayOneShot(lightAttackAudio, 0.8f);
+                    }
+                    else
+                    {
+                        audioSource.pitch = 1 - UnityEngine.Random.Range(0, 0.1f);
+                        audioSource.PlayOneShot(lightAttackAudio, 1f);
+                    }
+                     break;                    
+                case AttackTypes.Heavy:
+                    audioSource.pitch = 1 + UnityEngine.Random.Range(0, 0.2f);
+                    audioSource.PlayOneShot(heavyAttackAudio, 0.8f);
+                    break;
+                default: break;
             }
         }
         
@@ -699,6 +729,14 @@ namespace Platformer.Mechanics
             }
         }
 
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.collider.gameObject.name == "LevelDeathFloor")
+            {
+                Debug.Log("Died on the floor");
+                health.Die();
+            }
+        }
         public void ClearAttack(int id)
         {
 
@@ -777,11 +815,12 @@ namespace Platformer.Mechanics
                     jumpState = JumpState.Jumping;
                     jump = true;
                     stopJump = false;
+                    audioSource.PlayOneShot(jumpAudio);
                     break;
                 case JumpState.Jumping:
                     if (!IsGrounded)
                     {
-                        Schedule<PlayerJumpedN>(Sandbox.Tick.TickValue).oneShotAudio = new AudioHelper.OneShot(audioSource, jumpAudio);
+                        //Schedule<PlayerJumpedN>(Sandbox.Tick.TickValue).oneShotAudio = new AudioHelper.OneShot(audioSource, jumpAudio);
                         jumpState = JumpState.InFlight;
                     }
                     break;
@@ -860,7 +899,17 @@ namespace Platformer.Mechanics
                 {
                     targetVelocity = move * playerStats.maxSpeed;
                 }
-            }   
+            }
+            
+            if (healthState == HealthState.Normal && Mathf.Abs(targetVelocity.x) > 0.01 && IsGrounded)
+            {
+                if (!audioSource.isPlaying)
+                {
+                    audioSource.PlayOneShot(footsteps[UnityEngine.Random.Range(0, 2)], 0.5f);
+
+                }
+            }
+            
         }
         /*
         public void CheckAttackIntersection(NetworkAttackController attack)
@@ -960,6 +1009,9 @@ gg                Debug.Log("Analysing");
             hitEvent.player = this;
             hitEvent.attackController = NetworkAttackController.FindAttackByNetworkId(attackId);
             //hitEvent.attackController = attacks[attackId];
+            health.Hurt(hitEvent.attackController.playerAttack.baseAttack);
+            audioSource.pitch = 1 + UnityEngine.Random.Range(0, 0.2f);
+            audioSource.PlayOneShot(ouchAudio);
 
         }
 
@@ -967,7 +1019,6 @@ gg                Debug.Log("Analysing");
         {
             impactList.Add(attackController.GetInstanceID());
             SetHealthState(HealthState.Impacted);
-            health.Hurt(attackController.playerAttack.baseAttack);
             Schedule<PlayerImpactedN>(Sandbox.Tick.TickValue).player = this;
             ImpactFinishedN impactFinishedEvent = Schedule<ImpactFinishedN>(Sandbox.Tick.TickValue, (int)(attackController.playerAttack.impactTime/Sandbox.FixedDeltaTime));
             impactFinishedEvent.player = this;
@@ -979,8 +1030,6 @@ gg                Debug.Log("Analysing");
             controlEnabled = false;
             attackController.HitEnemy();
         }
-        
-
 
         public void OnImpactFinished(int impactId)
         {
@@ -990,11 +1039,21 @@ gg                Debug.Log("Analysing");
             }
             velocity.y = lastAttackTaken.knockback * impactVector.y * playerStats.knockbackModifier;
             velocity.x = lastAttackTaken.knockback * impactVector.x * playerStats.knockbackModifier;
-            health.TakeDamage();
+            if (IsServer)
+            {
+                TakeDamageRpc();
+            }
             SetHealthState(HealthState.Disabled);
             Schedule<PlayerDisableN>(Sandbox.Tick.TickValue).player = this;
             Schedule<DisableFinishedN>(Sandbox.Tick.TickValue, (int)(lastAttackTaken.disableTime/Sandbox.FixedDeltaTime)).player = this;
         }
+
+        [Rpc(target:RpcPeers.Everyone, localInvoke:true)]
+        public void TakeDamageRpc()
+        {
+            health.TakeDamage();
+        }
+
 
         private void SetHealthState(HealthState newState)
         {
@@ -1122,7 +1181,7 @@ gg                Debug.Log("Analysing");
                 
                 if (audioSource && ouchAudio)
                 {
-                    audioSource.PlayOneShot(ouchAudio);
+                    audioSource.PlayOneShot(respawnAudio);
                 }
                 animator.SetTrigger("hurt");
                 animator.SetBool("dead", true);

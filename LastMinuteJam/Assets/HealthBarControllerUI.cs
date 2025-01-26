@@ -21,7 +21,7 @@ public class HealthBarControllerUI : MonoBehaviour
     float _oldHealth = 0f;
 
     Tween damageTween;
-    public void Init(bool isLeft_, Sprite playerIcon_, Sprite hurtPlayerIcon_, Sprite damagedPlayerIcon_,  Sprite emptyHealthBar_, Sprite fullHealthBar_, Sprite damageHealthBar_)
+    public void Init(bool isLeft_, Sprite playerIcon_, Sprite hurtPlayerIcon_, Sprite damagedPlayerIcon_,  Sprite emptyHealthBar_, Sprite fullHealthBar_, Sprite damageHealthBar_, string playerName_)
     {
         if (!isLeft_)
         {
@@ -44,6 +44,7 @@ public class HealthBarControllerUI : MonoBehaviour
             damageHealthBar.fillOrigin = 0;
             fullHealthBar.fillOrigin = 0;
         }
+        playerName.text = playerName_;
         healthyPlayerIcon = playerIcon_;
         hurtPlayerIcon = hurtPlayerIcon_;
         damagedPlayerIcon = damagedPlayerIcon_;

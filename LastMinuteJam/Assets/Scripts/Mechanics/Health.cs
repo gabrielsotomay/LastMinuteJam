@@ -70,9 +70,7 @@ namespace Platformer.Mechanics
             
             if (newHp <= 0)
             {
-                OnDeath?.Invoke();
-                currentHP = maxHP;
-                OnPlayerDamaged?.Invoke(this, new PlayerDamagedEventArgs { newHealth = 1 });
+                Die();
 
                 //var ev = Schedule<HealthIsZero>();
                 //ev.health = this;
@@ -90,10 +88,8 @@ namespace Platformer.Mechanics
             currentHP = newHp;
             if (currentHP <= 0)
             {
-                OnDeath?.Invoke();
-                currentHP = maxHP;
-                OnPlayerDamaged?.Invoke(this, new PlayerDamagedEventArgs { newHealth = 1 });
-
+                Die();
+                
                 //var ev = Schedule<HealthIsZero>();
                 //ev.health = this;
             }
@@ -108,7 +104,9 @@ namespace Platformer.Mechanics
         /// </summary>
         public void Die()
         {
-            while (currentHP > 0) Decrement();
+            OnDeath?.Invoke();
+            currentHP = maxHP;
+            OnPlayerDamaged?.Invoke(this, new PlayerDamagedEventArgs { newHealth = 1 });
 
         }
 

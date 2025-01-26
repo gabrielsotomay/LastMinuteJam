@@ -620,9 +620,14 @@ MonoBehaviour:
   IsGrounded: 0
   SimpleMovement: 0
   networkTransform: {fileID: 5795076534449500483}
-  jumpAudio: {fileID: 0}
-  respawnAudio: {fileID: 0}
-  ouchAudio: {fileID: 0}
+  jumpAudio: {fileID: 8300000, guid: 4563f090a1334394e843f67e597e501d, type: 3}
+  respawnAudio: {fileID: 8300000, guid: 3020deef590e5f645bfa33732cec9d33, type: 3}
+  ouchAudio: {fileID: 8300000, guid: 2d5533541f2ad4c44902b5e5f2916e37, type: 3}
+  lightAttackAudio: {fileID: 8300000, guid: a212bc5d032f0714b9dfe1757d0b9557, type: 3}
+  heavyAttackAudio: {fileID: 8300000, guid: 54d22437e042b3544900c45bbed66b4b, type: 3}
+  footsteps:
+  - {fileID: 8300000, guid: bdb49257b73be764a8c04e4f37302e0e, type: 3}
+  - {fileID: 8300000, guid: 3318e557ea5714340abb5376ce7fb8c6, type: 3}
   audioSource: {fileID: 1513500698877243372}
   spriteRenderer: {fileID: 7479734947705083220}
   animator: {fileID: 5956421473153333409}

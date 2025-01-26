@@ -29,9 +29,17 @@ public class ComboUIController : MonoBehaviour
     [SerializeField] GameObject comboDestroyEffectPrefab;
     [SerializeField] AudioSource audioSource;
 
+    [SerializeField] AudioSource comboAudio;
     [SerializeField] Combo combo;
 
     [SerializeField] TMP_Text comboText;
+
+
+    [SerializeField] AudioClip comboHit;
+    [SerializeField] AudioClip comboFail;
+    [SerializeField] AudioClip comboSuccess;
+
+
 
     private float offset = 0;
     public float scrollSpeed = 100f;
@@ -71,7 +79,7 @@ public class ComboUIController : MonoBehaviour
         }
         StopAllCoroutines();
 
-
+        comboAudio.pitch = 1;
         comboPanel.SetActive(true);
         foreach (Combo.Input input in combo.sequence)
         {
@@ -125,8 +133,10 @@ public class ComboUIController : MonoBehaviour
         comboDestroyEffectPrefab, comboPrompts[index].transform.position, Quaternion.identity, comboPrompts[index].transform);
         
         particleObject.transform.localPosition = Vector3.zero;
-
-        audioSource.Play();
+        comboAudio.Stop();
+        comboAudio.pitch += 0.1f;
+        comboAudio.clip = comboFail;
+        comboAudio.Play();
         UpdatePromptLocations();
         if (index < combo.sequence.Count)
         {
@@ -213,6 +223,9 @@ public class ComboUIController : MonoBehaviour
         }
         comboText.text = "You failed the combo :(";
         hidePanel = StartCoroutine(DelayedHide(comboPanel,2f));
+        comboAudio.Stop();
+        comboAudio.clip = comboFail;
+        comboAudio.Play();
     }
 
     public void OnComboCompleted()
@@ -236,6 +249,10 @@ public class ComboUIController : MonoBehaviour
             default:
                 break;
         }
+        comboAudio.pitch = 1;
+        comboAudio.clip = comboSuccess;
+        comboAudio.Play();
+
         hidePanel = StartCoroutine(DelayedHide(comboPanel,2f));
 
     }

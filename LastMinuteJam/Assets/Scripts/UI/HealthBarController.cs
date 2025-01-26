@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Netick;
 using Platformer.Mechanics;
-using NUnit.Framework.Constraints;
 
 public class HealthBarController : MonoBehaviour
 { 
@@ -50,7 +48,7 @@ public class HealthBarController : MonoBehaviour
         }
         newEmptySprite = emptyHealthBars[healthBars.Count];
         newFullSprite = fullHealthBars[healthBars.Count];
-        newHealthBar.Init(isLeft, newIcon, newHurtSprite, newDamagedSprite, newEmptySprite, newFullSprite, newFullSprite);
+        newHealthBar.Init(isLeft, newIcon, newHurtSprite, newDamagedSprite, newEmptySprite, newFullSprite, newFullSprite, player.playerName);
 
         player.health.OnPlayerHurt += newHealthBar.ShowDamage;
         player.health.OnPlayerDamaged += newHealthBar.ShowHealth;
@@ -61,6 +59,42 @@ public class HealthBarController : MonoBehaviour
         
     }
 
+    public void TestNewBar(PlayerData.Character character, Health health)
+    {
+        HealthBarControllerUI newHealthBar = Instantiate(healthBarPrefab, healthBarPositions[healthBars.Count]).GetComponent<HealthBarControllerUI>();
+        Sprite newIcon = JJIcons[0];
+        Sprite newEmptySprite = JJIcons[0];
+        Sprite newFullSprite = JJIcons[0];
+        Sprite newHurtSprite = JJIcons[0];
+        Sprite newDamagedSprite = JJIcons[0];
+        bool isLeft = healthBars.Count == 0; // second character is on right (!isLeft)
+        switch (character)
+        {
+            case PlayerData.Character.JJ:
+                newIcon = JJIcons[healthBars.Count];
+                newHurtSprite = JJHurtIcons[healthBars.Count];
+                newDamagedSprite = JJDamagedIcons[healthBars.Count];
+                break;
+            case PlayerData.Character.Elvira:
+                newIcon = ElviraIcons[healthBars.Count];
+                newHurtSprite = ElviraHurtIcons[healthBars.Count];
+                newDamagedSprite = ElviraDamagedIcons[healthBars.Count];
+                break;
+            default:
+                break;
+        }
+        newEmptySprite = emptyHealthBars[healthBars.Count];
+        newFullSprite = fullHealthBars[healthBars.Count];
+        newHealthBar.Init(isLeft, newIcon, newHurtSprite, newDamagedSprite, newEmptySprite, newFullSprite, newFullSprite, name);
+
+        health.OnPlayerHurt += newHealthBar.ShowDamage;
+        health.OnPlayerDamaged += newHealthBar.ShowHealth;
+
+
+        healthBars.Add(newHealthBar);
+
+
+    }
     /*
     public void ShowDamage(NetworkPlayer networkPlayer, float damage, float health)
     {

@@ -131,6 +131,9 @@ MonoBehaviour:
   emptyHealthBar: {fileID: 9022740687339740650}
   damageHealthBar: {fileID: 357323065465466476}
   playerIcon: {fileID: 5372579944812121608}
+  healthyPlayerIcon: {fileID: 0}
+  hurtPlayerIcon: {fileID: 0}
+  damagedPlayerIcon: {fileID: 0}
   HorizontalLayoutGroup: {fileID: 2485442277863189170}
   playerName: {fileID: 7726647401015200776}
 --- !u!114 &2485442277863189170
@@ -435,8 +438,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -20, y: -127.5798}
+  m_AnchoredPosition: {x: 259.99973, y: 190.36127}
+  m_SizeDelta: {x: 520, y: 131.2723}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3066684602251890990
 CanvasRenderer:
@@ -494,7 +497,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
+  m_fontSize: 32.3
   m_fontSizeBase: 80
   m_fontWeight: 400
   m_enableAutoSizing: 1
