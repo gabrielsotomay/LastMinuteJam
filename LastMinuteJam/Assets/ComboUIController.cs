@@ -39,6 +39,7 @@ public class ComboUIController : MonoBehaviour
     [SerializeField] AudioClip comboFail;
     [SerializeField] AudioClip comboSuccess;
 
+    int lastComboHit = -1;
 
 
     private float offset = 0;
@@ -80,6 +81,7 @@ public class ComboUIController : MonoBehaviour
         StopAllCoroutines();
 
         comboAudio.pitch = 1;
+        lastComboHit = -1;
         comboPanel.SetActive(true);
         foreach (Combo.Input input in combo.sequence)
         {
@@ -128,20 +130,24 @@ public class ComboUIController : MonoBehaviour
     }
     public void OnComboHit(int index)
     {
-        comboPrompts[index].GetComponent<Image>().sprite = GetPressedSprite(combo.sequence[index]);
-        GameObject particleObject = Instantiate(
-        comboDestroyEffectPrefab, comboPrompts[index].transform.position, Quaternion.identity, comboPrompts[index].transform);
-        
-        particleObject.transform.localPosition = Vector3.zero;
-        comboAudio.Stop();
-        comboAudio.pitch += 0.1f;
-        comboAudio.clip = comboFail;
-        comboAudio.Play();
-        UpdatePromptLocations();
-        if (index < combo.sequence.Count)
+        for (int i = lastComboHit+1; i < index + 1 ; i++)
         {
-            StartCoroutine(ArrowFallAnimation(comboPrompts[index]));
+            comboPrompts[i].GetComponent<Image>().sprite = GetPressedSprite(combo.sequence[i]);
+            GameObject particleObject = Instantiate(
+            comboDestroyEffectPrefab, comboPrompts[i].transform.position, Quaternion.identity, comboPrompts[i].transform);
+
+            particleObject.transform.localPosition = Vector3.zero;
+            comboAudio.Stop();
+            comboAudio.pitch += 0.1f;
+            comboAudio.clip = comboHit;
+            comboAudio.Play();
+            UpdatePromptLocations();
+            if (i < combo.sequence.Count)
+            {
+                StartCoroutine(ArrowFallAnimation(comboPrompts[i]));
+            }
         }
+        lastComboHit = index;
     }
 
     Sprite GetFailSprite(Combo.Input input)

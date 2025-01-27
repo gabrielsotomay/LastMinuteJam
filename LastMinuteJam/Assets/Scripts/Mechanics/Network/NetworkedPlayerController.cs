@@ -36,6 +36,7 @@ namespace Platformer.Mechanics
         private Bounds bounds;
         public ComboEffectData comboEffectData;
         List<NetworkAttackController> allAttacks = new ();
+        public PlayerComboController comboController;
 
 
         // Other local scripts
@@ -731,11 +732,18 @@ namespace Platformer.Mechanics
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            if (collision.collider.gameObject.name == "LevelDeathFloor")
+            if (IsServer && collision.collider.gameObject.name == "LevelDeathFloor")
             {
                 Debug.Log("Died on the floor");
-                health.Die();
+                DieRpc();
             }
+        }
+
+        [Rpc(target: RpcPeers.Everyone, localInvoke: true)]
+        private void DieRpc()
+        {
+            health.Die();
+
         }
         public void ClearAttack(int id)
         {

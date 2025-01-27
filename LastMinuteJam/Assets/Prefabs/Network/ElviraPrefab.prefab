@@ -288,6 +288,7 @@ GameObject:
   - component: {fileID: 5437070535002535846}
   - component: {fileID: 5795076534449500483}
   - component: {fileID: -2464111510340329638}
+  - component: {fileID: 2237901733680487108}
   m_Layer: 7
   m_Name: ElviraPrefab
   m_TagString: Player
@@ -506,6 +507,7 @@ MonoBehaviour:
   spriteRenderer: {fileID: 7479734947705083220}
   animator: {fileID: 5956421473153333409}
   comboEffectData: {fileID: 11400000, guid: 44c0bbe334fdaf74aa08fa5fd700cef1, type: 2}
+  comboController: {fileID: 2237901733680487108}
   health: {fileID: 0}
   comboInput: {fileID: 0}
   jumpState: 0
@@ -631,6 +633,22 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -0.2}
   m_Size: {x: 0.5, y: 1}
   m_Direction: 0
+--- !u!114 &2237901733680487108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7142347752014638052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f22bd5678787fc4e80ea57a39d76b52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  comboData: {fileID: 11400000, guid: 685193aaeef8f1e4e8ed3630cb976fa5, type: 2}
+  lastInput: 6
+  requiredInput: 6
+  failable: 0
 --- !u!1 &8913450648949254713
 GameObject:
   m_ObjectHideFlags: 0

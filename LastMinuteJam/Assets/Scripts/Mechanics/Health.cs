@@ -104,6 +104,7 @@ namespace Platformer.Mechanics
         /// </summary>
         public void Die()
         {
+            Debug.Log("Player died");
             OnDeath?.Invoke();
             currentHP = maxHP;
             OnPlayerDamaged?.Invoke(this, new PlayerDamagedEventArgs { newHealth = 1 });
